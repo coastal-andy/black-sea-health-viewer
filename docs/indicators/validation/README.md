@@ -347,3 +347,44 @@ Numbers from the table (generated):
 - `interpretation.md`: the hand-written reading included above (kept separate so the script can re-run).
 
 Needs `matplotlib` in the venv (not yet in `requirements.txt`: add `matplotlib>=3.9`).
+
+
+## Contract for the viewer
+
+Added 2026-11-23 for GitHub issue #2, request 1 (source uncertainty on the Water page "Sources" section and the Methods page). The viewer should read these results through `marinekit.validation` (read-only, no network, paths resolved from the package location) rather than parse the files itself. Column names below are a stable contract: new columns may be added, existing ones are not renamed or removed.
+
+Note: `compare_sources.py` rewrites this README. Until the script appends this section itself, re-add it after a re-run (the module docstring of `src/marinekit/validation.py` holds the same contract).
+
+### Files
+
+- `metrics.csv`, one row per station, variable and pair: `station, variable, pair` ("in situ vs satellite", "in situ vs model", "satellite vs model"), `space` (linear, log10 for chl, z for no3 / po4), `start, end` (ISO dates), `season` (all), `n` (matched days), `mean_ref, mean_other, bias` (other minus reference, i.e. second source minus first), `rmse, ubrmse` (RMSE with the mean bias removed), `r, r2, slope, intercept, std_ref, std_other, std_ratio, spearman, r2_anom` (R² with each source's monthly mean removed), `median_ratio` (chl only, other / in situ in linear units). Units: the variable's unit in linear space, log10 of it for chl, unitless z for nutrients.
+- `metrics_seasonal.csv`: the same metrics split by `season` (DJF, MAM, JJA, SON), without `spearman, r2_anom, median_ratio`.
+- `matched_daily.csv`: `station, variable, date, insitu, satellite, model`, one row per matched day, native units (°C, mg/m³, PSU, mg/L, mmol/m³; chl not log-transformed, nutrients not standardised). Empty cell = no value from that source (no satellite for sal, o2, no3, po4).
+- `inventory.csv`: one row per station, variable and source, with `trust` (good, usable, indicative, not_usable_absolute) for the satellite and model rows.
+
+### Python API (`marinekit.validation`)
+
+| Function | Returns |
+|---|---|
+| `variables()` | variable ids in metrics.csv: sst, chl, sal, o2, no3, po4 |
+| `source_summary(variable)` | dict: `variable, title, unit, error_unit, space, trusted_source` (satellite, model, in situ), `trusted_label, uncertainty` (text), `uncertainty_value, rmse, bias, bias_range, headline_pair, n, stations, confidence` (high, medium, low), `reading` (one plain line), `caveats, pairs, untrusted` (list of source + reason), `basis` (files, start, end, run_date, stations) |
+| `summary_table()` | DataFrame, one row per variable, for the Methods page |
+| `pair_points(variable, station=None)` | DataFrame `station, variable, date, season, insitu, satellite, model` for scatter plots |
+
+- Headline `rmse` and `bias` are pooled over the headline rows (`headline=True` in `pairs`): n-weighted quadratic mean of RMSE and n-weighted mean bias, in `error_unit`. Headline rows: SST in situ vs satellite at the four offshore buoys; chlorophyll satellite vs model at the four buoys (consistency only, log10); salinity in situ vs model at the Constanta bottles; O2 in situ vs model at the four buoys; nutrients: none (`rmse` and `bias` are None, shape only).
+- `pairs` keeps every row, untrusted comparisons included (e.g. buoy chlorophyll), so the viewer can show them labelled; `untrusted` says which sources not to use and why.
+- An unknown variable or station raises `ValueError` with the list of valid ids.
+- All uncertainties are indicative: daily value at a point, a few stations, surface only (nothing on bottom O2).
+
+Example:
+
+```python
+from marinekit import validation as val
+
+s = val.source_summary("sst")
+# s["trusted_label"] -> "Satellite SST (Copernicus L4 analysis)"
+# s["rmse"] -> 0.43 (°C, 5458 buoy days), s["bias"] -> -0.07, s["confidence"] -> "high"
+# s["reading"] -> "Satellite SST is within about 0.45 °C of the offshore buoys on a typical day, ..."
+pts = val.pair_points("sst", station="EUXRoOB01")   # x = insitu, y = satellite or model
+table = val.summary_table()                         # Methods page
+```
