@@ -1505,3 +1505,63 @@ if __name__ == "__main__":
     for nm, (la, lo) in {"Constanta port entrance": (44.150, 28.680), "Mangalia coast": (43.807, 28.600)}.items():
         for d in ("2026-07-15", "2026-01-15"):
             print(f"smoke {nm:24s} {d}: {overlap_at(la, lo, d)}")
+
+
+# --------------------------------------------------------------------------------------------- hover labels (additive)
+_ZERO_BUFFER_LABEL = {
+    "shipping_lane": "AIS density cells, no buffer",
+    "fishing_ground": "AIS fishing density cells, no buffer",
+    "dredging_activity": "AIS dredging density cells, no buffer",
+}
+
+
+def buffer_label(props: dict) -> str:
+    """Plain hover text for one sector_zones feature, e.g. "300 m (law)" or "AIS density cells, no buffer".
+    A 0 m buffer means the zone is the mapped footprint itself (for AIS layers, the density cells)."""
+    try:
+        d = float(props.get("buffer_m"))
+    except (TypeError, ValueError):
+        d = float("nan")
+    basis = str(props.get("buffer_basis") or "").strip()
+    if d == 0:
+        lab = _ZERO_BUFFER_LABEL.get(str(props.get("activity")))
+        if lab is None:
+            lab = ("AIS density cells, no buffer" if "AIS" in str(props.get("basis_ref") or "")
+                   else "mapped footprint, no buffer")
+        return lab
+    if d != d:
+        return "buffer not set"
+    return f"{d:.0f} m ({basis})" if basis else f"{d:.0f} m"
+
+
+def add_buffer_labels(path: Path | None = None) -> int:
+    """Add (or refresh) the property buffer_label on every feature of sector_zones.geojson, in place.
+    Text-level insertion: every existing property, value, coordinate and the line layout stay byte-identical.
+    Run after export_all() (scripts/add_buffer_labels.py). Returns the number of features labelled."""
+    path = Path(path or OUT_DIR / "sector_zones.geojson")
+    txt = path.read_text(encoding="utf-8")
+    dec = json.JSONDecoder()
+    pos = txt.index('"features"')                  # skip the crs block, which has its own "properties"
+    out, n = [txt[:pos]], 0
+    key = '"properties": '
+    while True:
+        i = txt.find(key, pos)
+        if i < 0:
+            break
+        j = i + len(key)
+        props, end = dec.raw_decode(txt, j)
+        body = txt[j:end]
+        lab = json.dumps(buffer_label(props), ensure_ascii=False)
+        if "buffer_label" in props:
+            old = json.dumps(props["buffer_label"], ensure_ascii=False)
+            body = body.replace(f'"buffer_label": {old}', f'"buffer_label": {lab}', 1)
+        else:
+            k = body.rstrip()[:-1].rstrip()          # without the closing brace
+            body = f'{k}, "buffer_label": {lab} }}' if k != "{" else f'{{ "buffer_label": {lab} }}'
+        if "sector" not in props:
+            raise ValueError(f"unexpected properties block without 'sector' in {path}")
+        out.append(txt[pos:j] + body)
+        pos, n = end, n + 1
+    out.append(txt[pos:])
+    path.write_text("".join(out), encoding="utf-8", newline="")
+    return n
