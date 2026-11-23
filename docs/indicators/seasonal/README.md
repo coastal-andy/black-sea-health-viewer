@@ -505,3 +505,42 @@ Other figures: [EUXRoOB01 insitu monthly](figures/fit_EUXRoOB01_o2_insitu_monthl
 - `trends.csv`, `annual_means.csv`: interannual trend and the annual means with completeness and reason.
 - `synthetic_check.csv`: the method check above.
 - Code: `scripts/seasonal/harmonic.py` (aggregate, fit_harmonics, compare_nested, select_periods), `scripts/seasonal/trend.py` (annual_means, linear_trend), `scripts/seasonal/run_seasonal.py` (this report). The functions take a pandas Series and a list of periods and return a dict / DataFrame, ready to move into a marinekit analysis package for a Research page.
+
+## Contract for the viewer
+
+Added 23 Nov 2026 for issue #2, request 2. The fit code now lives in `src/marinekit/seasonal.py`; `scripts/seasonal/harmonic.py` and `trend.py` re-export it unchanged. All thresholds below are **OURS** (see `docs/indicators/SHORTLIST.md`, section "Seasonal cycle and trend gate").
+
+```python
+from marinekit import seasonal as se
+c = se.seasonal_cycle("sst", 43.98, 29.936)                  # dict, source="auto"
+u = se.usual_range("sst", 43.98, 29.936, dates)              # DataFrame fit, lo, hi (+ attrs = the cycle dict)
+t = se.long_term_trend("sst", 43.98, 29.936)                 # dict
+g = se.gate_summary(from_file=True)                          # DataFrame for the Methods page
+```
+
+Variables: `sst` (°C), `chl` (fitted in log10(mg/m³); `usual_range` returns mg/m³), `sal` (PSU), `o2` (mg/L, surface). Sources: `"auto"` or a datahub source id (`satellite`, `model`, `buoy`).
+
+**Every result carries `show` (bool) and `gate_reason` (plain text).** The viewer shows the result when `show` is true, otherwise the reason. `text` is a ready plain-language sentence for either case.
+
+- `seasonal_cycle` keys: `variable, unit, station, distance_km, source, source_label, origin, platform, trust, trust_from, method, window, n, annual, semi_annual, max_date, periods_d, cycles, r2_adj, resid_sd, show, gate_reason, gate_label, thresholds, text`. `annual` and `semi_annual` are `{amplitude, ci, max_date, p_value, period_d}` or `None`. Periods are the 3 strongest significant PSD peaks (`docs/indicators/spectra/peaks.csv`).
+- `usual_range`: mean seasonal cycle of the record (mean + fitted cycles, no trend) and fit ± 1.28 × weekly residual sd (about the p10-p90 band). The columns are filled even when `show` is false; check `u.attrs["show"]`.
+- `long_term_trend` keys: `variable, unit (per decade), station, distance_km, source, source_label, origin, platform, trust, trust_from, slope_per_decade, ci, p_value, n_years, years, enough_years, level ("none" | "indicative" | "climate"), significant, show, gate_reason, gate_label, table, text`. When `show` is false, slope, CI and p are NaN.
+- `gate_summary` columns: `station, variable, source, trust, trust_from, cycle_p, r2_adj, cycle_show, cycle_reason, n_years, trend_level, trend_show, trend_reason, trend_table`. Live it reads trust through about 40 `get_series` calls (1-2 min on a cold cache); `from_file=True` reads the snapshot `gate_summary.csv` (`scripts/seasonal/write_gate_summary.py`).
+
+Where the numbers come from:
+- Within 5 km of a fitted station (EUXRo03, EUXRoOB01-03) the precomputed weekly-mean fits in `cycles.csv` / `models.csv` and the trends in `trends.csv` are used. When two stations are that close (EUXRo03 and EUXRoOB03), the longer record wins.
+- `trends_long.csv` (satellite SST 1982-2025 at the 4 buoy points, `scripts/seasonal/fetch_long_sst.py`) replaces `trends.csv` for SST when present.
+- Elsewhere the fit is done on the fly from cached `datahub.get_series` data (last 10 years, weekly means, periods borrowed from the nearest station); with no cache the result is `show=False` with the reason.
+- Trust is read from `attrs["trust"]` of `datahub.get_series` for that source and station (so per-platform flags in datahub apply automatically). If that read fails, datahub's register is used and `trust_from` says so.
+- `"auto"` follows datahub's source order for the variable and takes the first source whose trust is good or usable (trend: the first with a shown trend).
+
+Gate result with today's data (weekly means; `gate_summary.csv`):
+
+| Variable | Seasonal cycle shown | Trend shown |
+|---|---|---|
+| SST | yes, every station and source (adj R² 0.95-0.99) | satellite 1982-2025: climate trend, +0.56 °C/decade (95 % CI +0.46 to +0.66, p < 0.001); model at EUXRo03: indicative (10 years) |
+| O2 (surface) | yes, buoy (adj R² 0.72-0.96) and model (0.75-0.96) | model at EUXRo03: indicative, not significant; buoys: not enough years yet (1) |
+| Chlorophyll | only satellite at EUXRoOB03 (adj R² 0.71); elsewhere R² too low or buoy / model trust "indicative" | satellite at EUXRo03: indicative, not significant |
+| Salinity | no (adj R² 0.08-0.42; buoy salinity at OB01-03 untrusted) | model at EUXRo03: indicative (9 years) |
+
+So the rule as agreed gives SST and surface O2 for the cycle, not SST alone: O2 has a strong, significant winter-maximum cycle from trusted sources. Trends with 8-19 years are shown only as "indicative".
