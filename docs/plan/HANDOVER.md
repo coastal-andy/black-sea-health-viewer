@@ -56,6 +56,25 @@ Pages:
 
 Streamlit notes for the rebuild: multipage via `st.navigation`, CSS injected with `st.markdown(..., unsafe_allow_html=True)` plus a dark `.streamlit/config.toml` theme, folium `Fullscreen` plugin, details on click via `st.expander` styled flat or a selected-row state. Keep the existing interfaces in `src/viewer/adapters.py` and the `marinekit` contracts unchanged.
 
+### Built (23 Nov 2026, late evening)
+Direction B is built on `design`, in five commits: e4f3bc5 (theme tokens, icon rail, Dark/Light switch), 1779536 (Overview B1), d8d5c6c (Water quality B2), 857a8f6 (Coast and seabed B3, light-theme fixes), 5c495c8 (Pressures B4, sea-state texts, light-mode arrows).
+
+What exists:
+- `src/viewer/app.py` is now only the entry point: page config, theme, `st.navigation` (hidden) and the 72 px rail. The pages are in `views.py` (entry points), `overview.py`, `water.py`, `seabed.py` and `pressures.py`. Methods still uses `screens.methods_screen`.
+- `style.py` holds two token sets (`THEMES["dark"]`, `THEMES["light"]`) and builds all CSS from them (`css(theme, active_page)`). `STATUS` and `ORIGIN` colours follow the theme; `plotly_layout()` themes charts; `table_html()` replaces `st.dataframe`, whose canvas grid ignores the light theme.
+- `shell.py`: the rail, the Dark/Light switch at its bottom (`st.session_state.theme`; `?theme=light` in the URL also works), the place picker, the profile menu, and `keep_widget_state()` so widget values survive page switches.
+- `maps.py`: the basemap matches the theme (Esri dark or light grey canvas, because CARTO tiles now need an API key), the Leaflet controls and legend are themed, zoom and full screen sit top right, the legend can be hidden, and the map fills the page height.
+- Interface addition, backward compatible: in `vectorviz.py`, `field_layer(..., legend_theme=None)` and `legend_html(..., theme=None)` give a themed legend and arrow colours (dark arrows with a white edge in light mode). Without the new arguments the output is unchanged.
+- Checked with `streamlit.testing.v1.AppTest`: every page, both themes, all four profiles, every Water variable and tab, every Seabed field, and every sector with both seasons. The coordinator checked each step in the browser.
+
+Known gaps:
+- The Overview timeline covers the last 7 days, today and 5 forecast days, with no play button. The old year-long date slider is gone.
+- Water clarity: the list shows the card's estimated see-through depth (m), while the chart shows Kd490 (1/m). Kd490 has too few complete years for a trend.
+- The depth profile is raw EMODnet REST data and has one spike at about 125 km. The wave legend shows the model hour, while the panel values are for 12:00.
+- Windows narrower than about 750 px are not designed for: columns stay side by side, with the panel at a 280 px minimum.
+- `screens.sectors_screen` and the old cards grid in `panels.cards_view` are no longer used by the pages. They are left in place.
+- No `marinekit` changes were needed.
+
 ## Decisions already made (don't reopen)
 - Pressure map = plain count of overlapping sectors (0-5); no weights or index. Tourism zones only 1 Jun-15 Sep.
 - One buffer per activity (law or literature where possible, else a stated rule).
