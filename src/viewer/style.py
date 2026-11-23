@@ -232,6 +232,7 @@ div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}
 .bsv-rv {{font-family:{FONT_NUM}; font-size:22px; font-weight:500; white-space:nowrap; color:{t['text']};}}
 .bsv-chev {{display:flex; align-items:center; align-self:center; color:{t['muted']};}}
 .bsv-rl {{font-size:12.5px; line-height:1.35; color:{t['sub']}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}}
+.bsv-row.open .bsv-rl {{display:block; -webkit-line-clamp:unset; line-clamp:unset; overflow:visible;}}
 .bsv-ro {{font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:{t['muted']}; text-align:right; white-space:nowrap;}}
 [class*="st-key-cbtn_"] {{position:absolute !important; inset:0; width:100% !important; max-width:none !important;
   height:100% !important; z-index:3; margin:0 !important;}}

@@ -490,22 +490,61 @@ def obs_vs_model(obs: pd.Series, mod: pd.Series) -> dict | None:
 # ------------------------------------------------------------------------------------------ gridded layers
 LAYERS = {
     "sst": dict(title="Sea surface temperature", key="sst_l4_nrt_hr", var="analysed_sst", unit="°C", origin="satellite",
-                cmap="plasma", fallback_key="sst_l4_nrt"),
+                cmap="cmo.thermal", fallback_key="sst_l4_nrt", tile_offset=273.15),
     "sst_anom": dict(title="Sea temperature anomaly", key="sst_anom_nrt", var="sst_anomaly", unit="°C",
-                     origin="satellite", cmap="RdBu_r", diverging=True),
+                     origin="satellite", cmap="cmo.balance", diverging=True),
     "chl": dict(title="Chlorophyll-a (algae)", key="sat_chl_l4_nrt", var="CHL", unit="mg/m³", origin="satellite",
-                cmap="viridis", log=True),
+                cmap="cmo.algae", log=True),
     "kd490": dict(title="Water clarity (Kd490)", key="sat_kd490_nrt", var="KD490", unit="1/m", origin="satellite",
-                  cmap="cividis_r", log=True, note="Gaps are clouds: this satellite layer is not gap-filled."),
+                  cmap="cmo.deep", log=True, note="Gaps are clouds: this satellite layer is not gap-filled."),
     "model_temp": dict(title="Model water temperature (surface)", key="phy_temp", var="thetao", unit="°C",
-                       origin="model", cmap="plasma"),
-    "o2": dict(title="Model oxygen (surface)", key="bgc_o2", var="o2", unit="mg/L", origin="model", cmap="YlGnBu",
+                       origin="model", cmap="cmo.thermal"),
+    "o2": dict(title="Model oxygen (surface)", key="bgc_o2", var="o2", unit="mg/L", origin="model", cmap="cmo.oxy",
                factor=O2_MMOL_TO_MGL),
     "o2_bottom": dict(title="Model oxygen near the seabed", key="bgc_o2", var="o2b", unit="mg/L", origin="model",
-                      cmap="RdYlBu", factor=O2_MMOL_TO_MGL, vrange=(0, 12),
+                      cmap="cmo.oxy", factor=O2_MMOL_TO_MGL, vrange=(0, 12),
                       note="Below about 150 m the Black Sea has no oxygen at all (natural, permanent). Red offshore is "
                            "that deep water, not pollution. Model bottom oxygen near the coast is indicative only."),
 }
+
+
+def colormap(name: str):
+    """A matplotlib colormap. 'cmo.<name>' = the cmocean ramp (exact stops, taken from plotly's copy of cmocean)."""
+    import matplotlib
+    if name.startswith("cmo."):
+        from matplotlib.colors import LinearSegmentedColormap
+        from plotly.colors import cmocean
+        stops = getattr(cmocean, name[4:])
+        rgb = [tuple(int(v) / 255 for v in c[c.index("(") + 1:-1].split(",")) for c in stops]
+        return LinearSegmentedColormap.from_list(name, rgb, N=256)
+    return matplotlib.colormaps[name]
+
+
+def nice_ticks(vmin: float, vmax: float, log: bool = False, diverging: bool = False) -> tuple[float, float, list]:
+    """Round the range out to round numbers and return (vmin, vmax, ticks) with 3-6 round ticks."""
+    if log:
+        steps = [b * 10.0 ** e for e in range(-3, 4) for b in (1, 2, 5)]
+        lo = max([x for x in steps if x <= vmin] or [steps[0]])
+        hi = min([x for x in steps if x >= vmax] or [steps[-1]])
+        ticks = [x for x in steps if lo <= x <= hi]
+        while len(ticks) > 6:
+            ticks = ticks[::2] if ticks[-1] in ticks[::2] else [ticks[0]] + ticks[2::2]
+        return lo, hi, ticks
+    def nice(x):  # smallest of 1, 2, 2.5, 5 x 10^k that is >= x
+        mag = 10 ** np.floor(np.log10(x))
+        return min((b * mag for b in (1, 2, 2.5, 5, 10) if b * mag >= x * (1 - 1e-9)), default=10 * mag)
+
+    if diverging:
+        m = max(abs(vmin), abs(vmax)) or 1.0
+        vmin, vmax = -m, m
+    span = (vmax - vmin) or 1.0
+    fine, tstep = nice(span / 10), nice(span / 4)  # range ends on a fine step, ticks on a coarser one
+    lo, hi = np.floor(vmin / fine + 1e-9) * fine, np.ceil(vmax / fine - 1e-9) * fine
+    if diverging:
+        hi = max(abs(lo), abs(hi))
+        lo = -hi
+    ticks = [round(float(x), 6) for x in np.arange(np.ceil(lo / tstep - 1e-9) * tstep, hi + tstep * 1e-6, tstep)]
+    return round(float(lo), 6), round(float(hi), 6), ticks
 
 
 @st.cache_data(ttl=6 * 3600, show_spinner=False, max_entries=64)
@@ -544,7 +583,11 @@ def field(layer: str, day: str) -> dict | None:
         vmin, vmax = -m, m
     else:
         vmin, vmax = (float(x) for x in np.nanpercentile(finite, [2, 98]))
-    cm = matplotlib.colormaps[L["cmap"]]
+    if L.get("vrange"):
+        ticks = [float(x) for x in np.linspace(vmin, vmax, 5)]
+    else:  # round range and ticks, so the legend reads cleanly and matches what is drawn
+        vmin, vmax, ticks = nice_ticks(vmin, vmax, log=bool(L.get("log")), diverging=bool(L.get("diverging")))
+    cm = colormap(L["cmap"])
     if L.get("log"):
         lo, hi = np.log10(max(vmin, 1e-3)), np.log10(max(vmax, 1e-3) * 1.0001)
         norm = (np.log10(np.clip(vals, 1e-3, None)) - lo) / (hi - lo)
@@ -555,10 +598,11 @@ def field(layer: str, day: str) -> dict | None:
     dlat = abs(float(lats[0] - lats[1])) / 2 if len(lats) > 1 else 0
     dlon = abs(float(lons[1] - lons[0])) / 2 if len(lons) > 1 else 0
     t = pd.Timestamp(da.time.values[0]) if "time" in da.coords and da.time.size else pd.Timestamp(day)
-    colors = [matplotlib.colors.to_hex(cm(x)) for x in np.linspace(0, 1, 7)]
+    colors = [matplotlib.colors.to_hex(cm(x)) for x in np.linspace(0, 1, 11)]
     return dict(rgba=(rgba * 255).astype(np.uint8), bounds=[[float(lats.min()) - dlat, float(lons.min()) - dlon],
                                                             [float(lats.max()) + dlat, float(lons.max()) + dlon]],
-                vmin=vmin, vmax=vmax, unit=L["unit"], colors=colors, log=bool(L.get("log")), title=L["title"],
+                vmin=vmin, vmax=vmax, ticks=ticks, unit=L["unit"], colors=colors, log=bool(L.get("log")),
+                title=L["title"], cmap=L["cmap"],
                 time=str(t.date()), dataset=da.attrs.get("dataset", ""), key=used_key, origin=L["origin"],
                 values=vals, lats=lats, lons=lons)
 
@@ -572,6 +616,25 @@ def tile_url(layer: str, day: str) -> str | None:
             continue
         try:
             return cp.wmts_tile_url(key, L["var"], time=day)
+        except Exception as ex:
+            log.info("wmts %s: %s", key, ex)
+    return None
+
+
+def tile_url_styled(layer: str, day: str, vmin: float, vmax: float) -> str | None:
+    """Copernicus WMTS tiles drawn with the viewer's ramp and range (STYLE=cmap:<name>,range:a/b in the
+    product's own units, e.g. kelvin for satellite SST). None if the layer has no WMTS tiles."""
+    from marinekit.sources import copernicus as cp
+    L = LAYERS[layer]
+    name = L["cmap"][4:] if L["cmap"].startswith("cmo.") else "thermal"
+    off, fac = L.get("tile_offset", 0.0), L.get("factor", 1.0)
+    a, b = vmin / fac + off, vmax / fac + off
+    style = f"cmap:{name},range:{a:.6g}/{b:.6g}" + (",logScale" if L.get("log") else "")
+    for key in [L["key"], L.get("fallback_key")]:
+        if not key:
+            continue
+        try:
+            return cp.wmts_tile_url(key, L["var"], time=day, style=style)
         except Exception as ex:
             log.info("wmts %s: %s", key, ex)
     return None

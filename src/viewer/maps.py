@@ -59,6 +59,7 @@ def base_map(lat, lon, zoom, theme: str | None = None) -> folium.Map:
     m.get_root().header.add_child(folium.Element(
         f"<style>html,body{{background:{t['bg']};}} .folium-map,#map_div{{height:100vh !important;}}"
         f".leaflet-container{{background:{t['bg']};font-family:{FONT_UI};}}"
+        "details.bsv-legend[open] .lg-closed,details.bsv-legend:not([open]) .lg-open{display:none;}"
         f".leaflet-bar a,.leaflet-control-layers{{background:{t['overlay']} !important;color:{t['text']} !important;"
         f"border-color:{t['ctrl']} !important;border-radius:4px !important;}}"
         f".leaflet-bar{{border:1px solid {t['ctrl']} !important;border-radius:4px !important;box-shadow:none !important;}}"
@@ -99,6 +100,88 @@ def add_field(m, fd: dict, opacity: float = 0.85):
 def add_tiles(m, url: str, title: str, opacity: float = 0.8):
     folium.TileLayer(tiles=url, attr="Copernicus Marine Service", name=title, overlay=True, opacity=opacity,
                      max_native_zoom=9, max_zoom=16).add_to(m)
+
+
+# one fold control per legend; its label follows the state (CSS in base_map)
+LEGEND_SUMMARY = "<span class='lg-open'>Hide legend</span><span class='lg-closed'>Legend</span>"
+FIELD_ALPHA = 0.82  # alpha of the gridded image (adapters.field); the legend bar uses the same overall opacity
+
+
+def _tiles(m, lay, day, opacity, msgs):
+    """Copernicus WMTS tiles. If the grid is in the cache, the tiles get the viewer's ramp and range (and the legend
+    matches); otherwise they keep the service's own colours and the legend says so. Returns a legend dict or None."""
+    L = A.LAYERS[lay]
+    try:
+        fd = A.timed(A.field, lay, day, timeout=4)
+    except Exception:
+        fd = None
+    url = A.tile_url_styled(lay, day, fd["vmin"], fd["vmax"]) if fd else A.tile_url(lay, day)
+    if not url:
+        msgs.append(f"{L['title']}: no map tiles available.")
+        return None
+    add_tiles(m, url, L["title"], opacity=opacity)
+    if fd:
+        return dict(fd, origin=f"{fd['origin']}, Copernicus map tiles")
+    return dict(title=L["title"], unit=L["unit"], origin=L["origin"], service_colours=True, time=day)
+
+
+DEPTH_STOPS = [0, 10, 20, 50, 100, 200, 500, 1000, 2200]  # m; the shelf gets most of the ramp
+
+
+def _depth_colours() -> list[str]:
+    import matplotlib
+    cm = A.colormap("cmo.deep")
+    return [matplotlib.colors.to_hex(cm(i / (len(DEPTH_STOPS) - 1))) for i in range(len(DEPTH_STOPS))]
+
+
+def add_bathy_colour(m):
+    """EMODnet DTM mean depth drawn with the cmocean 'deep' ramp (sent to the EMODnet GeoServer as SLD_BODY):
+    piecewise linear between DEPTH_STOPS, land transparent. depth_legend_html() draws the same stops."""
+    try:
+        from marinekit.sources import emodnet_layers as el
+        d = el.wms_tile_layer("bathymetry_colour")
+        cols = _depth_colours()
+        entries = '<ColorMapEntry color="#000000" quantity="0.1" opacity="0"/>' + "".join(
+            f'<ColorMapEntry color="{c}" quantity="{-z}" opacity="1"/>' for z, c in zip(DEPTH_STOPS, cols))
+        entries = "".join(sorted(entries.replace("/>", "/>|").split("|")[:-1],
+                                 key=lambda e: float(e.split('quantity="')[1].split('"')[0])))
+        sld = ('<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" '
+               'xmlns:ogc="http://www.opengis.net/ogc"><NamedLayer><Name>emodnet:mean</Name><UserStyle>'
+               '<FeatureTypeStyle><Rule><RasterSymbolizer><ColorMap type="ramp">' + entries +
+               '</ColorMap></RasterSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer>'
+               '</StyledLayerDescriptor>')
+        w = folium.raster_layers.WmsTileLayer(url=d["url"], layers="emodnet:mean", fmt="image/png", transparent=True,
+                                              attr=d["attr"], name="Depth (EMODnet DTM)", overlay=True, opacity=0.85,
+                                              version=d["version"])
+        w.options["SLD_BODY"] = sld  # set directly: folium would rename the keyword to 'sldBody'
+        w.add_to(m)
+    except Exception as ex:
+        log.info("bathy colour: %s", ex)
+
+
+def depth_legend_html() -> str:
+    """Legend for add_bathy_colour: the same stops, evenly spaced (the ramp is linear between them)."""
+    t = tokens()
+    cols = _depth_colours()
+    n = len(DEPTH_STOPS) - 1
+    grad = ", ".join(f"{c} {100 * i / n:.1f}%" for i, c in enumerate(cols))
+    show = {0, 20, 100, 200, 2200}
+    ticks = "".join(
+        f"<span style='position:absolute;left:{100 * i / n:.1f}%;transform:translateX("
+        f"{'0' if i == 0 else ('-100%' if i == n else '-50%')})'>{z}</span>"
+        for i, z in enumerate(DEPTH_STOPS) if z in show)
+    return (f"<details open class='bsv-legend' style='position:absolute;bottom:26px;right:10px;z-index:9999;"
+            f"background:{t['overlay']};color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;"
+            f"border:1px solid {t['ctrl']};font:12px/1.35 {FONT_UI};max-width:250px'>"
+            f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"
+            f"color:{t['muted']}'>{LEGEND_SUMMARY}</summary>"
+            f"<span style='display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']};"
+            "margin:8px 0 4px 0'>Depth, m &middot; EMODnet DTM</span>"
+            f"<div style='height:8px;width:220px;background:linear-gradient(to right,{grad});opacity:0.85'></div>"
+            f"<div style='position:relative;height:16px;width:220px;font-family:{FONT_NUM};font-size:12.5px;"
+            f"margin-top:2px'>{ticks}</div>"
+            f"<div style='font-size:10.5px;color:{t['muted']}'>Scale stretched for the shelf (0-200 m). Lines: "
+            "depth contours. Needs the internet (EMODnet map service).</div></details>")
 
 
 def add_bathy(m):
@@ -250,7 +333,7 @@ def _fmt(x):
 
 
 def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels: list | None = None,
-                hatched: bool = False) -> str:
+                hatched: bool = False, bar_opacity: float = 1.0) -> str:
     """Compact themed legend (flat panel, hairline border, 4 px corners), collapsible and height-capped."""
     t = tokens()
     lab = (f"font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']};"
@@ -258,14 +341,30 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
     num = f"font-family:{FONT_NUM};font-size:12.5px"
     row = "display:flex;align-items:center;gap:7px;margin:2px 0"
     parts = []
-    if fd:
+    if fd and fd.get("service_colours"):
+        parts.append(f"<span style='{lab};margin-top:2px'>{esc(fd['title'])} {esc(fd['unit'])} &middot; "
+                     f"{esc(fd['origin'])}</span><div style='font-size:11px;max-width:220px'>Copernicus map tiles in the "
+                     "service's own colours and range (the grid is not in the cache, so the viewer cannot set them).</div>")
+    elif fd:
         grad = ", ".join(fd["colors"])
-        ticks = "".join(f"<span>{_fmt(x)}</span>" for x in _ticks(fd))
+        vmin, vmax = fd["vmin"], fd["vmax"]
+
+        def frac(x):
+            if fd["log"]:
+                return (np.log10(x) - np.log10(vmin)) / (np.log10(vmax) - np.log10(vmin))
+            return (x - vmin) / (vmax - vmin)
+        ticks = "".join(
+            f"<span style='position:absolute;left:{100 * frac(x):.2f}%;transform:translateX("
+            f"{'0' if frac(x) < 0.02 else ('-100%' if frac(x) > 0.98 else '-50%')})'>{_fmt(x)}</span>"
+            for x in (fd.get("ticks") or _ticks(fd)) if vmin <= x <= vmax)
+        marks = "".join(f"<span style='position:absolute;left:{100 * frac(x):.2f}%;top:0;width:1px;height:4px;"
+                        f"background:{t['muted']}'></span>" for x in (fd.get("ticks") or []) if vmin <= x <= vmax)
         src = f"{fd['origin']}, {fd['time']}" + (f", {fd['dataset']}" if detail else "") + (", log scale" if fd["log"] else "")
         parts.append(
-            f"<span style='{lab};margin-top:2px'>{esc(fd['title'])} {esc(fd['unit'])} &middot; {esc(fd['origin'])}</span>"
-            f"<div style='height:6px;width:200px;background:linear-gradient(to right,{grad})'></div>"
-            f"<div style='display:flex;justify-content:space-between;width:200px;{num};margin-top:2px'>{ticks}</div>"
+            f"<span style='{lab};margin-top:2px'>{esc(fd['title'])} {esc(fd['unit'])}</span>"
+            f"<div style='height:8px;width:200px;background:linear-gradient(to right,{grad});opacity:{bar_opacity:.2f}'></div>"
+            f"<div style='position:relative;height:4px;width:200px'>{marks}</div>"
+            f"<div style='position:relative;height:16px;width:200px;{num}'>{ticks}</div>"
             f"<div style='font-size:10.5px;color:{t['muted']}'>{esc(src)}</div>")
     if "overlap" in layers:
         lv = overlap_levels()
@@ -305,28 +404,25 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
             f"background:{t['overlay']};color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;"
             f"border:1px solid {t['ctrl']};font:12px/1.35 {FONT_UI};max-width:250px'>"
             f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"
-            f"color:{t['muted']}'>Legend</summary>"
+            f"color:{t['muted']}'>{LEGEND_SUMMARY}</summary>"
             "<div style='max-height:min(46vh,330px);overflow-y:auto'>" + "".join(parts) + "</div></details>")
 
 
 def build(view: dict, layers: set, day: str, season: str, sel: dict | None, detail: bool, tiles_mode: bool = False,
           only_sector: str | None = None, theme: str | None = None,
-          legend: bool = True) -> tuple[folium.Map, dict | None, list[str]]:
-    """Return (map, field dict or None, messages)."""
+          legend: bool = True, extra=None) -> tuple[folium.Map, dict | None, list[str]]:
+    """Return (map, field dict or None, messages). extra(m), if given, adds page-specific layers."""
     msgs = []
     m = base_map(view["lat"], view["lon"], view["zoom"], theme)
     stamp = A._zones_stamp()
-    fd = None
+    fd = lfd = None
+    grid_op = 0.85
     grid = [l for l in layers if l in GRIDDED]
     if grid:
         lay = grid[0]
         grid_op = 0.45 if "overlap" in layers else 0.85
         if tiles_mode:
-            url = A.tile_url(lay, day)
-            if url:
-                add_tiles(m, url, A.LAYERS[lay]["title"], opacity=grid_op)
-            else:
-                msgs.append(f"{A.LAYERS[lay]['title']}: no map tiles available.")
+            lfd = _tiles(m, lay, day, grid_op, msgs)
         else:
             try:
                 fd = A.field(lay, day)
@@ -340,13 +436,13 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
                 if fd["time"] != day:
                     msgs.append(f"{fd['title']}: nearest available day is {fd['time']}.")
             else:
-                url = A.tile_url(lay, day)
-                if url:
-                    add_tiles(m, url, A.LAYERS[lay]["title"])
-                    msgs.append(f"{A.LAYERS[lay]['title']}: the grid could not be downloaded, showing Copernicus map tiles instead (online only).")
-                else:
-                    msgs.append(f"{A.LAYERS[lay]['title']}: no data for {day}.")
-    if "bathy" in layers:
+                lfd = _tiles(m, lay, day, grid_op, msgs)
+                if lfd is not None:
+                    msgs.append(f"{A.LAYERS[lay]['title']}: the grid could not be downloaded, showing Copernicus map tiles "
+                                "instead (online only).")
+    if "bathy_colour" in layers:
+        add_bathy_colour(m)
+    if "bathy" in layers or "bathy_colour" in layers:
         add_bathy(m)
     levels = None
     if "overlap" in layers:
@@ -376,7 +472,10 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
     if "insitu" in layers:
         add_platforms(m, A.platforms(), detail)
     add_selection(m, sel)
-    lg = legend_html(fd, layers, season, detail, levels, hatched=bool(grid)) if legend else ""
+    if extra is not None:  # page-specific layers go in before the layer control, or folium never adds them
+        extra(m)
+    lg = legend_html(fd or lfd, layers, season, detail, levels, hatched=bool(grid),
+                     bar_opacity=FIELD_ALPHA * grid_op) if legend else ""
     if lg:
         m.get_root().html.add_child(folium.Element(lg))
     folium.LayerControl(collapsed=True, position="topright").add_to(m)

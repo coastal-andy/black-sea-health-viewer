@@ -17,7 +17,7 @@ from viewer import shell as SH
 from viewer.style import esc, plotly_layout, theme_name, tokens
 
 FIELDS = {"waves": "Waves", "currents": "Currents", "wind": "Wind", "depth": "Depth"}
-LAYER = {"waves": "vec_waves", "currents": "vec_currents", "wind": "vec_wind", "depth": None}
+LAYER = {"waves": "vec_waves", "currents": "vec_currents", "wind": "vec_wind", "depth": "bathy_colour"}
 def _sea_word(h):
     """WMO sea-state words for significant wave height (m)."""
     for lim, w in ((0.1, "calm"), (0.5, "smooth"), (1.25, "slight"), (2.5, "moderate"), (4.0, "rough"), (6.0, "very rough")):
@@ -243,10 +243,11 @@ def page():
                 SH.place_picker()
                 st.segmented_control("Field", list(FIELDS), key="w_field", format_func=FIELDS.get, required=True,
                                      label_visibility="collapsed", width="stretch")
-            m, fd, msgs = M.build(ss.view, {LAYER[field]} if LAYER[field] else set(), day_s, season, None, detail, theme=theme_name(),
-                                  legend=True)
-            if field == "depth":
-                _add_depth(m)
+            extra = {"depth": _depth_legend, "wind": lambda mm: _wind_labels(mm, day_s, msgs_extra)}.get(field)
+            msgs_extra = []
+            m, fd, msgs = M.build(ss.view, {LAYER[field]}, day_s, season, None, detail, theme=theme_name(),
+                                  legend=True, extra=extra)
+            msgs = msgs + msgs_extra
             fg = __import__("folium").FeatureGroup(name="Selection")
             M.add_selection(fg, sel)
             out = st_folium(m, height=640, use_container_width=True,
@@ -287,26 +288,38 @@ def sea_panel(sel, day_s, profile):
         SH.profile_menu()
 
 
-def _add_depth(m):
-    """EMODnet DTM in colour (sea only) under the depth contours, with the service's own legend graphic."""
+def _depth_legend(m):
+    """The depth colour layer comes from maps.build ('bathy_colour'); this adds its matching legend."""
+    import folium
+    m.get_root().html.add_child(folium.Element(M.depth_legend_html()))
+
+
+def _wind_labels(m, day, msgs):
+    """Wind has no gridded source in vectorviz (Open-Meteo reference points only): label each point with its speed,
+    so the few points are easy to read, and say why there is no field."""
     import folium
     t = tokens()
+    vv = _vv()
     try:
-        from marinekit.sources import emodnet_layers as el
-        d = el.wms_tile_layer("bathymetry_colour")
-        folium.raster_layers.WmsTileLayer(url=d["url"], layers=d["layers"], fmt="image/png", transparent=True,
-                                          attr=d["attr"], name="Depth (EMODnet DTM)", overlay=True, opacity=0.8,
-                                          version=d["version"]).add_to(m)
-        M.add_bathy(m)  # depth contours on top
-        lg = (f"{d['url']}?service=WMS&version=1.1.1&request=GetLegendGraphic&format=image/png&layer={d['layers']}"
-              "&legend_options=fontAntiAliasing:true;fontSize:10")
-    except Exception:
+        ds = vv.load_field("wind", A.BBOX_RO, day)
+    except Exception as ex:
+        msgs.append(f"Wind not available: vectorviz.load_field('wind') failed ({str(ex)[:100]}).")
         return
-    m.get_root().html.add_child(folium.Element(
-        f"<details open class='bsv-legend' style='position:absolute;bottom:26px;right:10px;z-index:9999;background:{t['overlay']};"
-        f"color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;border:1px solid {t['ctrl']};"
-        f"font:12px/1.35 sans-serif;max-height:46vh;overflow:auto'>"
-        f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"
-        f"color:{t['muted']}'>Depth, m &middot; EMODnet</summary>"
-        f"<img src='{lg}' alt='Depth colour scale' style='display:block;margin-top:6px;background:#fff;padding:4px;"
-        "max-height:40vh'></details>"))
+    if "time" in ds.dims:
+        ds = ds.isel(time=0)
+    n = 0
+    for i in range(ds.sizes.get("station", 0)):
+        sp, frm = float(ds.wind_speed.values[i]), float(ds.wind_dir.values[i])
+        if not np.isfinite(sp):
+            continue
+        n += 1
+        folium.Marker([float(ds.lat.values[i]), float(ds.lon.values[i])], icon=folium.DivIcon(
+            icon_size=(110, 20), icon_anchor=(-18, 10),
+            html=f"<div style='font:600 12px sans-serif;color:{t['text']};background:{t['overlay']};"
+                 f"border:1px solid {t['ctrl']};border-radius:4px;padding:1px 6px;white-space:nowrap;"
+                 f"display:inline-block'>{sp:.1f} m/s from {_compass(frm)}</div>")).add_to(m)
+    msgs.append(f"Wind: model values at {n} reference points (Open-Meteo). There is no gridded wind field, so the "
+                "map shows points, not a coloured field." if n else
+                "Wind not available here: Open-Meteo returned no values (offline and not in the cache?).")
+
+

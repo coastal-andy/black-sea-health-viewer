@@ -211,13 +211,9 @@ def timeline_days() -> list:
     return [today + pd.Timedelta(days=d) for d in range(-6, 6)]
 
 
-def _toggle_legend():
-    ss = st.session_state
-    ss.w_legend = not ss.get("w_legend", True)
-
-
 def timeline():
-    """Last 7 days, today, forecast +5: one date for the map, the cards and the season."""
+    """Last 7 days, today, forecast +5: one date for the map, the cards and the season. The map legend folds
+    from its own control on the map."""
     ss = st.session_state
     days = timeline_days()
     today = A.today().date()
@@ -241,4 +237,3 @@ def timeline():
                                                                       (" (forecast)" if d > today else "")))
             st.markdown(f"<div class='bsv-tl-labels' style='--fc:{fc_left:.1f}%'>{''.join(labels)}</div>",
                         unsafe_allow_html=True)
-        st.button("Hide legend" if ss.get("w_legend", True) else "Legend", key="legend_btn", on_click=_toggle_legend)
