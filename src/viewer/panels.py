@@ -287,16 +287,24 @@ def vector_view(sel, profile):
     if not dfs:
         return
     try:
-        if len(dfs) > 1 and hasattr(vv, "combined_chart"):
-            fig = plotly_layout(vv.combined_chart(dfs, theme=theme_name()))
-        else:
-            k, df = next(iter(dfs.items()))
-            fig = plotly_layout(vv.point_chart(df, k, theme=theme_name()))
+        fig = _vec_fig(tuple(dfs), round(sel["lat"], 3), round(sel["lon"], 3), str(start.date()), str(end.date()),
+                       theme_name())
         st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
         st.caption("Arrows point where the water or air is going (up = north). For waves, a longer arrow means a "
                    "longer wave period (swell). The dashed line marks today; later values are forecast.")
     except Exception as ex:
         st.warning(f"Could not draw the chart: {str(ex)[:200]}")
+
+
+@st.cache_data(ttl=3 * 3600, show_spinner=False, max_entries=64)
+def _vec_fig(kinds, lat, lon, start, end, theme):
+    """The waves / currents / wind chart, cached: drawing the arrows costs about 1 s per figure."""
+    vv = A.vectorviz()
+    dfs = {k: _vec_point(k, lat, lon, start, end) for k in kinds}
+    if len(dfs) > 1 and hasattr(vv, "combined_chart"):
+        return plotly_layout(vv.combined_chart(dfs, theme=theme))
+    k, df = next(iter(dfs.items()))
+    return plotly_layout(vv.point_chart(df, k, theme=theme))
 
 
 @st.cache_data(ttl=3 * 3600, show_spinner=False)

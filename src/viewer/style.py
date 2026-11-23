@@ -120,12 +120,12 @@ def css(name: str | None = None, active: str = "overview") -> str:
 :root {{--bsv-bg:{t['bg']}; --bsv-panel:{t['panel']}; --bsv-rail:{t['rail']}; --bsv-line:{t['line']};
   --bsv-line2:{t['line2']}; --bsv-text:{t['text']}; --bsv-muted:{t['muted']}; --bsv-accent:{t['accent']};}}
 html, body, .stApp, [data-testid="stAppViewContainer"] {{background:{t['bg']} !important; color:{t['text']};}}
-.stApp, .stApp p, .stApp li, .stApp label, .stApp input, .stApp textarea, .stApp button, .stApp select,
-.stApp [data-testid="stMarkdownContainer"], .stApp [data-baseweb] {{font-family:{FONT_UI};}}
+.stApp, .stApp p, .stApp li, .stApp label, input, textarea, button, .stApp select,
+[data-testid="stMarkdownContainer"], [data-baseweb] {{font-family:{FONT_UI};}}
 .stApp {{font-variant-numeric: tabular-nums;}}
 .stApp h1, .stApp h2, .stApp h3, .stApp h4 {{font-family:{FONT_NUM}; font-weight:500; color:{t['text']}; letter-spacing:0.2px;}}
 .stApp a {{color:{t['accent']};}} .stApp a:hover {{color:{t['accent_hi']};}}
-.stApp p, .stApp li, .stApp label, .stApp [data-testid="stMarkdownContainer"] {{color:{t['text']};}}
+.stApp p, .stApp li, .stApp label, [data-testid="stMarkdownContainer"] {{color:{t['text']};}}
 [data-testid="stCaptionContainer"], .stApp small {{color:{t['muted']} !important;}}
 hr {{border-color:{t['line']} !important;}}
 
@@ -147,7 +147,13 @@ section[data-testid="stSidebar"] div[style*="cursor: col-resize"], section[data-
 [data-testid="stSidebarContent"] {{padding:0 !important; overflow:hidden !important;}}
 [data-testid="stSidebarUserContent"] {{padding:10px 0 0 0 !important; width:72px;}}
 [data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"] {{gap:2px;}}
-.bsv-logo {{height:52px; display:flex; align-items:center; justify-content:center;}}
+.st-key-logo_block {{height:64px; min-height:64px; flex:0 0 64px; margin:0 0 10px 0; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;}}
+.st-key-logo_block [data-testid="stElementContainer"], .st-key-logo_block [data-testid="stMarkdown"] {{margin:0 !important; height:52px;}}
+.st-key-logo_block [data-testid="stMarkdownContainer"] {{margin:0 !important;}}
+.bsv-logo {{height:52px; width:72px; display:flex; align-items:center; justify-content:center;}}
+[class*="st-key-rail_"] {{height:64px; min-height:64px; flex:0 0 64px; overflow:hidden;}}
+[class*="st-key-rail_"] [data-testid="stElementContainer"], [class*="st-key-rail_"] [data-testid="stPageLink"] {{margin:0 !important; height:64px;}}
 [class*="st-key-rail_"] a[data-testid="stPageLink-NavLink"] {{height:64px; width:72px; margin:0; padding:0; border-radius:0;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; text-decoration:none;
   background:transparent;}}
@@ -358,30 +364,30 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .st-key-legend_btn button p {{font-size:12px !important; letter-spacing:1px; text-transform:uppercase; color:{t['soft']} !important;}}
 
 /* native widgets: flat, 4 px corners, theme colours (light theme overrides the dark config theme) */
-.stApp [data-baseweb="select"] > div, .stApp [data-baseweb="input"], .stApp [data-baseweb="input"] > div,
-.stApp input, .stApp textarea, .stApp [data-baseweb="textarea"] {{background:{t['panel']} !important; color:{t['text']} !important;
+[data-baseweb="select"] > div, [data-baseweb="input"], [data-baseweb="input"] > div,
+input, textarea, [data-baseweb="textarea"] {{background:{t['panel']} !important; color:{t['text']} !important;
   border-color:{t['ctrl']} !important; border-radius:4px !important;}}
-.stApp [data-baseweb="select"] svg {{fill:{t['muted']};}}
-.stApp [data-testid="stSelectbox"] [role="group"], .stApp [data-testid="stMultiSelect"] [role="group"],
-.stApp [data-testid="stDateInput"] [role="group"], .stApp [data-testid="stNumberInput"] [role="group"] {{background:{t['panel']} !important;
+[data-baseweb="select"] svg {{fill:{t['muted']};}}
+[data-testid="stSelectbox"] [role="group"], [data-testid="stMultiSelect"] [role="group"],
+[data-testid="stDateInput"] [role="group"], [data-testid="stNumberInput"] [role="group"] {{background:{t['panel']} !important;
   border-color:{t['ctrl']} !important; border-radius:4px !important;}}
-.stApp [role="combobox"], .stApp [role="combobox"]::placeholder {{color:{t['text']} !important; background:transparent !important;}}
-.stApp [role="combobox"]::placeholder {{color:{t['muted']} !important;}}
+[role="combobox"], [role="combobox"]::placeholder {{color:{t['text']} !important; background:transparent !important;}}
+[role="combobox"]::placeholder {{color:{t['muted']} !important;}}
 [role="listbox"], .react-aria-Popover, [data-rac][role="dialog"] {{background:{t['panel']} !important; color:{t['text']} !important;
   border:1px solid {t['ctrl']} !important; border-radius:4px !important;}}
 [role="option"] {{color:{t['text']} !important; background:transparent;}}
 [role="option"][data-focused], [role="option"]:hover, [role="option"][aria-selected="true"] {{background:{t['raised']} !important;}}
-.stApp [data-baseweb="select"] span, .stApp [data-baseweb="select"] div {{color:{t['text']};}}
+[data-baseweb="select"] span, [data-baseweb="select"] div {{color:{t['text']};}}
 [data-baseweb="popover"] ul, [data-baseweb="popover"] li, [data-baseweb="menu"], [data-testid="stPopoverBody"],
 [data-baseweb="popover"] > div {{background:{t['panel']} !important; color:{t['text']} !important; border-color:{t['ctrl']} !important;}}
 [data-baseweb="popover"] li:hover, [data-baseweb="popover"] li[aria-selected="true"] {{background:{t['raised']} !important;}}
 [data-testid="stPopoverBody"] * {{color:{t['text']};}}
-.stApp button[kind], .stApp [data-testid="stPopover"] button, .stApp [data-testid="stDownloadButton"] button {{border-radius:4px !important;
+button[kind], [data-testid="stPopover"] button, [data-testid="stDownloadButton"] button {{border-radius:4px !important;
   background:transparent !important; color:{t['text']} !important; border:1px solid {t['ctrl']} !important; box-shadow:none !important;}}
-.stApp button[kind="primary"], .stApp button[kind="primaryFormSubmit"] {{background:{t['accent']} !important; color:{t['on_accent']} !important; border-color:{t['accent']} !important;}}
-.stApp button[kind="primary"] p {{color:{t['on_accent']} !important;}}
-.stApp button[kind]:hover {{border-color:{t['accent']} !important;}}
-.stApp button p {{color:inherit;}}
+button[kind="primary"], button[kind="primaryFormSubmit"] {{background:{t['accent']} !important; color:{t['on_accent']} !important; border-color:{t['accent']} !important;}}
+button[kind="primary"] p {{color:{t['on_accent']} !important;}}
+button[kind]:hover {{border-color:{t['accent']} !important;}}
+button p {{color:inherit;}}
 [data-testid="stButtonGroup"] button {{border-radius:0 !important; background:transparent !important; color:{t['muted']} !important;
   border-color:{t['ctrl']} !important; font-size:13px;}}
 [data-testid="stButtonGroup"] button[kind*="Active"], [data-testid="stButtonGroup"] button[aria-checked="true"] {{background:{t['raised']} !important; color:{t['text']} !important;}}
@@ -395,26 +401,46 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 [data-testid="stExpander"] summary *:not(svg):not(path) {{background:transparent !important;}}
 [data-testid="stExpander"] summary p {{font-size:12px !important; letter-spacing:1.2px; text-transform:uppercase; color:{t['sub']} !important;}}
 [data-testid="stExpanderDetails"] {{padding:4px 22px 14px 22px !important;}}
-.stApp [data-testid="stTabs"] [data-baseweb="tab-list"] {{gap:0; border-bottom:1px solid {t['line']};}}
-.stApp [data-testid="stTabs"] [data-baseweb="tab"] {{background:transparent; padding:0 14px; height:44px;}}
-.stApp [data-testid="stTabs"] [data-baseweb="tab"] p {{font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:{t['muted']};}}
-.stApp [data-testid="stTabs"] [aria-selected="true"] p {{color:{t['text']}; font-weight:600;}}
-.stApp [data-baseweb="tab-highlight"] {{background:{t['accent']} !important;}}
-.stApp [data-baseweb="tab-border"] {{background:{t['line']} !important;}}
-.stApp [data-testid="stSlider"] [role="slider"] {{background:{t['accent']}; border-color:{t['accent']};}}
-.stApp [data-testid="stSliderTickBarMin"], .stApp [data-testid="stSliderTickBarMax"], .stApp [data-testid="stSliderThumbValue"] {{color:{t['muted']} !important;}}
-.stApp [data-baseweb="checkbox"] span, .stApp [data-baseweb="radio"] div {{border-color:{t['ctrl']};}}
-.stApp [data-testid="stAlert"] {{border-radius:4px; background:{t['row_open']} !important; color:{t['text']};}}
-.stApp [data-testid="stDataFrame"] {{border:1px solid {t['line']};}}
-.stApp [data-testid="stMetricValue"], .stApp [data-testid="stMetricValue"] * {{color:{t['text']} !important;
+[data-testid="stTabs"] [data-baseweb="tab-list"] {{gap:0; border-bottom:1px solid {t['line']};}}
+[data-testid="stTabs"] [data-baseweb="tab"] {{background:transparent; padding:0 14px; height:44px;}}
+[data-testid="stTabs"] [data-baseweb="tab"] p {{font-size:12px; letter-spacing:1.2px; text-transform:uppercase; color:{t['muted']};}}
+[data-testid="stTabs"] [aria-selected="true"] p {{color:{t['text']}; font-weight:600;}}
+[data-baseweb="tab-highlight"] {{background:{t['accent']} !important;}}
+[data-baseweb="tab-border"] {{background:{t['line']} !important;}}
+[data-testid="stSlider"] [role="slider"] {{background:{t['accent']}; border-color:{t['accent']};}}
+[data-testid="stSliderTickBarMin"], [data-testid="stSliderTickBarMax"], [data-testid="stSliderThumbValue"] {{color:{t['muted']} !important;}}
+[data-baseweb="checkbox"] span, [data-baseweb="radio"] div {{border-color:{t['ctrl']};}}
+[data-testid="stAlert"] {{border-radius:4px; background:{t['row_open']} !important; color:{t['text']};}}
+[data-testid="stDataFrame"] {{border:1px solid {t['line']};}}
+[data-testid="stCheckbox"] label > div:first-of-type {{background:{t['panel']} !important; border:1px solid {t['ctrl']} !important;
+  border-radius:3px !important;}}
+[data-testid="stCheckbox"][data-selected] label > div:first-of-type {{background:{t['accent']} !important; border-color:{t['accent']} !important;}}
+[data-testid="stCheckbox"] label > div:first-of-type svg, [data-testid="stCheckbox"] label > div:first-of-type polyline {{stroke:{t['on_accent']} !important;}}
+[data-testid="stCheckbox"]:has(input[role="switch"]) label > div:first-of-type {{background:{t['ctrl']} !important; border-radius:999px !important;
+  border:0 !important;}}
+[data-testid="stCheckbox"][data-selected]:has(input[role="switch"]) label > div:first-of-type {{background:{t['accent']} !important;}}
+[data-testid="stCheckbox"]:has(input[role="switch"]) label > div:first-of-type > div {{background:{t['panel']} !important;}}
+[data-testid="stRadioOption"] > div > div:first-child {{background:{t['panel']} !important; border:1px solid {t['ctrl']} !important;}}
+[data-testid="stRadioOption"][data-selected] > div > div:first-child {{background:{t['accent']} !important; border-color:{t['accent']} !important;}}
+[data-testid="stRadioOption"] > div > div:first-child > div {{background:{t['panel']} !important;}}
+[data-testid="stTooltipIcon"] svg, [data-testid="stTooltipIcon"] button {{color:{t['muted']} !important; background:transparent !important;}}
+[data-testid="stPopoverBody"] p, [data-testid="stPopoverBody"] label, [data-testid="stPopoverBody"] span {{color:{t['text']};}}
+[data-testid="stPopoverBody"] [data-testid="stCaptionContainer"] * {{color:{t['muted']} !important;}}
+[data-testid="stSlider"] [role="slider"] {{background:{t['accent']} !important; border-color:{t['accent']} !important; box-shadow:none !important;}}
+[data-testid="stTextInput"] input, [data-testid="stNumberInput"] input, [data-testid="stTextArea"] textarea,
+[data-testid="stDateInput"] input {{background:{t['panel']} !important; color:{t['text']} !important;}}
+[data-testid="stNumberInput"] button {{background:{t['row_open']} !important; color:{t['text']} !important;}}
+[data-testid="stProgressBarTrack"] {{background:{t['line']} !important;}}
+[data-testid="stProgressBarFill"], [data-testid="stProgressBarTrack"] > div {{background:{t['accent']} !important;}}
+[data-testid="stMetricValue"], [data-testid="stMetricValue"] * {{color:{t['text']} !important;
   font-family:{FONT_NUM}; font-weight:500;}}
-.stApp [data-testid="stMetricLabel"], .stApp [data-testid="stMetricLabel"] * {{color:{t['muted']} !important;}}
-.stApp [data-testid="stAlert"] *, .stApp [data-testid="stCaptionContainer"] * {{color:inherit;}}
-.stApp [data-testid="stAlertContentInfo"], .stApp [data-testid="stAlertContentInfo"] * {{color:{t['text']} !important;}}
-.stApp [data-testid="stMarkdownContainer"] strong, .stApp [data-testid="stMarkdownContainer"] code {{color:{t['text']};}}
-.stApp [data-testid="stMarkdownContainer"] code {{background:{t['row_open']};}}
-.stApp [data-testid="stWidgetLabel"] p, .stApp [data-testid="stWidgetLabel"] label {{color:{t['sub']} !important;}}
-.stApp [data-baseweb="checkbox"] p, .stApp [data-testid="stRadio"] p {{color:{t['text']} !important;}}
+[data-testid="stMetricLabel"], [data-testid="stMetricLabel"] * {{color:{t['muted']} !important;}}
+[data-testid="stAlert"] *, [data-testid="stCaptionContainer"] * {{color:inherit;}}
+[data-testid="stAlertContentInfo"], [data-testid="stAlertContentInfo"] * {{color:{t['text']} !important;}}
+[data-testid="stMarkdownContainer"] strong, [data-testid="stMarkdownContainer"] code {{color:{t['text']};}}
+[data-testid="stMarkdownContainer"] code {{background:{t['row_open']};}}
+[data-testid="stWidgetLabel"] p, [data-testid="stWidgetLabel"] label {{color:{t['sub']} !important;}}
+[data-baseweb="checkbox"] p, [data-testid="stRadio"] p {{color:{t['text']} !important;}}
 
 /* text styles */
 .bsv-title {{font-family:{FONT_NUM}; font-size:1.6rem; font-weight:500; margin:0; line-height:1.15; color:{t['text']};}}

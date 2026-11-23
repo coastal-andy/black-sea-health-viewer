@@ -250,7 +250,7 @@ def page():
             fg = __import__("folium").FeatureGroup(name="Selection")
             M.add_selection(fg, sel)
             out = st_folium(m, height=640, use_container_width=True,
-                            key=f"seamap_{field}_{ss.get('map_nonce', 0)}_{theme_name()}",
+                            key=f"seamap_{field}_{day_s}_{ss.get('map_nonce', 0)}_{theme_name()}",
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
             if msgs:
                 with st.container(key="map_msgs"):
@@ -265,20 +265,26 @@ def page():
                 st.rerun()
     with right:
         with st.container(key="bsv_panel"):
-            rows = sea_state(sel, day_s)
-            t = next((r[4] for r in rows.values() if r[4] is not None), None)
-            when = f"{pd.Timestamp(t):%d %b %H:%M}" if t is not None else day_s
-            st.markdown(f"<div class='bsv-sec'><div class='bsv-lbl'>Sea state &middot; {esc(when)}</div>"
-                        f"<div class='bsv-place'>{esc(sel['name'])}</div>"
-                        "<p class='bsv-vsub'>How the water moves and how deep it is. Values come from the Copernicus "
-                        "wave and current models, Open-Meteo wind and EMODnet Bathymetry.</p></div>",
-                        unsafe_allow_html=True)
-            _rows(rows)
-            with st.expander("Waves, currents and wind  ·  10 days and forecast"):
-                PN.vector_view(sel, profile)
-            with st.container(key="panel_foot", horizontal=True, vertical_alignment="center"):
-                st.page_link(SH.PAGE_OBJS["water"], label="Water quality analysis")
-                SH.profile_menu()
+            sea_panel(sel, day_s, profile)
+
+
+@st.fragment
+def sea_panel(sel, day_s, profile):
+    """Right panel. A fragment: opening a row or the chart section does not redraw the map."""
+    rows = sea_state(sel, day_s)
+    t = next((r[4] for r in rows.values() if r[4] is not None), None)
+    when = f"{pd.Timestamp(t):%d %b %H:%M}" if t is not None else day_s
+    st.markdown(f"<div class='bsv-sec'><div class='bsv-lbl'>Sea state &middot; {esc(when)}</div>"
+                f"<div class='bsv-place'>{esc(sel['name'])}</div>"
+                "<p class='bsv-vsub'>How the water moves and how deep it is. Values come from the Copernicus "
+                "wave and current models, Open-Meteo wind and EMODnet Bathymetry.</p></div>",
+                unsafe_allow_html=True)
+    _rows(rows)
+    with st.expander("Waves, currents and wind  ·  10 days and forecast"):
+        PN.vector_view(sel, profile)
+    with st.container(key="panel_foot", horizontal=True, vertical_alignment="center"):
+        st.page_link(SH.PAGE_OBJS["water"], label="Water quality analysis")
+        SH.profile_menu()
 
 
 def _add_depth(m):

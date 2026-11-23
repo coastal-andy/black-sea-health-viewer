@@ -181,6 +181,7 @@ def page():
         st.switch_page(SH.PAGE_OBJS["overview"])
 
 
+@st.fragment
 def site_list(sites, sector, season, day, profile):
     ss = st.session_state
     keys = SITE_CARDS[sector]
@@ -192,7 +193,7 @@ def site_list(sites, sector, season, day, profile):
                     unsafe_allow_html=True)
         return
     prof = f"stakeholder:{sector}" if profile.get("role") == "stakeholder" else P.card_profile(profile)
-    all_cards = A.cards_for_sites(sites, day, prof, wait=8.0)
+    all_cards = A.cards_for_sites(sites, day, prof, wait=2.0)
     pending = False
     from viewer.overview import _CHEV, _CHEV_OPEN
     for i, (s, cs) in enumerate(zip(sites, all_cards)):
@@ -229,3 +230,6 @@ def site_list(sites, sector, season, day, profile):
                 st.button("Full report for this site", key=f"cchart_site{i}", on_click=_open_site, args=(s,))
     if pending:
         SC.poll_sites(sites, day, prof)
+    if ss.get("_goto") == "overview":
+        ss.pop("_goto")
+        st.switch_page(SH.PAGE_OBJS["overview"])

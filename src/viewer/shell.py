@@ -43,7 +43,8 @@ def rail(pages: dict):
     """Logo, one link per page (icons come from CSS), and the Dark/Light switch at the bottom."""
     t = tokens()
     with st.sidebar:
-        st.markdown(f"<div class='bsv-logo'>{LOGO_SVG.format(c=t['accent'])}</div>", unsafe_allow_html=True)
+        with st.container(key="logo_block"):
+            st.markdown(f"<div class='bsv-logo'>{LOGO_SVG.format(c=t['accent'])}</div>", unsafe_allow_html=True)
         for k, label in PAGES.items():
             with st.container(key=f"rail_{k}"):
                 st.page_link(pages[k], label=label)

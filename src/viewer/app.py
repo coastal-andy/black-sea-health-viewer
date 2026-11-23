@@ -6,7 +6,10 @@ Demo shortcuts: ?role=stakeholder&sector=tourism&goal=risk skips the questionnai
 
 from __future__ import annotations
 
+import logging
+import os
 import sys
+import time
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[1]
@@ -21,6 +24,7 @@ from viewer import shell as SH  # noqa: E402
 from viewer import views as V  # noqa: E402
 from viewer.style import css  # noqa: E402
 
+T0 = time.perf_counter()
 st.set_page_config(page_title="Black Sea Health Viewer", layout="wide", initial_sidebar_state="expanded")
 ss = st.session_state
 SH.init_theme()
@@ -55,3 +59,6 @@ if "sel" not in ss:
     OB.apply_defaults(ss.profile)
 
 page.run()
+if os.environ.get("BSV_TIMING"):  # BSV_TIMING=1 streamlit run ... logs the script time of every full run
+    logging.getLogger("viewer.timing").warning("page %s ran in %.2f s", page.url_path or "overview",
+                                               time.perf_counter() - T0)

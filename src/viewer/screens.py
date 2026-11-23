@@ -91,7 +91,7 @@ def sectors_screen(profile, day, season):
     t0 = time.perf_counter()
     # stakeholders get the sentence for the sector on screen, not only their own
     prof = f"stakeholder:{sector}" if profile.get("role") == "stakeholder" else P.card_profile(profile)
-    all_cards = A.cards_for_sites(sites, day, prof, wait=8.0)
+    all_cards = A.cards_for_sites(sites, day, prof, wait=2.0)
     site_rows(sites, all_cards, linked, profile)
     if any(A.cards_pending(cs) for cs in all_cards):
         st.caption("Some sites are still being computed; the rows fill in by themselves.")

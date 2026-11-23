@@ -30,7 +30,7 @@ WINDOW = 60
 
 # ------------------------------------------------------------------------------------------ data helpers
 def _cards(sel, day, profile) -> dict:
-    cards = A.zone_cards(sel["lat"], sel["lon"], day, P.card_profile(profile), sel.get("wkt"), wait=4)
+    cards = A.zone_cards(sel["lat"], sel["lon"], day, P.card_profile(profile), sel.get("wkt"), wait=1.5)
     if A.cards_pending(cards):
         return {}
     return {c.get("id"): c for c in cards}

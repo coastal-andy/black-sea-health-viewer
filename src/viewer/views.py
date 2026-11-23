@@ -22,6 +22,12 @@ from viewer.style import esc, theme_name
 MAP_RATIO = [2.3, 1]  # map column : docked panel
 
 
+def map_key(prefix, *parts) -> str:
+    """A short widget key that changes whenever any of the parts changes."""
+    import hashlib
+    return f"{prefix}_" + hashlib.md5(repr(parts).encode()).hexdigest()[:10]
+
+
 def _layers() -> set:
     ss = st.session_state
     layers = {lid for g, items in M.CATALOGUE.items() for lid in items if ss.get(f"w_{lid}")}
@@ -70,8 +76,11 @@ def overview():
                                   only_sector=only, theme=theme_name(), legend=ss.get("w_legend", True))
             fg = folium.FeatureGroup(name="Selection")
             M.add_selection(fg, ss.sel)
-            out = st_folium(m, height=700, use_container_width=True,
-                            key=f"map_{ss.get('map_nonce', 0)}_{theme_name()}",
+            # st_folium draws the base map only when it first mounts; later changes to layers, date, season or
+            # legend are ignored unless the key changes, so the key carries every input that changes the base map
+            mkey = map_key("map", ss.get("map_nonce", 0), theme_name(), sorted(layers), day_s, season,
+                           ss.get("w_legend", True), ss.get("w_tiles", False), only, ss.view)
+            out = st_folium(m, height=700, use_container_width=True, key=mkey,
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
             if msgs:
                 with st.container(key="map_msgs"):
@@ -87,30 +96,37 @@ def overview():
                 st.rerun()
     with right:
         with st.container(key="bsv_panel"):
-            OV.profile_tabs()
-            profile = ss.profile
-            sel = ss.sel
-            cards = A.zone_cards(sel["lat"], sel["lon"], day_s, P.card_profile(profile), sel.get("wkt"), wait=6)
-            pending = A.cards_pending(cards)
-            n, secs = A.overlap_at(sel["lat"], sel["lon"], season)
-            head = SH.selection_header(sel, season)
-            if pending:
-                st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>Computing the health signs for this "
-                            "place.</p><p class='bsv-vsub'>The first time takes up to a minute; after that it is "
-                            "cached. The rows appear by themselves.</p></div>", unsafe_allow_html=True)
-                PN.poll_cards(sel, day_s, profile)
-                return
-            if profile.get("role") == "public":
-                cards = [c for c in cards if c.get("status") != "no_data"] + \
-                        [c for c in cards if c.get("status") == "no_data"]
-            v1, v2 = OV.verdict(cards, profile, season, n, secs, day_s)
-            st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>{esc(v1)}</p>"
-                        f"<p class='bsv-vsub'>{esc(v2)}</p>{OV.counts_html(cards)}</div>", unsafe_allow_html=True)
-            OV.card_rows(cards, profile)
-            with st.container(key="panel_foot", horizontal=True, vertical_alignment="center"):
-                st.page_link(SH.PAGE_OBJS["water"], label="Water quality analysis")
-                st.markdown(f"<span class='bsv-note'>vs. usual for {pd.Timestamp(day_s):%d %B}, "
-                            f"cards from the {esc(A.cards_source())}</span>", unsafe_allow_html=True)
+            overview_panel(day_s, season)
+
+
+@st.fragment
+def overview_panel(day_s, season):
+    """The docked panel. A fragment: tabs and row clicks rerun only this, not the map."""
+    ss = st.session_state
+    OV.profile_tabs()
+    profile = ss.profile
+    sel = ss.sel
+    cards = A.zone_cards(sel["lat"], sel["lon"], day_s, P.card_profile(profile), sel.get("wkt"), wait=1.5)
+    pending = A.cards_pending(cards)
+    n, secs = A.overlap_at(sel["lat"], sel["lon"], season)
+    head = SH.selection_header(sel, season)
+    if pending:
+        st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>Computing the health signs for this "
+                    "place.</p><p class='bsv-vsub'>The first time takes up to a minute; after that it is "
+                    "cached. The rows appear by themselves.</p></div>", unsafe_allow_html=True)
+        PN.poll_cards(sel, day_s, profile)
+        return
+    if profile.get("role") == "public":
+        cards = [c for c in cards if c.get("status") != "no_data"] + \
+                [c for c in cards if c.get("status") == "no_data"]
+    v1, v2 = OV.verdict(cards, profile, season, n, secs, day_s)
+    st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>{esc(v1)}</p>"
+                f"<p class='bsv-vsub'>{esc(v2)}</p>{OV.counts_html(cards)}</div>", unsafe_allow_html=True)
+    OV.card_rows(cards, profile)
+    with st.container(key="panel_foot", horizontal=True, vertical_alignment="center"):
+        st.page_link(SH.PAGE_OBJS["water"], label="Water quality analysis")
+        st.markdown(f"<span class='bsv-note'>vs. usual for {pd.Timestamp(day_s):%d %B}, "
+                    f"cards from the {esc(A.cards_source())}</span>", unsafe_allow_html=True)
     if ss.pop("_goto", None):
         st.switch_page(SH.PAGE_OBJS["water"])
 
