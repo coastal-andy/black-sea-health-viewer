@@ -246,9 +246,12 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
                      "border:1.5px dashed #1B7F3B;margin-right:5px'></span>Natura 2000 site</div>")
     if not parts:
         return ""
-    return ("<div style='position:absolute;bottom:22px;right:10px;z-index:9999;background:rgba(255,255,255,0.94);"
-            "color:#1C2430;padding:8px 10px;border-radius:6px;font:12px/1.35 -apple-system,Segoe UI,sans-serif;"
-            "box-shadow:0 1px 4px rgba(0,0,0,.25);max-width:240px'>" + "".join(parts) + "</div>")
+    # collapsible, height-capped legend so it never hides the coast it explains
+    return ("<details open style='position:absolute;bottom:22px;right:10px;z-index:9999;background:rgba(255,255,255,0.94);"
+            "color:#1C2430;padding:6px 10px;border-radius:6px;font:11.5px/1.3 -apple-system,Segoe UI,sans-serif;"
+            "box-shadow:0 1px 4px rgba(0,0,0,.25);max-width:230px'>"
+            "<summary style='cursor:pointer;font-weight:650;color:#444'>Legend</summary>"
+            "<div style='max-height:min(48vh,340px);overflow-y:auto;margin-top:4px'>" + "".join(parts) + "</div></details>")
 
 
 def build(view: dict, layers: set, day: str, season: str, sel: dict | None, detail: bool, tiles_mode: bool = False,
