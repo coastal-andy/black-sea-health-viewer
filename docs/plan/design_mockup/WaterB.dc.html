@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Water quality, direction B</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#06131D}
+a{color:#4CC3E6}a:hover{color:#8ADBF2}
+</style>
+</helmet>
+<div style="height: 900px; display: flex; font-family: 'Barlow', system-ui, sans-serif; color: #E6EEF3; background: #06131D; font-variant-numeric: tabular-nums; overflow: hidden">
+
+  <nav aria-label="Pages" style="width: 72px; flex: 0 0 72px; background: #0A1B27; border-right: 1px solid #1E3646; display: flex; flex-direction: column; padding-top: 10px; gap: 2px">
+    <div style="height: 52px; display: flex; align-items: center; justify-content: center">
+      <svg width="30" height="30" viewBox="0 0 28 28" role="img" aria-label="Black Sea Health"><circle cx="14" cy="14" r="12.5" fill="none" stroke="#4CC3E6" stroke-width="1.5"></circle><path d="M4 16 C8 12 11 20 15 16 S22 12 24 15" fill="none" stroke="#4CC3E6" stroke-width="2"></path></svg>
+    </div>
+    <a href="OverviewB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 5 L8 3 L14 5 L20 3 V17 L14 19 L8 17 L2 19 Z M8 3 V17 M14 5 V19" fill="none" stroke="#8FA7B6" stroke-width="1.6"></path></svg>Overview</a>
+    <a href="WaterB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #E6EEF3; background: #13293A; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M11 2 C11 2 4 10 4 14 A7 7 0 0 0 18 14 C18 10 11 2 11 2 Z" fill="none" stroke="#4CC3E6" stroke-width="1.6"></path></svg>Water</a>
+    <a href="SeabedB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 8 C5 5 8 11 11 8 S17 5 20 8 M2 13 C5 10 8 16 11 13 S17 10 20 13 M2 19 L8 16 L14 18 L20 15" fill="none" stroke="#8FA7B6" stroke-width="1.6"></path></svg>Seabed</a>
+    <a href="PressuresB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="3" width="10" height="10" fill="none" stroke="#8FA7B6" stroke-width="1.6"></rect><rect x="9" y="9" width="10" height="10" fill="none" stroke="#8FA7B6" stroke-width="1.6"></rect></svg>Pressures</a>
+    <a href="#" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4 H18 M4 9 H18 M4 14 H13 M4 19 H10" fill="none" stroke="#8FA7B6" stroke-width="1.6"></path></svg>Methods</a>
+  </nav>
+
+  <aside aria-label="Variables" style="width: 290px; flex: 0 0 290px; background: #0C1F2C; border-right: 1px solid #1E3646; display: flex; flex-direction: column; overflow-y: auto">
+    <div style="padding: 18px 20px 14px; border-bottom: 1px solid #1E3646; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">Place</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 500">Constanța offshore</span>
+      <span style="font-size: 12px; color: #8FA7B6">44.170 N · 28.720 E</span>
+    </div>
+    <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6; padding: 14px 20px 6px">Water quality</span>
+    <sc-for list="{{vars}}" as="v" hint-placeholder-count="7">
+      <a href="#" style="{{v.style}}"><span style="width: 8px; height: 8px; background: {{v.color}}"></span><span style="flex: 1 1 auto">{{v.name}}</span><span style="font-family: 'Barlow Condensed', sans-serif; font-size: 17px">{{v.value}}</span></a>
+    </sc-for>
+    <a href="SeabedB.dc.html" style="margin-top: auto; padding: 16px 20px; border-top: 1px solid #1E3646; font-size: 13px; text-decoration: none">Waves, currents and depth →</a>
+  </aside>
+
+  <main style="flex: 1 1 auto; min-width: 0; overflow-y: auto; display: flex; flex-direction: column">
+    <div style="padding: 22px 32px 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; border-bottom: 1px solid #1E3646">
+      <div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 14px">
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 500; line-height: 1">Sea surface temperature</h1>
+        <span style="font-size: 13px; color: #8FA7B6">Satellite · CMEMS SST L4, 1 km · usual = 1991-2020</span>
+      </div>
+      <div role="tablist" aria-label="Analysis" style="display: flex">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+          <button type="button" role="tab" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #1E3646">
+      <div style="padding: 16px 32px; border-right: 1px solid #1E3646; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">Today</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 500">13.4 <span style="font-size: 17px; color: #A9BDCA">°C</span></span>
+      </div>
+      <div style="padding: 16px 24px; border-right: 1px solid #1E3646; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">Usual</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 500">11.6 <span style="font-size: 17px; color: #A9BDCA">°C</span></span>
+      </div>
+      <div style="padding: 16px 24px; border-right: 1px solid #1E3646; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">Difference</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 500; display: flex; align-items: center; gap: 10px">+1.8 <span style="font-size: 17px; color: #A9BDCA">°C</span><span style="font-family: 'Barlow', sans-serif; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #2BB38A; display: flex; align-items: center; gap: 5px"><span style="width: 8px; height: 8px; background: #2BB38A"></span>normal</span></span>
+      </div>
+      <div style="padding: 16px 24px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">Trend since 1982</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 500">+0.53 <span style="font-size: 17px; color: #A9BDCA">°C / decade</span></span>
+      </div>
+    </div>
+
+    <figure style="margin: 0; padding: 20px 32px 8px; display: flex; flex-direction: column; gap: 10px">
+      <figcaption style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 12.5px; color: #A9BDCA">
+        <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">Last 60 days</span>
+        <span style="display: flex; gap: 18px">
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 2px; background: #4CC3E6"></span>this year</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 10px; background: #16303F"></span>usual range</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; border-top: 1.5px dashed #8FA7B6"></span>usual</span>
+        </span>
+      </figcaption>
+      <svg role="img" aria-label="Sea temperature falling from about 20 to 13.4 degrees over 60 days, in the upper half of the usual range" viewBox="0 0 900 300" width="100%" style="display: block">
+        <g font-family="Barlow Condensed" font-size="13" fill="#8FA7B6">
+          <text x="30" y="68" text-anchor="end">20°</text><text x="30" y="148" text-anchor="end">15°</text><text x="30" y="228" text-anchor="end">10°</text>
+          <text x="40" y="294">24 Sep</text><text x="450" y="294" text-anchor="middle">24 Oct</text><text x="860" y="294" text-anchor="end">23 Nov</text>
+        </g>
+        <g stroke="#16303F"><line x1="40" y1="64" x2="860" y2="64"></line><line x1="40" y1="144" x2="860" y2="144"></line><line x1="40" y1="224" x2="860" y2="224"></line></g>
+        <path d="M40,64 Q450,104 860,192 L860,253 Q450,190 40,136 Z" fill="#16303F"></path>
+        <path d="M40,100 Q450,146 860,222" fill="none" stroke="#8FA7B6" stroke-width="1.5" stroke-dasharray="5 4"></path>
+        <polyline points="40,91 91,94 142,101 194,99 245,110 296,116 347,128 399,126 450,138 501,147 552,145 604,158 655,166 706,168 757,180 809,184 860,194" fill="none" stroke="#4CC3E6" stroke-width="2.5" stroke-linejoin="round"></polyline>
+        <circle cx="860" cy="194" r="5" fill="#4CC3E6"></circle>
+      </svg>
+      <p style="margin: 0; font-size: 15px; line-height: 1.45; color: #E6EEF3; max-width: 760px">Cooling as usual for autumn, but about 1.8 °C warmer than the 1991-2020 average. Still within the normal range.</p>
+    </figure>
+
+    <div style="margin-top: 12px; border-top: 1px solid #1E3646">
+      <sc-for list="{{more}}" as="m" hint-placeholder-count="3">
+        <div style="border-bottom: 1px solid #1E3646">
+          <button type="button" onClick="{{m.toggle}}" aria-expanded="{{m.expanded}}" style="font: inherit; color: #E6EEF3; width: 100%; height: 52px; padding: 0 32px; border: 0; background: transparent; cursor: pointer; display: flex; align-items: center; gap: 12px; text-align: left">
+            <span style="font-size: 12px; color: #8FA7B6; width: 12px">{{m.chev}}</span>
+            <span style="font-size: 14.5px; font-weight: 500">{{m.title}}</span>
+            <span style="margin-left: auto; font-size: 12.5px; color: #8FA7B6">{{m.hint}}</span>
+          </button>
+          <sc-if value="{{m.isSources}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 32px 18px 56px; overflow-x: auto">
+              <table style="width: 100%; min-width: 520px; border-collapse: collapse; font-size: 13px">
+                <thead><tr style="text-align: left; color: #8FA7B6; font-size: 11px; letter-spacing: 1px; text-transform: uppercase"><th style="padding: 6px 0; font-weight: 500">Source</th><th style="padding: 6px 0; font-weight: 500">Origin</th><th style="padding: 6px 0; font-weight: 500">Latest</th><th style="padding: 6px 0; font-weight: 500">Distance</th></tr></thead>
+                <tbody>
+                  <tr style="border-top: 1px solid #16303F"><td style="padding: 9px 0">Satellite SST L4 (CMEMS)</td><td>satellite</td><td style="font-family: 'Barlow Condensed', sans-serif; font-size: 16px">13.4 °C</td><td>1.1 km</td></tr>
+                  <tr style="border-top: 1px solid #16303F"><td style="padding: 9px 0">Black Sea physics model</td><td>model</td><td style="font-family: 'Barlow Condensed', sans-serif; font-size: 16px">[ ] °C</td><td>0.7 km</td></tr>
+                  <tr style="border-top: 1px solid #16303F; color: #6E8392"><td style="padding: 9px 0">Coastal buoy EUXRoCB0x</td><td>measured</td><td>not used</td><td>not quality-checked</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </sc-if>
+          <sc-if value="{{m.isChain}}" hint-placeholder-val="{{ false }}">
+            <ol style="margin: 0; padding: 0 32px 18px 74px; font-size: 13.5px; line-height: 1.6; color: #C9D7E0">
+              <li>Season: usual autumn cooling explains the fall.</li>
+              <li>Danube flow at 57 % of normal: saltier, clearer water.</li>
+              <li>Weather: [storm check, last 7 days].</li>
+              <li>Left over after natural causes: [result of the rule chain].</li>
+            </ol>
+          </sc-if>
+          <sc-if value="{{m.isData}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 32px 18px 56px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 13.5px">
+              <a href="#">Download the 60-day series (CSV)</a>
+              <a href="#">Download the 1982-2025 annual means (CSV)</a>
+              <span style="color: #8FA7B6">Dataset IDs and licences on the Methods page</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 0, open: -1 };
+  }
+  renderVals() {
+    const S = { normal: '#2BB38A', watch: '#F2B134', none: '#6E8392' };
+    const list = [
+      ['Temperature', '13.4 °C', 'normal'], ['Salinity', '[ ] psu', 'none'], ['Oxygen, seabed', '3.59 mg/L', 'watch'],
+      ['Chlorophyll-a', '1.61 mg/m³', 'normal'], ['Water clarity', '2.5 m', 'normal'], ['Nutrients', '9.8 µmol/L', 'normal'], ['Acidity (pH)', '8.20', 'normal']
+    ];
+    const vars = list.map((v, i) => ({
+      name: v[0], value: v[1], color: S[v[2]],
+      style: 'display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 20px; text-decoration: none; font-size: 14.5px; ' +
+        (i === 0 ? 'background: #13293A; color: #FFFFFF; box-shadow: inset 2px 0 0 #4CC3E6' : 'color: #C9D7E0')
+    }));
+    const tabs = ['Now vs usual', 'Long-term trend', 'Measured vs model'].map((l, i) => ({
+      label: l,
+      pick: () => this.setState({ tab: i }),
+      style: 'font: inherit; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; height: 48px; padding: 0 16px; border: 0; background: transparent; cursor: pointer; ' +
+        (i === this.state.tab ? 'color: #FFFFFF; font-weight: 600; box-shadow: inset 0 -2px 0 #4CC3E6' : 'color: #8FA7B6')
+    }));
+    const defs = [['Sources', '3 compared · 1 excluded'], ['Natural or pressure?', 'rule chain, 4 steps'], ['Data', 'CSV download']];
+    const more = defs.map((d, i) => {
+      const open = this.state.open === i;
+      return {
+        title: d[0], hint: d[1], chev: open ? '▾' : '▸', expanded: open ? 'true' : 'false',
+        isSources: open && i === 0, isChain: open && i === 1, isData: open && i === 2,
+        toggle: () => this.setState({ open: open ? -1 : i })
+      };
+    });
+    return { vars, tabs, more };
+  }
+}
+</script>
+</body>
+</html>
