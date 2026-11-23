@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 import folium
+from jinja2 import Template
 import numpy as np
 import pandas as pd
 
@@ -65,12 +66,26 @@ def base_map(lat, lon, zoom, theme: str | None = None) -> folium.Map:
         f".leaflet-control-layers label{{color:{t['text']};}}"
         f".leaflet-control-zoom-fullscreen,.leaflet-control-zoom-fullscreen.fullscreen-icon{{background-image:{_fs_icon(t['text'])} !important;background-size:18px 18px !important;"
         f"background-position:center !important;background-repeat:no-repeat !important;}}"
-        f".leaflet-control-attribution{{background:{t['overlay']} !important;color:{t['muted']} !important;}}"
+        f".leaflet-control-attribution{{background:{t['overlay']} !important;color:{t['muted']} !important;"
+        "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100vw - 120px);font-size:10px;}}"
         f".leaflet-control-attribution a{{color:{t['muted']} !important;}}"
         f".leaflet-control-scale-line{{background:transparent;color:{t['muted']};border-color:{t['muted']};}}"
         f".leaflet-popup-content-wrapper,.leaflet-popup-tip,.leaflet-tooltip{{background:{t['panel']};color:{t['text']};"
         f"border-radius:4px;border:1px solid {t['ctrl']};box-shadow:none;}}</style>"))
+    m.add_child(_LegendCollapse())
     return m
+
+
+class _LegendCollapse(folium.MacroElement):
+    """Starts the map legend folded in narrow windows (the viewer stacks the map above the panel below 900 px).
+    Runs with the map script, because scripts inside the legend HTML are not executed by streamlit-folium."""
+    _template = Template("""{% macro script(this, kwargs) %}
+    setTimeout(function () {
+        var w = window.innerWidth;
+        try { w = window.parent.innerWidth; } catch (e) {}
+        if (w < 900) { document.querySelectorAll('details.bsv-legend').forEach(function (d) { d.open = false; }); }
+    }, 0);
+    {% endmacro %}""")
 
 
 def add_field(m, fd: dict, opacity: float = 0.85):

@@ -303,7 +303,7 @@ def _add_depth(m):
     except Exception:
         return
     m.get_root().html.add_child(folium.Element(
-        f"<details open style='position:absolute;bottom:26px;right:10px;z-index:9999;background:{t['overlay']};"
+        f"<details open class='bsv-legend' style='position:absolute;bottom:26px;right:10px;z-index:9999;background:{t['overlay']};"
         f"color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;border:1px solid {t['ctrl']};"
         f"font:12px/1.35 sans-serif;max-height:46vh;overflow:auto'>"
         f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"

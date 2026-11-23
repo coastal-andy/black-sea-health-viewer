@@ -226,11 +226,11 @@ def timeline():
     labels = []
     for i, d in enumerate(days):
         if d == today:
-            labels.append(f"<span class='today'>{d:%d %b} today</span>")
+            labels.append(f"<span class='today'><b class='lg'>{d:%d %b} today</b><b class='sh'>Today</b></span>")
         elif i == 0:
-            labels.append(f"<span>{d:%d %b}</span>")
+            labels.append(f"<span><b class='lg'>{d:%d %b}</b><b class='sh'>{d:%d %b}</b></span>")
         elif i == len(days) - 1:
-            labels.append(f"<span class='fc'>{d.day} forecast</span>")
+            labels.append(f"<span class='fc'><b class='lg'>{d.day} forecast</b><b class='sh'>{d:%d %b}</b></span>")
         else:
             labels.append(f"<span class='mid{' fc' if d > today else ''}'>{d.day}</span>")
     fc_left = 100 * (days.index(today)) / (len(days) - 1)

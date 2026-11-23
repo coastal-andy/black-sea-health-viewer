@@ -359,7 +359,11 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .bsv-tl-labels .today {{color:{t['text']}; font-weight:600;}}
 .bsv-tl-labels .fc {{color:{t['muted']};}}
 .st-key-tl_track {{container-type:inline-size;}}
-@container (max-width: 520px) {{ .bsv-tl-labels .mid {{visibility:hidden;}} }}
+.bsv-tl-labels b {{font-weight:inherit;}}
+.bsv-tl-labels .sh {{display:none;}}
+.bsv-tl-labels {{white-space:nowrap; overflow:hidden;}}
+@container (max-width: 520px) {{ .bsv-tl-labels .mid {{display:none;}} }}
+@container (max-width: 340px) {{ .bsv-tl-labels .lg {{display:none;}} .bsv-tl-labels .sh {{display:inline;}} }}
 .st-key-legend_btn button {{height:40px; padding:0 12px;}}
 .st-key-legend_btn button p {{font-size:12px !important; letter-spacing:1px; text-transform:uppercase; color:{t['soft']} !important;}}
 
@@ -496,7 +500,12 @@ button p {{color:inherit;}}
   .st-key-map_tools {{width:calc(100% - 88px);}}
   .st-key-map_tools_wide {{max-width:calc(100% - 80px);}}
   .st-key-map_tools_wide [data-testid="stButtonGroup"] button {{padding:0 8px !important;}}
-  .st-key-timeline {{height:64px; padding:0 10px; flex-wrap:nowrap !important; gap:10px !important;}}
+  .st-key-timeline {{height:64px !important; min-height:64px !important; padding:0 10px; flex-wrap:nowrap !important;
+    gap:10px !important; overflow:hidden; align-items:center !important;}}
+  .bsv-tl-labels .mid {{display:none;}}
+  .st-key-tl_track [data-testid="stSliderThumbValue"] {{display:none !important;}}
+  .st-key-tl_track [data-testid="stSlider"] {{margin-top:-6px;}}
+  .bsv-tl-labels {{margin-top:-16px;}}
   .st-key-tl_track {{flex:1 1 0 !important; min-width:0 !important;}}
   .st-key-legend_btn {{flex:0 0 auto !important; width:auto !important;}}
   .st-key-dp_head {{height:auto; min-height:56px; flex-wrap:wrap !important; padding:6px 0;}}
