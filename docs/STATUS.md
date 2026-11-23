@@ -39,3 +39,6 @@ The QGIS project is `gis/black_sea_pressures.qgz`. The old starter dashboard (`s
 - The new coastal buoys EUXRoCB0x are not quality-controlled. Station 15480 is on shore.
 - Some fishing and shipyard features are assumed (landing points, pound nets, dumping sites) and are drawn dashed.
 - The Copernicus catalogue changes on 24 Nov at 15:00 Romanian time, after the pitch. The cache covers the demo.
+
+## Update 23 Nov 2026, late evening (design branch)
+- Viewer rebuilt in design direction B: dark by default with a Light switch, a 72 px icon rail, and five pages (Overview, Water quality, Coast and seabed, Pressures, Methods). Commits e4f3bc5, 1779536, d8d5c6c, 857a8f6, 5c495c8 on `design`. Details and known gaps are in `docs/plan/HANDOVER.md`, under "Built".
