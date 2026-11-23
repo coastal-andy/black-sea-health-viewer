@@ -21,6 +21,7 @@ streamlit>=1.45
 streamlit-folium>=0.22
 folium>=0.17
 plotly>=5.24
+matplotlib>=3.9  # static validation figures (scripts/validation)
 # vision
 pillow>=10.4
 opencv-python-headless>=4.10
