@@ -4,6 +4,16 @@ Black Sea Health Viewer: EfxINNOs Hackathon Romania, Challenge 04 Ecosystem Heal
 
 Read first: `docs/STATUS.md` (what is done and what's left), `docs/plan/WORKFLOW.md` (interfaces and decisions), `docs/COLLABORATION.md` (the human workflow).
 
+## 0. First-time setup on a new laptop
+When the user asks to set up the project, or `.venv/` doesn't exist yet, do these steps in order and report each one:
+1. `git switch data` if the user is the data-analysis colleague, or `git switch design` if it's Andrei. Ask if unsure.
+2. If `uv` is missing, tell the user to install it with `brew install uv`.
+3. `uv venv .venv --python 3.12`, then `uv pip install --python .venv/bin/python -r requirements.txt`.
+4. Copernicus Marine login: check with `.venv/bin/copernicusmarine login --check-credentials-valid`. If it isn't valid, ask the user to run `.venv/bin/copernicusmarine login` themselves in a terminal, with their own free account from data.marine.copernicus.eu. Never ask for, type or print their credentials.
+5. `.venv/bin/python scripts/preload_cache.py` (run it in the background; the first run takes a while).
+6. `.venv/bin/python -m pytest -q tests/test_indicators.py` to confirm everything works.
+7. Summarise for the user: the branch they're on, what they own (section 1), and how to start the viewer.
+
 ## 1. Check the branch before editing anything
 Run `git branch --show-current` at the start of every session, and work only inside your branch's area:
 
