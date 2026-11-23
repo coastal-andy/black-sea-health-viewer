@@ -14,6 +14,7 @@ THEMES = {
         accent="#4CC3E6", accent_hi="#8ADBF2", on_accent="#06131D",
         normal="#2BB38A", watch="#F2B134", alert="#F07B3F", no_data="#6E8392",
         basemap="Dark", grid="rgba(255,255,255,0.07)",
+        arrow_core="#ffffff", arrow_edge="rgba(6,19,29,0.9)", arrow_bg="#2E5A73",
     ),
     "light": dict(
         bg="#F4F7F9", panel="#FFFFFF", rail="#EAF0F4", raised="#DCE7EE", row_open="#EEF4F8",
@@ -22,6 +23,7 @@ THEMES = {
         accent="#0A7FAE", accent_hi="#06648A", on_accent="#FFFFFF",
         normal="#1B7F5E", watch="#9A6700", alert="#C2410C", no_data="#6B7F8C",
         basemap="Light", grid="rgba(14,34,48,0.08)",
+        arrow_core="#0E2230", arrow_edge="rgba(255,255,255,0.95)", arrow_bg="#C9D8E2",
     ),
 }
 STATUS_LABEL = {"normal": "Normal", "watch": "Watch", "alert": "Alert", "no_data": "No data"}
@@ -311,6 +313,33 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .bsv-dp-t {{font-size:14px; font-weight:500; color:{t['text']}; white-space:nowrap;}}
 .st-key-profile_btn button {{height:32px; min-height:32px; padding:0 12px;}}
 .st-key-profile_btn button p {{font-size:12px !important; letter-spacing:1px; text-transform:uppercase; color:{t['soft']} !important;}}
+/* Pressures (B4) */
+.st-key-bsv_map_full iframe {{height:100vh !important;}}
+.st-key-map_tools_wide {{position:absolute; left:16px; top:16px; z-index:20; width:auto; max-width:calc(100% - 96px);
+  gap:8px !important; flex-wrap:wrap;}}
+.st-key-map_tools_wide [data-testid="stButtonGroup"] {{background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px;}}
+.st-key-map_tools_wide [data-testid="stButtonGroup"] > div {{gap:0; flex-wrap:nowrap;}}
+.st-key-map_tools_wide [data-testid="stButtonGroup"] button {{height:40px; padding:0 14px !important; border:0 !important;
+  border-right:1px solid {t['ctrl']} !important;}}
+.st-key-map_tools_wide [data-testid="stButtonGroup"] button:last-child {{border-right:0 !important;}}
+.st-key-map_tools_wide [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
+.bsv-stats.bsv-stats3 {{grid-template-columns:repeat(3, minmax(0,1fr)); margin:0; border-top:0;}}
+.bsv-stats3 .bsv-stat:first-child {{padding-left:22px;}}
+.bsv-stats3 .bsv-stat .v {{font-size:28px;}}
+.bsv-sites-head {{display:flex; justify-content:space-between; align-items:flex-end; padding:18px 18px 8px 22px;}}
+.bsv-sites-head .cols, .bsv-site .cols {{display:grid; grid-template-columns:repeat(4, 52px); text-align:center;}}
+.bsv-sites-head .cols span {{font-size:9.5px; letter-spacing:0.3px; text-transform:uppercase; color:{t['muted']};}}
+.bsv-site {{display:grid; grid-template-columns:12px minmax(0,1fr) auto; column-gap:10px; align-items:center;
+  padding:12px 18px 12px 22px; border-bottom:1px solid {t['line2']};}}
+.bsv-site.open {{background:{t['row_open']}; border-bottom-color:transparent;}}
+[class*="st-key-crow_site"]:hover .bsv-site {{background:{t['row_open']};}}
+.bsv-site .nm {{display:flex; flex-direction:column; min-width:0;}}
+.bsv-site .t {{font-size:14.5px; font-weight:500; color:{t['text']};}}
+.bsv-site .n {{font-size:12px; color:{t['sub']};}}
+.bsv-site .cell {{display:flex; justify-content:center;}}
+.bsv-site .cell .bsv-sq {{margin:0;}}
+.bsv-det1 {{display:flex; flex-direction:column; gap:6px; font-size:12.5px; line-height:1.45; color:{t['soft']};}}
+.bsv-det1 .bsv-lbl {{font-size:10.5px; margin-right:4px;}}
 /* bottom timeline */
 .st-key-timeline {{height:64px; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
   flex-wrap:nowrap !important;}}

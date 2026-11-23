@@ -18,14 +18,65 @@ from viewer.style import esc, plotly_layout, theme_name, tokens
 
 FIELDS = {"waves": "Waves", "currents": "Currents", "wind": "Wind", "depth": "Depth"}
 LAYER = {"waves": "vec_waves", "currents": "vec_currents", "wind": "vec_wind", "depth": None}
-WHY = {
-    "waves": "Waves stir up the seabed in shallow water and make it murky. Long-period swell reaches deeper than "
-             "short wind waves.",
-    "currents": "The coastal current carries Danube water south along the coast, with its nutrients and mud.",
-    "wind": "Strong offshore wind can pull cold deep water up to the surface (upwelling), which drops the "
-            "temperature fast.",
-    "depth": "Shallow water warms and loses oxygen faster than deep water; the shelf here deepens slowly.",
-}
+def _sea_word(h):
+    """WMO sea-state words for significant wave height (m)."""
+    for lim, w in ((0.1, "calm"), (0.5, "smooth"), (1.25, "slight"), (2.5, "moderate"), (4.0, "rough"), (6.0, "very rough")):
+        if h < lim:
+            return w
+    return "high"
+
+
+def _towards_south(deg):
+    return deg is not None and np.isfinite(deg) and 100 <= deg % 360 <= 260
+
+
+def why_waves(r):
+    base = ("Waves stir up the seabed in shallow water and make it murky. Long-period swell reaches deeper than "
+            "short wind waves.")
+    if r is None:
+        return base
+    kind = "mostly wind waves" if r.wave_period <= 6 else ("swell from farther away" if r.wave_period >= 8 else
+                                                             "a mix of wind waves and swell")
+    return f"{base} Today: {r.wave_height:.1f} m ({_sea_word(r.wave_height)} sea), {r.wave_period:.0f} s, {kind}."
+
+
+def why_current(r, wind_r):
+    base = ("The main coastal current usually runs south along this coast, carrying Danube water, nutrients and "
+            "mud.")
+    if r is None:
+        return base
+    today = f" Today the model shows {r.current_speed:.2f} m/s towards {_compass(r.dir_to)}"
+    if _towards_south(r.dir_to):
+        return base + today + ", in line with the usual flow."
+    if wind_r is not None and np.isfinite(wind_r.dir_to):
+        diff = abs((r.dir_to - wind_r.dir_to + 180) % 360 - 180)
+        if diff <= 60:
+            return (base + today + ", against the usual flow. The wind is also blowing towards "
+                    f"{_compass(wind_r.dir_to)} today, which can push the surface water that way.")
+    return base + today + ", against the usual flow. The model does not say why; short reversals near the coast happen."
+
+
+def why_wind(r):
+    base = ("Wind from the south or south-west along this coast can push surface water offshore and pull cold deep "
+            "water up (upwelling), mostly in summer; the sea temperature then drops fast.")
+    if r is None:
+        return base
+    upw = 157.5 <= r.wind_dir % 360 <= 247.5 and r.wind_speed >= 5
+    return base + (f" Today: {r.wind_speed:.1f} m/s from {_compass(r.wind_dir)}, "
+                   + ("a direction and strength that can cause upwelling." if upw else "not an upwelling wind."))
+
+
+def why_depth(d):
+    base = "Shallow water warms and loses oxygen faster than deep water; the shelf here deepens slowly."
+    if d is None or not np.isfinite(d) or d <= 0:
+        return base
+    if d < 20:
+        return base + f" At {d:.0f} m, storms can mix the water down to the seabed."
+    if d < 60:
+        return base + f" At {d:.0f} m, the bottom water can stay cut off from the surface in summer, when oxygen can drop."
+    return base + f" At {d:.0f} m this is the outer shelf, less affected by the coast."
+
+
 PROFILE_EAST = 1.6  # degrees of longitude east of the place: from the coast out over the shelf
 
 
@@ -78,31 +129,33 @@ def _compass(deg):
 
 
 def sea_state(sel, day):
-    """Rows: key -> (title, value, sub line, origin)."""
+    """Rows: key -> (title, value, sub line, origin, time, why it matters)."""
     when = pd.Timestamp(day) + pd.Timedelta(hours=12)
     rows = {}
     w = _at(_point("waves", sel["lat"], sel["lon"]), when)
+    c = _at(_point("currents", sel["lat"], sel["lon"]), when)
+    wd = _at(_point("wind", sel["lat"], sel["lon"]), when)
     if w:
         r, t = w
         rows["waves"] = ("Waves", f"{r.wave_height:.1f} m · {r.wave_period:.0f} s",
-                         f"height · period · from {_compass(r.wave_dir)}", "model", t)
-    c = _at(_point("currents", sel["lat"], sel["lon"]), when)
+                         f"height · period · from {_compass(r.wave_dir)}", "model", t, why_waves(r))
     if c:
         r, t = c
         rows["currents"] = ("Surface current", f"{r.current_speed:.2f} m/s", f"flowing towards {_compass(r.dir_to)}",
-                            "model", t)
-    wd = _at(_point("wind", sel["lat"], sel["lon"]), when)
+                            "model", t, why_current(r, wd[0] if wd else None))
     if wd:
         r, t = wd
-        rows["wind"] = ("Wind", f"{r.wind_speed:.1f} m/s", f"from {_compass(r.wind_dir)}", "model", t)
+        rows["wind"] = ("Wind", f"{r.wind_speed:.1f} m/s", f"from {_compass(r.wind_dir)}", "model", t, why_wind(r))
     d = _safe(_depth_at, round(sel["lat"], 4), round(sel["lon"], 4))
     if d is not None and np.isfinite(d):
         rows["depth"] = ("Seabed depth here", f"{d:.0f} m" if d > 0 else "on land", "EMODnet Bathymetry DTM",
-                         "measured", None)
+                         "measured", None, why_depth(d))
+    fallback = {"waves": why_waves(None), "currents": why_current(None, None), "wind": why_wind(None),
+                "depth": why_depth(None)}
     for k, title in (("waves", "Waves"), ("currents", "Surface current"), ("wind", "Wind"),
                      ("depth", "Seabed depth here")):
-        rows.setdefault(k, (title, "-", "no data here (or still downloading)", "", None))
-    return rows
+        rows.setdefault(k, (title, "-", "no data here (or still downloading)", "", None, fallback[k]))
+    return {k: rows[k] for k in ("waves", "currents", "wind", "depth")}
 
 
 # ------------------------------------------------------------------------------------------ panel rows
@@ -114,7 +167,7 @@ def _toggle(k):
 def _rows(rows):
     ss = st.session_state
     from viewer.overview import _CHEV, _CHEV_OPEN
-    for k, (title, value, sub, origin, _) in rows.items():
+    for k, (title, value, sub, origin, _, why) in rows.items():
         is_open = ss.get("open_sea") == k
         with st.container(key=f"crow_sea_{k}"):
             st.markdown(f"<div class='bsv-row bsv-row4{' open' if is_open else ''}'>"
@@ -126,7 +179,7 @@ def _rows(rows):
                       on_click=_toggle, args=(k,))
         if is_open:
             with st.container(key=f"cdet_sea_{k}"):
-                st.markdown(f"<div class='bsv-det'><span class='bsv-lbl'>Why</span><span>{esc(WHY[k])}</span></div>",
+                st.markdown(f"<div class='bsv-det'><span class='bsv-lbl'>Why</span><span>{esc(why)}</span></div>",
                             unsafe_allow_html=True)
 
 

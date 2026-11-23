@@ -13,6 +13,7 @@ from viewer import overview as OV
 from viewer import panels as PN
 from viewer import profiles as P
 from viewer import screens as SC
+from viewer import pressures as PR
 from viewer import seabed as SB
 from viewer import shell as SH
 from viewer import water as WQ
@@ -126,11 +127,7 @@ def seabed():
 
 # ------------------------------------------------------------------------------------------ Pressures
 def pressures():
-    ss = st.session_state
-    day_s, season = SH.day_season()
-    with st.container(key="page_body"):
-        SH.page_head("Pressures", "Five sectors, overlap count 0-5")
-        SC.sectors_screen(ss.profile, day_s, season)
+    PR.page()
 
 
 # ------------------------------------------------------------------------------------------ Methods

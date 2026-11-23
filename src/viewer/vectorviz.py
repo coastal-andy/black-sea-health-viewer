@@ -272,18 +272,19 @@ def _field_image(da: xr.DataArray, vmin, vmax, cmap, opacity, rows_per_cell: int
     return _png_data_url(rgba), [[s, w], [n, e]]
 
 
-def _arrow_svg(length: float, angle_to: float = 90.0, h: int = 18) -> str:
-    """Inline SVG of one legend arrow in the same style as the map arrows (white with dark outline)."""
+def _arrow_svg(length: float, angle_to: float = 90.0, h: int = 18, core: str = "#ffffff",
+               edge: str = "#1a1a1a", bg: str = "#5b6f86") -> str:
+    """Inline SVG of one legend arrow in the same style as the map arrows (default white with dark outline)."""
     L = float(length)
     W = int(L + 8)
     x0, x1, yc = 4, 4 + L, h / 2
     hl = max(5.0, 0.32 * L)
     path = f"M{x0},{yc} L{x1},{yc} M{x1 - hl},{yc - hl * 0.55} L{x1},{yc} L{x1 - hl},{yc + hl * 0.55}"
     return (f'<svg width="{W}" height="{h}" style="vertical-align:middle">'
-            f'<rect x="0" y="0" width="{W}" height="{h}" rx="3" fill="#5b6f86"/>'
-            f'<path d="{path}" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round" '
+            f'<rect x="0" y="0" width="{W}" height="{h}" rx="3" fill="{bg}"/>'
+            f'<path d="{path}" stroke="{edge}" stroke-width="4" fill="none" stroke-linecap="round" '
             f'stroke-linejoin="round" opacity="0.85"/>'
-            f'<path d="{path}" stroke="#ffffff" stroke-width="1.8" fill="none" stroke-linecap="round" '
+            f'<path d="{path}" stroke="{core}" stroke-width="1.8" fill="none" stroke-linecap="round" '
             f'stroke-linejoin="round"/></svg>')
 
 
@@ -291,10 +292,12 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
     """HTML legend: colorbar with units, arrow meaning and, for waves, period examples (3, 6, 10 s).
 
     theme (optional): dict with keys bg, overlay, text, muted, ctrl (the viewer's colour tokens) for a flat themed
-    box; without it the legend is the original white box."""
+    box, plus arrow_core / arrow_edge / arrow_bg for the sample arrows; without it the legend is the original
+    white box."""
     th = theme or {}
     base = th.get("bg", "#ffffff")
     c_sub, c_tick, c_note = (th.get("muted", "#444"), th.get("text", "#333"), th.get("muted", "#666"))
+    arw = dict(core=th.get("arrow_core", "#ffffff"), edge=th.get("arrow_edge", "#1a1a1a"), bg=th.get("arrow_bg", "#5b6f86"))
     sp = SPEC[_check_kind(kind)]
     cm = _cmap(sp["cmap"])
     # colours blended on white with the field opacity, so the bar matches what the map shows
@@ -315,7 +318,7 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
     ]
     if kind == "waves":
         ex = "".join(f'<div style="display:flex;align-items:center;gap:6px;height:18px">'
-                     f'<span style="width:30px;text-align:right">{p} s</span>{_arrow_svg(float(_wave_len_px(p)))}</div>'
+                     f'<span style="width:30px;text-align:right">{p} s</span>{_arrow_svg(float(_wave_len_px(p)), **arw)}</div>'
                      for p in (3, 6, 10))
         parts.append('<div style="margin-top:4px;font-size:11px">Arrow length = peak period</div>'
                      f'<div style="font-size:11px">{ex}</div>'
@@ -325,7 +328,7 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
     elif kind == "wind":
         parts.append('<div style="margin-top:4px;font-size:11px">Disc colour = wind speed at reference points '
                      '(no gridded wind source)</div>')
-    parts.append(f'<div style="margin-top:4px;font-size:11px;max-width:200px">{_arrow_svg(22)} '
+    parts.append(f'<div style="margin-top:4px;font-size:11px;max-width:200px">{_arrow_svg(22, **arw)} '
                  f'{sp["convention"].split(".")[0]}.</div>')
     parts.append(f'<div style="font-size:10px;color:{c_note};max-width:200px">Click the sea for values.</div>')
     if theme:
@@ -410,7 +413,7 @@ L.VectorArrows = L.Layer.extend({
           ctx.beginPath(); ctx.arc(p.x, p.y, o.disc, 0, 2 * Math.PI);
           ctx.fillStyle = d.col[i]; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = '#1a1a1a'; ctx.stroke();
         }
-        ctx.strokeStyle = pass === 0 ? 'rgba(26,26,26,0.85)' : '#ffffff';
+        ctx.strokeStyle = pass === 0 ? (o.edge || 'rgba(26,26,26,0.85)') : (o.core || '#ffffff');
         ctx.fillStyle = ctx.strokeStyle;
         ctx.lineWidth = pass === 0 ? 4 : 1.8;
         if (o.still && d.mag[i] < o.still) {  // too weak to have a meaningful direction: small dot
@@ -543,6 +546,8 @@ def field_layer(m, ds: xr.Dataset, kind: str | None = None, time=None, name: str
                         lenHi=_WAVE_LEN["hi"])
         else:
             opts.update(spacing=spacing_px or 30, len=22, still=0.02)
+    if legend_theme and legend_theme.get("arrow_core"):
+        opts.update(core=legend_theme["arrow_core"], edge=legend_theme.get("arrow_edge", "rgba(26,26,26,0.85)"))
     if legend:
         opts.update(legend=legend_html(kind, when_txt, opacity, legend_theme), legendPos=legend_pos)
     _arrow_layer_class()(data, opts, name=f"{sp['label']} arrows").add_to(fg)
