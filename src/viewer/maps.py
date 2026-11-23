@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from viewer import adapters as A
-from viewer.style import FONT_UI, OVERLAP, SECTOR, OI, esc, overlap_levels, theme_name, tokens
+from viewer.style import FONT_NUM, FONT_UI, OVERLAP, SECTOR, OI, esc, overlap_levels, theme_name, tokens
 
 log = logging.getLogger("viewer")
 
@@ -29,11 +29,20 @@ GRIDDED = set(A.LAYERS)
 VECTOR = {"vec_waves": "waves", "vec_currents": "currents", "vec_wind": "wind"}
 
 
+def _fs_icon(colour: str) -> str:
+    from urllib.parse import quote
+    svg = (f"<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'><path d='M2 7 V2 H7 "
+           f"M11 2 H16 V7 M16 11 V16 H11 M7 16 H2 V11' fill='none' stroke='{colour}' stroke-width='1.6'/></svg>")
+    return "url(\"data:image/svg+xml;utf8," + quote(svg, safe=" =:/;,'()") + "\")"
+
+
 def base_map(lat, lon, zoom, theme: str | None = None) -> folium.Map:
     """Basemap matched to the viewer theme: Esri dark grey (dark) or light grey canvas (light), others in the layer list."""
     t = tokens(theme)
     m = folium.Map(location=[lat, lon], zoom_start=zoom, tiles=None, control_scale=True, max_zoom=16, min_zoom=5,
-                   prefer_canvas=False)  # SVG renderer: needed for the hatch patterns
+                   prefer_canvas=False, zoom_control="topright")  # SVG renderer: needed for the hatch patterns
+    from folium.plugins import Fullscreen
+    Fullscreen(position="topright", title="Full-screen map", title_cancel="Exit full screen").add_to(m)
     # Esri dark / light grey canvas (no API key needed; CARTO tiles now ask for one), with its label layer on top
     folium.TileLayer(ESRI.format(f"Canvas/World_{t['basemap']}_Gray_Base"), attr="Esri, HERE, Garmin, OpenStreetMap",
                      name="Basemap (matches the theme)", max_native_zoom=16, max_zoom=16, show=True).add_to(m)
@@ -47,13 +56,15 @@ def base_map(lat, lon, zoom, theme: str | None = None) -> folium.Map:
                      max_zoom=16, show=False).add_to(m)
     # fill the iframe height (the viewer sets the iframe to the page height) and theme the Leaflet controls
     m.get_root().header.add_child(folium.Element(
-        f"<style>html,body{{background:{t['bg']};}} .folium-map{{height:100vh !important;}}"
+        f"<style>html,body{{background:{t['bg']};}} .folium-map,#map_div{{height:100vh !important;}}"
         f".leaflet-container{{background:{t['bg']};font-family:{FONT_UI};}}"
         f".leaflet-bar a,.leaflet-control-layers{{background:{t['overlay']} !important;color:{t['text']} !important;"
         f"border-color:{t['ctrl']} !important;border-radius:4px !important;}}"
         f".leaflet-bar{{border:1px solid {t['ctrl']} !important;border-radius:4px !important;box-shadow:none !important;}}"
         f".leaflet-control-layers{{box-shadow:none !important;border:1px solid {t['ctrl']} !important;}}"
         f".leaflet-control-layers label{{color:{t['text']};}}"
+        f".leaflet-control-zoom-fullscreen,.leaflet-control-zoom-fullscreen.fullscreen-icon{{background-image:{_fs_icon(t['text'])} !important;background-size:18px 18px !important;"
+        f"background-position:center !important;background-repeat:no-repeat !important;}}"
         f".leaflet-control-attribution{{background:{t['overlay']} !important;color:{t['muted']} !important;}}"
         f".leaflet-control-attribution a{{color:{t['muted']} !important;}}"
         f".leaflet-control-scale-line{{background:transparent;color:{t['muted']};border-color:{t['muted']};}}"
@@ -225,58 +236,67 @@ def _fmt(x):
 
 def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels: list | None = None,
                 hatched: bool = False) -> str:
+    """Compact themed legend (flat panel, hairline border, 4 px corners), collapsible and height-capped."""
+    t = tokens()
+    lab = (f"font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']};"
+           "display:block;margin:8px 0 4px 0")
+    num = f"font-family:{FONT_NUM};font-size:12.5px"
+    row = "display:flex;align-items:center;gap:7px;margin:2px 0"
     parts = []
     if fd:
         grad = ", ".join(fd["colors"])
-        ticks = "".join(f"<span>{_fmt(t)}</span>" for t in _ticks(fd))
-        src = f"{fd['origin']}, {fd['time']}" + (f" - {fd['dataset']}" if detail else "")
+        ticks = "".join(f"<span>{_fmt(x)}</span>" for x in _ticks(fd))
+        src = f"{fd['origin']}, {fd['time']}" + (f", {fd['dataset']}" if detail else "") + (", log scale" if fd["log"] else "")
         parts.append(
-            f"<div style='font-weight:600'>{esc(fd['title'])} ({esc(fd['unit'])})</div>"
-            f"<div style='height:10px;width:190px;background:linear-gradient(to right,{grad});border-radius:2px'></div>"
-            f"<div style='display:flex;justify-content:space-between;width:190px;font-size:11px'>{ticks}</div>"
-            f"<div style='opacity:0.75;font-size:10.5px;margin-bottom:4px'>{esc(src)}{' - log scale' if fd['log'] else ''}</div>")
+            f"<span style='{lab};margin-top:2px'>{esc(fd['title'])} {esc(fd['unit'])} &middot; {esc(fd['origin'])}</span>"
+            f"<div style='height:6px;width:200px;background:linear-gradient(to right,{grad})'></div>"
+            f"<div style='display:flex;justify-content:space-between;width:200px;{num};margin-top:2px'>{ticks}</div>"
+            f"<div style='font-size:10.5px;color:{t['muted']}'>{esc(src)}</div>")
     if "overlap" in layers:
         lv = overlap_levels()
         present = sorted(levels or lv)
+
         def sw(n):
             col, op, _ = lv[n]
             if hatched:
                 gap = max(2, int(9 - 1.6 * n))
                 bg = (f"repeating-linear-gradient(-45deg,{col} 0 {1 + 0.6 * n:.1f}px,transparent {1 + 0.6 * n:.1f}px "
                       f"{1 + 0.6 * n + gap:.1f}px)")
-                return (f"<span style='display:inline-block;width:18px;height:11px;background:{bg};"
-                        f"border:{STROKE.get(n, 2):.1f}px solid {col};margin-right:5px;vertical-align:middle'></span>")
-            return (f"<span style='display:inline-block;width:18px;height:10px;background:{col};"
-                    f"opacity:{max(op, 0.55)};margin-right:5px;vertical-align:middle'></span>")
-        rows = "".join(f"<div>{sw(n)}{esc(lv[n][2])}</div>" for n in present if n in lv)
-        parts.append(f"<div style='font-weight:600;margin-top:2px'>Sectors overlapping ({season}), of 5</div>{rows}")
+                return (f"<span style='display:inline-block;width:22px;height:12px;background:{bg};"
+                        f"border:{STROKE.get(n, 2):.1f}px solid {col}'></span>")
+            return f"<span style='display:inline-block;width:22px;height:12px;background:{col};opacity:{max(op, 0.6)}'></span>"
+        cells = "".join(f"<span style='{row};margin:0 6px 0 0'>{sw(n)}<span style='{num}'>{n}</span></span>"
+                        for n in present if n in lv)
+        parts.append(f"<span style='{lab}'>Sectors overlapping, of 5 ({esc(season)})</span>"
+                     f"<div style='display:flex;flex-wrap:wrap;gap:2px 0'>{cells}</div>")
     if "zones" in layers or "features" in layers:
-        rows = "".join(f"<div><span style='display:inline-block;width:10px;height:10px;border:2px solid {c};"
-                       f"margin-right:5px'></span>{esc(l)}</div>" for k, (l, c) in SECTOR.items())
-        parts.append(f"<div style='font-weight:600;margin-top:4px'>Sectors</div>{rows}"
-                     f"<div style='opacity:0.75;font-size:10.5px'>dashed = location assumed, to confirm with NIMRD</div>")
+        rows = "".join(f"<div style='{row}'><span style='width:10px;height:10px;border:2px solid {c}'></span>{esc(l)}</div>"
+                       for k, (l, c) in SECTOR.items())
+        parts.append(f"<span style='{lab}'>Sectors</span>{rows}"
+                     f"<div style='{row};color:{t['muted']}'><span style='width:10px;height:10px;"
+                     f"border:2px dashed {t['muted']}'></span>dashed = location assumed</div>")
     if "insitu" in layers:
-        parts.append("<div style='font-weight:600;margin-top:4px'>In-situ</div>"
-                     f"<div><span style='display:inline-block;width:10px;height:10px;border-radius:50%;background:{OI['blue']};"
-                     "border:1px solid #1C2430;margin-right:5px'></span>trusted or not assessed</div>"
-                     "<div><span style='display:inline-block;width:10px;height:10px;border-radius:50%;background:#9AA3AD;"
-                     "margin-right:5px'></span>under QC, context only, or no recent data</div>")
+        parts.append(f"<span style='{lab}'>In-situ</span>"
+                     f"<div style='{row}'><span style='width:9px;height:9px;border-radius:50%;background:{OI['blue']};"
+                     f"border:1px solid {t['text']}'></span>trusted or not assessed</div>"
+                     f"<div style='{row}'><span style='width:9px;height:9px;border-radius:50%;background:#9AA3AD'></span>"
+                     "under QC, context only, or old</div>")
     if "natura" in layers:
-        parts.append("<div style='margin-top:4px'><span style='display:inline-block;width:10px;height:10px;"
-                     "border:1.5px dashed #1B7F3B;margin-right:5px'></span>Natura 2000 site</div>")
+        parts.append(f"<div style='{row};margin-top:8px'><span style='width:10px;height:10px;"
+                     "border:1.5px dashed #1B7F3B'></span>Natura 2000 site</div>")
     if not parts:
         return ""
-    # collapsible, height-capped legend so it never hides the coast it explains
-    t = tokens()
-    return (f"<details open style='position:absolute;bottom:22px;right:10px;z-index:9999;background:{t['overlay']};"
-            f"color:{t['text']};padding:8px 12px;border-radius:4px;border:1px solid {t['ctrl']};"
-            f"font:12px/1.35 {FONT_UI};max-width:240px'>"
-            f"<summary style='cursor:pointer;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']}'>Legend</summary>"
-            "<div style='max-height:min(48vh,340px);overflow-y:auto;margin-top:4px'>" + "".join(parts) + "</div></details>")
+    return (f"<details open class='bsv-legend' style='position:absolute;bottom:26px;right:10px;z-index:9999;"
+            f"background:{t['overlay']};color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;"
+            f"border:1px solid {t['ctrl']};font:12px/1.35 {FONT_UI};max-width:250px'>"
+            f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"
+            f"color:{t['muted']}'>Legend</summary>"
+            "<div style='max-height:min(46vh,330px);overflow-y:auto'>" + "".join(parts) + "</div></details>")
 
 
 def build(view: dict, layers: set, day: str, season: str, sel: dict | None, detail: bool, tiles_mode: bool = False,
-          only_sector: str | None = None, theme: str | None = None) -> tuple[folium.Map, dict | None, list[str]]:
+          only_sector: str | None = None, theme: str | None = None,
+          legend: bool = True) -> tuple[folium.Map, dict | None, list[str]]:
     """Return (map, field dict or None, messages)."""
     msgs = []
     m = base_map(view["lat"], view["lon"], view["zoom"], theme)
@@ -338,7 +358,7 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
     if "insitu" in layers:
         add_platforms(m, A.platforms(), detail)
     add_selection(m, sel)
-    lg = legend_html(fd, layers, season, detail, levels, hatched=bool(grid))
+    lg = legend_html(fd, layers, season, detail, levels, hatched=bool(grid)) if legend else ""
     if lg:
         m.get_root().html.add_child(folium.Element(lg))
     folium.LayerControl(collapsed=True, position="topright").add_to(m)

@@ -33,6 +33,7 @@ PAGES = {
     "pressures": st.Page(V.pressures, title="Pressures", url_path="pressures"),
     "methods": st.Page(V.methods, title="Data and methods", url_path="methods"),
 }
+SH.PAGE_OBJS.update(PAGES)
 page = st.navigation(list(PAGES.values()), position="hidden")
 active = next((k for k, p in PAGES.items() if p.url_path == page.url_path), "overview")
 st.markdown(css(ss.theme, active), unsafe_allow_html=True)

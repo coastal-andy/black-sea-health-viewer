@@ -11,6 +11,7 @@ from viewer import profiles as P
 from viewer.style import LOGO_SVG, SECTOR, THEMES, esc, tokens
 
 # rail key -> label; the order is the rail order
+PAGE_OBJS: dict = {}  # rail key -> st.Page, filled by app.py
 PAGES = {"overview": "Overview", "water": "Water", "seabed": "Seabed", "pressures": "Pressures", "methods": "Methods"}
 
 
@@ -103,6 +104,14 @@ def day_season() -> tuple[str, str]:
     auto = A.season_for_date(day)
     mode = ss.get("w_season", "auto")
     return str(day), (auto if mode == "auto" else mode)
+
+
+def season_control():
+    day, _ = day_season()
+    auto = A.season_for_date(pd.Timestamp(day).date())
+    st.radio("Season for pressure zones", ["auto", "summer", "winter"], horizontal=True, key="w_season",
+             format_func=lambda s: f"From date ({auto})" if s == "auto" else s.capitalize(),
+             help="Summer = bathing season, 1 June to 15 September: tourism zones are on.")
 
 
 def date_controls():

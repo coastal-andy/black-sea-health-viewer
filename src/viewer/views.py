@@ -3,18 +3,20 @@
 from __future__ import annotations
 
 import folium
+import pandas as pd
 import streamlit as st
 from streamlit_folium import st_folium
 
 from viewer import adapters as A
 from viewer import maps as M
+from viewer import overview as OV
 from viewer import panels as PN
 from viewer import profiles as P
 from viewer import screens as SC
 from viewer import shell as SH
 from viewer.style import esc, theme_name
 
-MAP_RATIO = [2.6, 1]  # map column : docked panel
+MAP_RATIO = [2.3, 1]  # map column : docked panel
 
 
 def _layers() -> set:
@@ -57,42 +59,57 @@ def overview():
         with st.container(key="bsv_map"):
             with st.container(key="map_tools"):
                 SH.place_picker()
-                with st.popover("Map layers", width="stretch"):
+                with st.popover("Map layers and season", width="stretch"):
                     _layer_controls(profile)
+                    SH.season_control()
             only = profile.get("sector") if (profile.get("sector") and ss.get("w_mysector", True)) else None
             m, fd, msgs = M.build(ss.view, layers, day_s, season, None, detail, tiles_mode=ss.get("w_tiles", False),
-                                  only_sector=only, theme=theme_name())
+                                  only_sector=only, theme=theme_name(), legend=ss.get("w_legend", True))
             fg = folium.FeatureGroup(name="Selection")
             M.add_selection(fg, ss.sel)
-            out = st_folium(m, height=760, use_container_width=True,
+            out = st_folium(m, height=700, use_container_width=True,
                             key=f"map_{ss.get('map_nonce', 0)}_{theme_name()}",
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
             if msgs:
                 with st.container(key="map_msgs"):
                     for msg in msgs:
                         st.caption(msg)
+            OV.timeline()
             click = (out or {}).get("last_clicked")
             if click and click != ss.get("last_click"):
                 ss.last_click = click
                 ss.sel = dict(name="Clicked point", lat=round(click["lat"], 4), lon=round(click["lng"], 4),
                               kind="point", wkt=None)
+                ss.open_card = None
                 st.rerun()
     with right:
         with st.container(key="bsv_panel"):
-            with st.container(key="bsv_pad"):
-                SH.profile_menu()
+            OV.profile_tabs()
+            profile = ss.profile
             sel = ss.sel
-            st.markdown(f"<div class='bsv-sec'>{SH.selection_header(sel, season)}</div>", unsafe_allow_html=True)
-            if fd:
-                v = A.sample_field(fd, sel["lat"], sel["lon"])
-                if v is not None:
-                    st.markdown(f"<div class='bsv-sec'><div class='bsv-lbl'>{esc(fd['title'])} here &middot; "
-                                f"{esc(fd['origin'])}, {esc(fd['time'])}</div><span class='bsv-num' style='font-size:26px'>"
-                                f"{v:.2f} {esc(fd['unit'])}</span></div>", unsafe_allow_html=True)
-            with st.expander("Date and season"):
-                SH.date_controls()
-            with st.container(key="bsv_cards"):
-                PN.cards_view(sel, day_s, profile, ncols=1, compact=True)
+            cards = A.zone_cards(sel["lat"], sel["lon"], day_s, P.card_profile(profile), sel.get("wkt"), wait=6)
+            pending = A.cards_pending(cards)
+            n, secs = A.overlap_at(sel["lat"], sel["lon"], season)
+            head = SH.selection_header(sel, season)
+            if pending:
+                st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>Computing the health signs for this "
+                            "place.</p><p class='bsv-vsub'>The first time takes up to a minute; after that it is "
+                            "cached. The rows appear by themselves.</p></div>", unsafe_allow_html=True)
+                PN.poll_cards(sel, day_s, profile)
+                return
+            if profile.get("role") == "public":
+                cards = [c for c in cards if c.get("status") != "no_data"] + \
+                        [c for c in cards if c.get("status") == "no_data"]
+            v1, v2 = OV.verdict(cards, profile, season, n, secs, day_s)
+            st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>{esc(v1)}</p>"
+                        f"<p class='bsv-vsub'>{esc(v2)}</p>{OV.counts_html(cards)}</div>", unsafe_allow_html=True)
+            OV.card_rows(cards, profile)
+            with st.container(key="panel_foot", horizontal=True, vertical_alignment="center"):
+                st.page_link(SH.PAGE_OBJS["water"], label="Water quality analysis")
+                st.markdown(f"<span class='bsv-note'>vs. usual for {pd.Timestamp(day_s):%d %B}, "
+                            f"cards from the {esc(A.cards_source())}</span>", unsafe_allow_html=True)
+    if ss.pop("_goto", None):
+        st.switch_page(SH.PAGE_OBJS["water"])
 
 
 # ------------------------------------------------------------------------------------------ Water quality
