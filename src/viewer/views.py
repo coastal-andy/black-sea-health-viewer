@@ -14,6 +14,7 @@ from viewer import panels as PN
 from viewer import profiles as P
 from viewer import screens as SC
 from viewer import shell as SH
+from viewer import water as WQ
 from viewer.style import esc, theme_name
 
 MAP_RATIO = [2.3, 1]  # map column : docked panel
@@ -114,30 +115,7 @@ def overview():
 
 # ------------------------------------------------------------------------------------------ Water quality
 def water():
-    ss = st.session_state
-    profile = ss.profile
-    with st.container(key="page_body"):
-        SH.page_head("Water quality", "Water")
-        views = ["Compare sources", "Anomaly", "Long-term trend", "Obs vs model"]
-        if ss.get("w_wview") not in views:
-            ss["w_wview"] = "Anomaly"
-        c1, c2 = st.columns([3, 1.2])
-        with c1:
-            view = st.segmented_control("View", views, key="w_wview", label_visibility="collapsed",
-                                        format_func=PN.VIEW_SHORT.get) or "Anomaly"
-        with c2:
-            st.selectbox("Variable", list(A.VARIABLES), key="w_var", label_visibility="collapsed",
-                         format_func=lambda k: PN.var_label(k, profile))
-        var = ss.get("w_var", "sst")
-        sel = ss.sel
-        if view == "Compare sources":
-            PN.compare_view(sel, var, profile)
-        elif view == "Anomaly":
-            PN.anomaly_view(sel, var, profile)
-        elif view == "Long-term trend":
-            PN.trend_view(sel, var, profile)
-        else:
-            PN.obs_model_view(sel, var, profile)
+    WQ.page()
 
 
 # ------------------------------------------------------------------------------------------ Coast and seabed

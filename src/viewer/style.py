@@ -165,7 +165,9 @@ section[data-testid="stSidebar"] div[style*="cursor: col-resize"], section[data-
 .st-key-theme_switch .bsv-lbl {{display:block; text-align:center; width:72px; margin-bottom:4px;}}
 
 /* docked panel on the right */
-div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{background:{t['panel']}; border-left:1px solid {t['line']};
+[data-testid="stHorizontalBlock"]:has(> div > .st-key-bsv_panel), [data-testid="stHorizontalBlock"]:has(.st-key-bsv_map) {{flex-wrap:nowrap !important;}}
+div[data-testid="stColumn"]:has(.st-key-bsv_map) {{min-width:0 !important;}}
+div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{min-width:280px; background:{t['panel']}; border-left:1px solid {t['line']};
   height:100vh; overflow-y:auto; position:sticky; top:0;}}
 .st-key-bsv_panel {{padding:0 0 24px 0;}}
 .st-key-bsv_panel > div {{gap:0;}}
@@ -187,11 +189,17 @@ div[data-testid="stColumn"]:has(.st-key-bsv_map) {{position:relative;}}
 .st-key-page_body {{padding:24px 28px 40px 28px;}}
 /* Overview panel (B1) */
 .st-key-ptabs {{border-bottom:1px solid {t['line']}; padding:0 8px;}}
+.st-key-ptabs {{container-type:inline-size;}}
+@container (max-width: 270px) {{
+  .st-key-ptabs [data-testid="stButtonGroup"] > div {{flex-wrap:wrap !important;}}
+  .st-key-ptabs [data-testid="stButtonGroup"] button {{flex:1 1 50% !important; height:38px !important;}}
+}}
 .st-key-ptabs [data-testid="stButtonGroup"] {{width:100%;}}
 .st-key-ptabs [data-testid="stButtonGroup"] > div {{width:100%; gap:0; flex-wrap:nowrap;}}
 .st-key-ptabs [data-testid="stButtonGroup"] button {{flex:1 1 0; min-width:0; padding:0 4px !important; height:48px; border:0 !important; border-radius:0 !important;
   background:transparent !important; color:{t['muted']} !important;}}
-.st-key-ptabs [data-testid="stButtonGroup"] button p {{font-size:12px !important; letter-spacing:1px; text-transform:uppercase;
+.st-key-ptabs [data-testid="stButtonGroup"] button p {{font-size:clamp(10px, 0.85vw, 12px) !important;
+  letter-spacing:clamp(0px, 0.07vw, 1px); text-transform:uppercase;
   overflow:visible !important; text-overflow:clip !important; white-space:nowrap;}}
 .st-key-ptabs [data-testid="stButtonGroup"] button div {{overflow:visible !important; max-width:none !important;}}
 .st-key-ptabs [data-testid="stButtonGroup"] button[kind*="Active"] {{color:{t['text']} !important; background:transparent !important;
@@ -232,6 +240,62 @@ div[data-testid="stColumn"]:has(.st-key-bsv_map) {{position:relative;}}
 .st-key-panel_foot a[data-testid="stPageLink-NavLink"] {{padding:0; background:transparent;}}
 .st-key-panel_foot a[data-testid="stPageLink-NavLink"] p {{font-size:14px !important; font-weight:600; color:{t['accent']} !important;}}
 .st-key-panel_foot .bsv-note {{font-size:11.5px;}}
+/* Water quality (B2) */
+[data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) {{flex-wrap:nowrap !important;}}
+div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:300px; background:{t['panel']};
+  border-right:1px solid {t['line']}; height:100vh; overflow-y:auto; position:sticky; top:0;}}
+.st-key-bsv_aside {{gap:0 !important; padding-bottom:24px;}}
+[class*="st-key-vrow_"] {{position:relative; gap:0 !important;}}
+.bsv-vrow {{display:flex; align-items:center; gap:12px; height:48px; padding:0 20px; font-size:14.5px; color:{t['soft']};}}
+.bsv-vrow .bsv-sq {{margin:0;}}
+.bsv-vrow .nm {{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}}
+.bsv-vrow .vl {{font-family:{FONT_NUM}; font-size:16px; color:{t['sub']}; white-space:nowrap;}}
+.bsv-vrow.active {{background:{t['raised']}; color:{t['text']}; box-shadow:inset 2px 0 0 {t['accent']};}}
+.bsv-vrow.active .vl {{color:{t['text']};}}
+[class*="st-key-vrow_"]:hover .bsv-vrow {{background:{t['raised']};}}
+[class*="st-key-vbtn_"] {{position:absolute !important; inset:0; width:100% !important; max-width:none !important;
+  height:100% !important; z-index:3; margin:0 !important;}}
+[class*="st-key-vbtn_"] *, [class*="st-key-vbtn_"] button {{width:100% !important; max-width:none !important; height:100% !important;}}
+[class*="st-key-vbtn_"] button {{opacity:0; cursor:pointer; border:0 !important;}}
+[class*="st-key-vbtn_"] button:focus-visible {{opacity:1; background:transparent !important; outline:2px solid {t['accent']};}}
+[class*="st-key-vbtn_"] button:focus-visible p {{display:none;}}
+.st-key-aside_foot {{padding:18px 20px 0 20px; gap:12px !important;}}
+.st-key-aside_foot a[data-testid="stPageLink-NavLink"] {{padding:0; background:transparent;}}
+.st-key-aside_foot a[data-testid="stPageLink-NavLink"] p {{font-size:14px !important; font-weight:600; color:{t['accent']} !important;}}
+.st-key-page_body:has(.bsv-whead) {{padding:24px 36px 48px 36px; max-width:1100px;}}
+.bsv-whead {{display:flex; justify-content:space-between; align-items:flex-end; gap:16px; margin-bottom:6px;}}
+.bsv-whead .bsv-place {{font-size:36px; margin:0;}}
+.st-key-wtabs {{border-bottom:1px solid {t['line']}; margin-bottom:18px;}}
+.st-key-wtabs [data-testid="stButtonGroup"] > div {{gap:0;}}
+.st-key-wtabs [data-testid="stButtonGroup"] button {{height:48px; padding:0 16px !important; border:0 !important; border-radius:0 !important;
+  background:transparent !important; color:{t['muted']} !important;}}
+.st-key-wtabs [data-testid="stButtonGroup"] button p {{font-size:12px !important; letter-spacing:1.2px; text-transform:uppercase;}}
+.st-key-wtabs [data-testid="stButtonGroup"] button[kind*="Active"] {{color:{t['text']} !important; background:transparent !important;
+  box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
+.st-key-wtabs [data-testid="stButtonGroup"] button[kind*="Active"] p {{font-weight:600;}}
+.bsv-stats {{display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); border-top:1px solid {t['line']};
+  border-bottom:1px solid {t['line']}; margin:0 0 20px 0;}}
+.bsv-stat {{display:flex; flex-direction:column; gap:4px; padding:14px 18px 14px 0;}}
+.bsv-stat + .bsv-stat {{border-left:1px solid {t['line']}; padding-left:18px;}}
+.bsv-stat .v {{font-family:{FONT_NUM}; font-size:34px; font-weight:500; line-height:1.05; color:{t['text']}; white-space:nowrap;}}
+.bsv-stat .u {{font-size:15px; color:{t['muted']}; margin-left:4px;}}
+.bsv-stat .tag {{display:inline-flex; align-items:center; font-family:{FONT_UI}; font-size:11px; letter-spacing:1px;
+  text-transform:uppercase; color:{t['soft']}; margin-left:10px; vertical-align:middle;}}
+.bsv-fighead {{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px;}}
+.bsv-key {{display:flex; gap:16px; font-size:12px; color:{t['sub']};}}
+.bsv-key > span {{display:inline-flex; align-items:center; gap:6px;}}
+.bsv-key i {{display:inline-block; width:18px;}}
+.bsv-table {{width:100%; border-collapse:collapse; font-size:13px; color:{t['soft']};}}
+.bsv-table th {{text-align:left; font-weight:500; font-size:10.5px; letter-spacing:1px; text-transform:uppercase;
+  color:{t['muted']}; padding:6px 10px 6px 0; border-bottom:1px solid {t['line']};}}
+.bsv-table td {{padding:8px 10px 8px 0; border-bottom:1px solid {t['line2']}; vertical-align:top;}}
+.bsv-table td.n {{font-family:{FONT_NUM}; font-size:15px; white-space:nowrap;}}
+.bsv-chain {{margin:4px 0 0 18px; padding:0; font-size:13.5px; line-height:1.5; color:{t['soft']};}}
+.bsv-chain li {{margin:4px 0;}}
+.st-key-page_body [data-testid="stExpander"] summary {{padding:12px 0 !important;}}
+.st-key-page_body [data-testid="stExpanderDetails"] {{padding:4px 0 14px 0 !important;}}
+.st-key-page_body [data-testid="stExpander"] details {{border-top:0 !important;}}
+.st-key-page_body [data-testid="stExpander"]:first-of-type details {{border-top:1px solid {t['line']} !important;}}
 /* bottom timeline */
 .st-key-timeline {{height:64px; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
   flex-wrap:nowrap !important;}}
@@ -244,6 +308,8 @@ div[data-testid="stColumn"]:has(.st-key-bsv_map) {{position:relative;}}
   background:repeating-linear-gradient(-45deg, {t['ctrl']} 0 1px, transparent 1px 5px); pointer-events:none;}}
 .bsv-tl-labels .today {{color:{t['text']}; font-weight:600;}}
 .bsv-tl-labels .fc {{color:{t['muted']};}}
+.st-key-tl_track {{container-type:inline-size;}}
+@container (max-width: 520px) {{ .bsv-tl-labels .mid {{visibility:hidden;}} }}
 .st-key-legend_btn button {{height:40px; padding:0 12px;}}
 .st-key-legend_btn button p {{font-size:12px !important; letter-spacing:1px; text-transform:uppercase; color:{t['soft']} !important;}}
 

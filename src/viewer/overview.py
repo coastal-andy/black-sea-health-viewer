@@ -13,7 +13,8 @@ from viewer.style import ORIGIN_LABEL, STATUS, STATUS_LABEL, esc, status_square
 # tab label -> role key
 TABS = {"public": "Public", "student": "Student", "stakeholder": "Sector", "researcher": "Research"}
 # card id -> variable of the Water quality chart (cards without one get no chart link)
-CARD_VAR = {"temperature": "sst", "oxygen": "o2_bottom", "blooms": "chl", "clarity": "kd490", "drivers": "sal"}
+CARD_VAR = {"temperature": "sst", "oxygen": "o2_bottom", "blooms": "chl", "clarity": "kd490", "drivers": "sal",
+            "nutrients": "nutrients", "acidification": "ph"}
 ORDER = ("alert", "watch", "normal", "no_data")
 _CHEV = ("<svg width='10' height='10' viewBox='0 0 10 10' aria-hidden='true'><path d='M3 1.5 L7 5 L3 8.5' fill='none' "
          "stroke='currentColor' stroke-width='1.5'/></svg>")
@@ -167,7 +168,7 @@ def _toggle(cid):
 def _to_chart(cid):
     ss = st.session_state
     ss["w_var"] = CARD_VAR[cid]
-    ss["w_wview"] = "Anomaly"
+    ss["w_wview"] = "now"
     ss["_goto"] = "water"
 
 
@@ -231,7 +232,7 @@ def timeline():
         elif i == len(days) - 1:
             labels.append(f"<span class='fc'>{d.day} forecast</span>")
         else:
-            labels.append(f"<span class='{'fc' if d > today else ''}'>{d.day}</span>")
+            labels.append(f"<span class='mid{' fc' if d > today else ''}'>{d.day}</span>")
     fc_left = 100 * (days.index(today)) / (len(days) - 1)
     with st.container(key="timeline", horizontal=True, vertical_alignment="center"):
         with st.container(key="tl_track"):
