@@ -1,0 +1,16 @@
+{
+ "load_field waves": 0.979,
+ "load_field currents": 0.033,
+ "load_field wind (points)": 3.11,
+ "field_layer waves": 0.221,
+ "field_layer currents": 0.006,
+ "combined map (3 layers)": 0.015,
+ "load_point waves 7 d": 0.067,
+ "load_point currents 7 d": 0.002,
+ "load_point wind 7 d": 0.768,
+ "point_chart waves": 0.211,
+ "point_chart currents": 0.015,
+ "point_chart wind": 0.072,
+ "wave_time": "2026-11-23T14:00:00",
+ "current_time": "2026-11-23T00:00:00"
+}

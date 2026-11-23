@@ -1,0 +1,20 @@
+Direction check, 2026-11-09 14:00 to 2026-11-23 14:00 UTC
+
+== Constanta (44.17, 28.72)
+1. CMEMS VMDR (from) vs Open-Meteo wave_direction (from): n=337, median |diff|=9 deg, circular mean diff=-6 deg, share within 45 deg=98%
+2. wave to-direction vs wind to-direction, wind >= 8 m/s: n=22, median |diff|=62 deg, circular mean diff=-64 deg, share within 45 deg=5%
+   same, all hours: n=337, median |diff|=71 deg, circular mean diff=-74 deg, share within 45 deg=22%
+   (control) if the +180 were wrongly skipped for waves only, the strong-wind diff would be ~180 deg
+3. CMEMS daily current to-direction vs Open-Meteo SMOC daily vector-mean 'towards' (speed >= 0.05 m/s): n=13, median |diff|=17 deg, circular mean diff=-26 deg, share within 45 deg=77%
+
+== Offshore shelf (44.4, 29.5)
+1. CMEMS VMDR (from) vs Open-Meteo wave_direction (from): n=337, median |diff|=5 deg, circular mean diff=2 deg, share within 45 deg=99%
+2. wave to-direction vs wind to-direction, wind >= 8 m/s: n=151, median |diff|=21 deg, circular mean diff=-19 deg, share within 45 deg=81%
+   same, all hours: n=337, median |diff|=24 deg, circular mean diff=-19 deg, share within 45 deg=74%
+   (control) if the +180 were wrongly skipped for waves only, the strong-wind diff would be ~180 deg
+3. CMEMS daily current to-direction vs Open-Meteo SMOC daily vector-mean 'towards' (speed >= 0.05 m/s): n=12, median |diff|=58 deg, circular mean diff=0 deg, share within 45 deg=42%
+
+4. Arrow maths (canvas: x right, y down; dx = sin(to) * L, dy = -cos(to) * L)
+   wave from N (VMDR=0): to=180 deg -> dx=+0.00, dy=+1.00 (S)
+   current u=+1, v=0: to=90 deg -> dx=+1.00, dy=-0.00 (E)
+   wind from W (270): to=90 deg -> dx=+1.00, dy=-0.00 (E)

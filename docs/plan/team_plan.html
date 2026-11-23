@@ -1,0 +1,249 @@
+<title>Challenge 04 Build Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: one reading column (~880px) with wide tables scrolling inside their own boxes; role cards in a 3-up grid that stacks on phones */
+:root {
+  --bg: #f6f8f8; --surface: #ffffff; --fg: #10232b; --muted: #546a72; --line: #d5e0e2;
+  --accent: #0f6e78; --accent-soft: #e2f0f1;
+  --good: #1b7a4b; --watch: #a86400; --alert: #b3361f;
+  --good-bg: #e3f3ea; --watch-bg: #fbefdc; --alert-bg: #f9e4df;
+  --display: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0c171c; --surface: #12222a; --fg: #e3eef0; --muted: #93aab1; --line: #24404b;
+  --accent: #5cc3cd; --accent-soft: #143740;
+  --good: #6fd19d; --watch: #f0b25a; --alert: #f08a74;
+  --good-bg: #133628; --watch-bg: #3a2a12; --alert-bg: #3f1e18; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0c171c; --surface: #12222a; --fg: #e3eef0; --muted: #93aab1; --line: #24404b;
+  --accent: #5cc3cd; --accent-soft: #143740;
+  --good: #6fd19d; --watch: #f0b25a; --alert: #f08a74;
+  --good-bg: #133628; --watch-bg: #3a2a12; --alert-bg: #3f1e18; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 44px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.2; text-wrap: balance; margin: 0; }
+h1 { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.35rem; font-weight: 600; }
+h3 { font-size: 1.02rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+section { display: grid; gap: 14px; }
+.eyebrow { font: 500 0.72rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: 1.05rem; color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 500 0.75rem/1 var(--mono); padding: 6px 9px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.chip.good { background: var(--good-bg); color: var(--good); }
+.chip.watch { background: var(--watch-bg); color: var(--watch); }
+.chip.alert { background: var(--alert-bg); color: var(--alert); }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.88rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+th { font: 500 0.72rem/1.3 var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+code, .mono { font-family: var(--mono); font-size: 0.85em; }
+pre { margin: 0; overflow-x: auto; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font: 0.8rem/1.55 var(--mono); }
+ul, ol { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+li { max-width: 68ch; }
+.steps { display: grid; gap: 10px; }
+.step { display: grid; grid-template-columns: 9.5rem 1fr; gap: 16px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+.step > div { min-width: 0; display: grid; gap: 6px; }
+.step .when { font: 500 0.78rem/1.4 var(--mono); color: var(--accent); }
+.roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.role { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: 6px; padding: 16px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.role .who { font: 500 0.72rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.role ul { font-size: 0.88rem; }
+.role .files { font: 0.75rem/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.note { padding: 12px 14px; border-left: 3px solid var(--watch); background: var(--watch-bg); border-radius: 0 6px 6px 0; font-size: 0.9rem; }
+.mermaid { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; overflow-x: auto; }
+@media (max-width: 760px) {
+  .roles { grid-template-columns: 1fr; }
+  .step { grid-template-columns: 1fr; gap: 6px; }
+  h1 { font-size: 1.7rem; }
+}
+</style>
+
+<div class="wrap">
+
+<header style="display:grid;gap:14px">
+  <span class="eyebrow">EfxINNOs Hackathon Romania · Challenge 04 Ecosystem Health</span>
+  <h1>Black Sea Health Viewer: build plan</h1>
+  <p class="lede">A map-first viewer, like Copernicus MyOcean Viewer, for the Romanian coast. It adds long-term trends, in-situ points, anomalies against reference conditions, and the pressure zones of the five blue-economy sectors. It opens with a short questionnaire so a beach manager, a student and a NIMRD researcher each get a view that fits them.</p>
+  <div class="meta">
+    <span class="chip good">4 of 4 data sources verified live</span>
+    <span class="chip good">Copernicus login works</span>
+    <span class="chip watch">Pressure zones: in progress</span>
+    <span class="chip">Pitch: Day 2, 11:00</span>
+  </div>
+</header>
+
+<section>
+  <span class="eyebrow">1 · Data</span>
+  <h2>What we can actually get</h2>
+  <p>Every row was fetched for real near Constanța on 23 Nov 2026. The code is in <code>src/marinekit/sources/</code> and each source has notes in <code>docs/data_sources/</code>. Everything fetched once is cached on disk, so the demo also works without internet.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Source</th><th>What it gives us</th><th>Login</th><th>Freshest data</th><th>Use in the viewer</th></tr></thead>
+    <tbody>
+      <tr><td><b>Copernicus Marine</b><br><span class="mono">copernicus.py</span></td><td>Black Sea model at 2.5 km (temp, salinity, currents, chl, O₂, nutrients, pH), 10-day forecast; reanalysis 1993–2025; satellite chl 1 km since 1997; satellite SST since 1982; in-situ buoys</td><td>Yes (works on this Mac)</td><td class="num">model: +10 days<br>chl, SST: 22 Nov</td><td>Map layers with a time slider; reference climatologies; observations vs model comparison</td></tr>
+      <tr><td><b>EMODnet Physics + Chemistry</b><br><span class="mono">emodnet_insitu.py</span></td><td>44 platforms near Romania: GeoEcoMar buoys (temp, salinity, chl, O₂, turbidity) 2013–2026, coastal buoys off Constanța and Sulina, tide gauges; 14,746 water samples 1963–2021; seasonal chemistry climatologies</td><td>No</td><td class="num">22 Nov (new buoys)</td><td>In-situ points on the map; measured series; reference conditions for O₂ and nutrients</td></tr>
+      <tr><td><b>EMODnet layers + OpenStreetMap</b><br><span class="mono">emodnet_layers.py</span></td><td>Ports and port traffic, vessel density by ship type (incl. fishing, passenger, dredging), 49 bathing waters, 23 marinas, shipyards, Natura 2000 (24 sites), bathymetry, seabed substrate, wastewater discharges</td><td>No</td><td class="num">static (2024 stats)</td><td>Five-sector pressure map; sensitivity context</td></tr>
+      <tr><td><b>No-login backup</b><br><span class="mono">open_data.py</span></td><td>NOAA satellite SST (since 1985) and Sentinel-3 chl; ESA ocean-colour chl since 1997; Kd490/SPM (turbidity); Open-Meteo waves, currents, wind; Danube discharge (GloFAS) since 1997</td><td>No</td><td class="num">SST, chl: 21–22 Nov<br>Danube: today</td><td>Backup if a login fails; Danube discharge explains low salinity and high chl (natural variability)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Known gaps.</b> EMODnet has no aquaculture farm locations or offshore platforms for Romania. The pressure-zones session is researching other sources and will mark anything assumed. The Copernicus model's chl, O₂ and nutrients disagree with its own reanalysis, so for those use satellite and in-situ data and keep the model for temperature, salinity and currents.</div>
+</section>
+
+<section>
+  <span class="eyebrow">2 · Product</span>
+  <h2>What the viewer does</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Screen</th><th>What the user sees and does</th><th>Covers</th></tr></thead>
+    <tbody>
+      <tr><td><b>Questionnaire</b> (first visit, 3 taps)</td><td>Who are you: general public / student / sector stakeholder / researcher. For stakeholders, which sector. What do you want: conditions now, long-term change, compare sources, risks in my area. The answers set the wording, default layers, starting area and level of detail. A profile chip at the top changes it at any time.</td><td>Ease of use (10)</td></tr>
+      <tr><td><b>Map</b> (main screen)</td><td>Basemap and bathymetry. Gridded layers with a time slider (SST, chl, turbidity, model temperature and O₂). In-situ platforms as points. Five-sector pressure zones and hotspots. Natura 2000. Vessel density. Click anywhere or pick a zone.</td><td>Options A, C</td></tr>
+      <tr><td><b>Point / zone panel</b></td><td>Compare series from several sources on one chart (satellite vs model vs buoy), each labelled measured / satellite / model. Long-term trend (annual means, change per decade with its uncertainty). Anomaly against the day-of-year climatology (shaded p10–p90 band). Observations vs model: bias, RMSE, correlation.</td><td>Options A, B, F; Sprint 4</td></tr>
+      <tr><td><b>Zone health and risk screening</b></td><td>For each sector zone: one card per indicator with a status (normal / watch / alert), a short reason and a confidence level (how many independent sources agree). Where an anomaly falls inside a pressure hotspot or a protected area, the tool suggests what to check next.</td><td>Options B, D; data to decisions (15)</td></tr>
+      <tr><td><b>Sectors</b></td><td>Ports, shipyards, tourism, fishing, aquaculture: the pressures, indicators and zones for each, and the current status inside those zones. This is the Sprint 1 map, live.</td><td>Five sectors (15)</td></tr>
+      <tr><td><b>Data and methods</b></td><td>Every source, dataset ID, reference period, QC rule, threshold and known limitation. Researchers get the full detail; the jury sees the monitoring logic.</td><td>Technical logic (20)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <span class="eyebrow">3 · Science</span>
+  <h2>Indicators and how we answer the jury</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Indicator</th><th>Best source</th><th>Reference</th><th>Watch / alert (draft, to confirm with NIMRD)</th></tr></thead>
+    <tbody>
+      <tr><td>Thermal stress</td><td>Satellite SST</td><td>Day-of-year climatology 1991–2020</td><td>z &gt; 2 / above p90 for 5+ days (marine heatwave definition)</td></tr>
+      <tr><td>Oxygen</td><td>Buoys, then model</td><td>EMODnet seasonal climatology</td><td>&lt; 4 mg/L / &lt; 2 mg/L (hypoxia)</td></tr>
+      <tr><td>Eutrophication</td><td>Satellite chl (log scale)</td><td>Satellite climatology 1998–2020</td><td>z &gt; 2 / &gt; 10 mg/m³</td></tr>
+      <tr><td>Water clarity</td><td>Kd490, SPM, buoy turbidity</td><td>Satellite climatology</td><td>z &gt; 2 / persistent for 7+ days</td></tr>
+      <tr><td>Driver: Danube discharge</td><td>GloFAS</td><td>1997–2025 mean, about 6,500 m³/s</td><td>Context only: explains natural changes</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Natural variability vs real change:</b> anomalies are always measured against the same day of year, never the yearly mean. Upwelling and Danube flood flags explain events, they don't count as damage.</li>
+    <li><b>Integration:</b> sources on different grids are compared at the same point and on the same daily step. The origin label and the pixel actually used are always shown.</li>
+    <li><b>Uncertainty:</b> confidence goes up when sources agree. The jury explicitly asks whether a value is measured directly or derived.</li>
+    <li><b>Ecological meaning:</b> an anomaly triggers an "investigate" suggestion (sample oxygen, check a ROV transect), not a verdict.</li>
+  </ul>
+</section>
+
+<section>
+  <span class="eyebrow">4 · Architecture</span>
+  <h2>From data to decision</h2>
+  <p>This diagram doubles as the Sprint 2 and Sprint 3 deliverables.</p>
+  <pre class="mermaid">
+flowchart LR
+  subgraph Sources
+    CM[Copernicus Marine<br>model, reanalysis, satellite]
+    EI[EMODnet Physics<br>buoys, stations]
+    EC[EMODnet Chemistry<br>samples, climatology]
+    OD[NOAA, ESA, Open-Meteo<br>GloFAS Danube]
+    EL[EMODnet layers, OSM<br>ports, shipping, beaches]
+  end
+  CM --> HUB
+  EI --> HUB
+  EC --> HUB
+  OD --> HUB
+  HUB[Data hub<br>harmonise, QC, cache] --> IND[Indicators<br>climatology, anomaly, trend, obs vs model]
+  EL --> PZ[Pressure zones<br>5 sectors, buffers, hotspots]
+  IND --> RS[Zone health and risk screening]
+  PZ --> RS
+  RS --> UI[Viewer<br>profile-aware map and panels]
+  UI --> U[Port, tourism, fishing, aquaculture managers<br>NIMRD, agencies, public]
+  </pre>
+</section>
+
+<section>
+  <span class="eyebrow">5 · Team</span>
+  <h2>How three people split the work</h2>
+  <p>Each person owns separate files, so nobody waits on anyone else. Agree the interface below in the first ten minutes; until the real data is wired in, the viewer can use cached data. Each person can run their own Claude Code session on their own files.</p>
+  <div class="roles">
+    <div class="role">
+      <span class="who">Person A</span>
+      <h3>Data and indicators</h3>
+      <ul>
+        <li>One data hub on top of the four source modules</li>
+        <li>Climatologies, anomalies, trends, obs vs model metrics</li>
+        <li>Indicator status and confidence per zone</li>
+        <li>Preload the cache tonight for every station and zone</li>
+      </ul>
+      <div class="files">src/marinekit/datahub.py<br>src/marinekit/indicators.py<br>scripts/preload_cache.py</div>
+    </div>
+    <div class="role">
+      <span class="who">Person B</span>
+      <h3>Viewer and experience</h3>
+      <ul>
+        <li>Questionnaire and profile logic</li>
+        <li>Map: layers, time slider, in-situ points, zones and hotspots</li>
+        <li>Point and zone panels, charts</li>
+        <li>Plain look: no emoji, clear status colours</li>
+      </ul>
+      <div class="files">src/viewer/app.py<br>src/viewer/onboarding.py<br>src/viewer/map.py, panels.py</div>
+    </div>
+    <div class="role">
+      <span class="who">Person C</span>
+      <h3>Sectors, story and pitch</h3>
+      <ul>
+        <li>Sprint 1 pressure table and problem statement</li>
+        <li>Sprint 2–3 diagrams and Sprint 5 roadmap</li>
+        <li>On-screen wording for each profile and indicator</li>
+        <li>Deck, demo script, jury Q&amp;A; test the viewer as a stakeholder</li>
+      </ul>
+      <div class="files">docs/pitch/<br>src/viewer/texts.json<br>(wording that Person B's screens read)</div>
+    </div>
+  </div>
+<pre># The interface we agree on (Person A provides it, Person B calls it)
+get_series(variable, location, start, end, source="auto")   -> DataFrame  # time index, one column; attrs: source, dataset, origin, units, lat, lon
+get_climatology(variable, location, source="auto")          -> DataFrame  # by day of year: mean, std, p10, p50, p90
+get_field(variable, date, bbox)                             -> xarray.DataArray
+list_insitu(bbox)                                           -> DataFrame  # id, name, lat, lon, parameters, time_start, time_end
+zone_status(zone_id, date) -> [ {indicator, value, reference, z, status, origin, confidence, why} ]
+# Static files from the pressure-zones work
+data/zones/sector_zones.geojson   data/zones/hotspots.geojson</pre>
+</section>
+
+<section>
+  <span class="eyebrow">6 · Timeline</span>
+  <h2>From now to the pitch</h2>
+  <div class="steps">
+    <div class="step"><span class="when">Today, until 16:00</span><div>
+      <p><b>All:</b> 10 minutes to agree the interface and sketch the screens on paper.</p>
+      <p><b>A:</b> data hub for SST, chl and in-situ data. <b>B:</b> viewer skeleton with the questionnaire and a map showing zones and in-situ points. <b>C:</b> Sprint 1 pressure table and problem statement.</p>
+    </div></div>
+    <div class="step"><span class="when">Tonight</span><div>
+      <p><b>A:</b> anomalies, trends, obs vs model, zone status. <b>B:</b> point panel, time slider, wording that changes with the profile. <b>C:</b> deck draft and architecture and canvas diagrams.</p>
+      <p><b>All:</b> run the preload, then test the viewer with Wi-Fi off.</p>
+    </div></div>
+    <div class="step"><span class="when">Day 2, 09:30–10:30</span><div>
+      <p>Join everything, add the zone health and risk screening screen, fix whatever the stakeholder test found.</p>
+    </div></div>
+    <div class="step"><span class="when">Day 2, 10:30–11:00</span><div>
+      <p>Freeze the code. Rehearse the demo twice on the laptop that will present. Keep a screen recording as a backup.</p>
+    </div></div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">7 · Risks</span>
+  <h2>What could go wrong</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Risk</th><th>What we do about it</th></tr></thead>
+    <tbody>
+      <tr><td>Venue Wi-Fi is slow or down</td><td>Preload the cache tonight; every module falls back to cached files</td></tr>
+      <tr><td>Copernicus switches catalogue release on 24 Nov, 15:00 Romanian time</td><td>That's after the pitch. Cached data stays valid, and the code has fallbacks for the ocean-colour datasets being retired</td></tr>
+      <tr><td>NOAA servers time out on long requests</td><td>Requests are already split into 40-day chunks and cached</td></tr>
+      <tr><td>No official aquaculture or offshore-platform locations</td><td>Research in progress; anything assumed is marked as assumed on the map</td></tr>
+      <tr><td>Thresholds questioned by the jury</td><td>Show the reference period and source for every threshold; ask NIMRD lecturers to confirm before the pitch</td></tr>
+      <tr><td>Too many features, nothing finished</td><td>Must-have for the demo: questionnaire, map with zones and in-situ points, one comparison chart with an anomaly band, one zone health card. Everything else is a bonus</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+</div>

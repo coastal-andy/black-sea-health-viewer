@@ -1,0 +1,113 @@
+# Buffer table for marinekit.pressure_zones: one buffer per activity, seaward (clipped to the
+# Romanian sea). buffer_basis: law | literature | rule. Edit and rebuild.
+bathing_season:
+  start: 06-01
+  end: 09-15
+  basis_ref: Ministry of Health / INSP bathing-water monitoring season 1 June - 15 September (practice under HG 546/2008;
+    no statutory article fixing the dates was found)
+fishing_closures_optional:
+- name: turbot ban
+  start: 04-15
+  end: 06-15
+  applies_to: turbot gillnets (part of the fishing sector)
+  source: Ordin MADR/MMAP 23/297/2025 art. 6(3), MO 95/01.02.2025
+  source_url: https://legislatie.just.ro/Public/DetaliiDocumentAfis/294196
+  applied: false
+buffers:
+  ports:
+    port_area:
+      buffer_m: 1000
+      buffer_basis: rule
+      season: all
+      basis_ref: '1 km around basins and terminals: berths, entrance channel, propeller wash and maintenance dredging (harbour
+        turbidity and sediment-contamination near field)'
+    anchorage:
+      buffer_m: 300
+      buffer_basis: rule
+      season: all
+      basis_ref: 'anchor and chain swing radius: chain about 5-7 x water depth (20-30 m) plus ship length'
+    shipping_lane:
+      buffer_m: 0
+      buffer_basis: rule
+      season: all
+      basis_ref: the AIS cells themselves (top decile of EMSA vessel density, ~1.2 km cells)
+  shipyards:
+    shipyard:
+      buffer_m: 500
+      buffer_basis: rule
+      season: all
+      basis_ref: '500 m: dry-dock discharge, blasting grit and antifouling residues near the yard'
+    offshore_platform:
+      buffer_m: 500
+      buffer_basis: law
+      season: all
+      basis_ref: 'Law 17/1990 art. 16(2): safety zones ''up to 500 m from each point of their outer limits'' around installations
+        in the Romanian EEZ; UNCLOS art. 60(5)'
+    pipeline_cable:
+      buffer_m: 1000
+      buffer_basis: law
+      season: all
+      basis_ref: 'Law 17/1990 (republished MO 252/2014) art. 12(2): safety and protection zones ''up to 1,000 m on either
+        side'' of the axis of cables and pipelines laid in the sea'
+    coastal_protection:
+      buffer_m: 200
+      buffer_basis: rule
+      season: all
+      basis_ref: '200 m: structure footprint plus scour and accretion cell next to it'
+    beach_nourishment:
+      buffer_m: 300
+      buffer_basis: rule
+      season: all
+      basis_ref: '300 m seaward of the nourished beach: placement, burial and plume'
+    dredging_activity:
+      buffer_m: 0
+      buffer_basis: rule
+      season: all
+      basis_ref: the AIS cells themselves (top 5% of EMSA dredging / underwater-ops density)
+  tourism:
+    beach:
+      buffer_m: 300
+      buffer_basis: law
+      season: summer
+      basis_ref: 'OMT 1079/2014 Annex 2: nautical recreation zones ''may not extend more than 300 m from the shore''; user
+        rule: 300 m seaward from the beach line'
+    bathing_water:
+      buffer_m: 300
+      buffer_basis: law
+      season: summer
+      basis_ref: 'OMT 1079/2014 Annex 2: nautical recreation zones ''may not extend more than 300 m from the shore''; user
+        rule: 300 m seaward from the beach line; applied to 500 m of coastline at each EEA bathing-water site'
+    marina:
+      buffer_m: 300
+      buffer_basis: rule
+      season: summer
+      basis_ref: '300 m, same as the nautical recreation zone: leisure craft leaving the marina'
+  fishing:
+    landing_point:
+      buffer_m: 1000
+      buffer_basis: rule
+      season: all
+      basis_ref: '1 km around the landing point: boats launching and landing, nets set nearby'
+    fishing_ground:
+      buffer_m: 0
+      buffer_basis: rule
+      season: all
+      basis_ref: the AIS cells themselves (top decile of EMSA fishing-vessel density)
+    pound_net_zone:
+      buffer_m: 0
+      buffer_basis: rule
+      season: all
+      basis_ref: potential zone only (5-13 m isobaths within 5 km of shore); shown, not counted until NIMRD/ANPA supply the
+        pound-net sites
+  aquaculture:
+    aquaculture_lease:
+      buffer_m: 100
+      buffer_basis: literature
+      season: all
+      basis_ref: benthic effects of shellfish longlines and fish cages are mostly within 50-100 m of the farm edge (Wilding
+        and Nickell 2013, PLoS ONE 8:e68313; Kalantzi and Karakassis 2006, Mar Pollut Bull 52:484)
+    aquaculture_planned:
+      buffer_m: 0
+      buffer_basis: rule
+      season: all
+      basis_ref: 'perimeter offered in a tender but not awarded: shown, not counted'

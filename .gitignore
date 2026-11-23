@@ -1,0 +1,28 @@
+# Secrets: never commit. Copernicus credentials live in ~/.copernicusmarine/, outside the repo.
+.streamlit/secrets.toml
+.env
+*.credentials
+.copernicusmarine*
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Downloaded data, rebuilt by scripts/preload_cache.py (about 0.5 GB)
+data/cache/
+data/uploads/
+data/zones/archive_v1/
+# YOLO weights, downloaded automatically on first use
+models/*.pt
+
+# Local tooling and OS
+.DS_Store
+.claude/settings.local.json
+gis/*.qgz~
+gis/*.qgs~
+
+# Third-party or unreviewed documents: kept local, not published
+*.docx
+*.pdf

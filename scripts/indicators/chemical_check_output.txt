@@ -1,0 +1,229 @@
+Chemical indicator check, Constanta 44.17 N 28.72 E, reference date 2026-11-23
+Copernicus login: True
+
+====================================================================================================
+C1  Bottom-oxygen status class (bgc_o2 o2_bottom; rea_bgc_o2; EMODnet bottles)
+====================================================================================================
+model cell 44.175/28.725 (0.68 km); o2_bottom is the deepest wet level of that cell
+
+Latest analysis day 2026-11-23: bottom O2 3.59 mg/L -> C hypoxia risk (2-4 mg/L)
+Forecast to 2026-11-30: min 2.53 mg/L -> C hypoxia risk (2-4 mg/L)
+
+Last 60 days vs reanalysis day-of-year climatology 1993-2022 (mmol m-3), weekly means:
+            o2_bottom  clim_mean  clim_p10  anomaly  zscore
+time                                                       
+2026-09-24      222.0      228.2     179.4     -6.2    -0.2
+2026-10-01      243.4      231.9     182.7     11.5     0.3
+2026-10-08      210.1      237.0     187.0    -26.9    -0.8
+2026-10-15      250.8      242.2     194.6      8.6     0.3
+2026-10-22      221.0      246.3     199.5    -25.3    -0.8
+2026-10-29      273.3      249.3     200.2     24.0     0.7
+2026-11-05      266.1      252.3     201.1     13.9     0.4
+2026-11-12      253.9      256.1     201.9     -2.2    -0.1
+2026-11-19      121.9      260.1     202.5   -138.2    -3.4
+  NOTE: forecast-system bottom O2 sits ~2 mg/L below the reanalysis in the 2024 overlap (section R), so a
+        negative anomaly here is partly a model-system offset. Use the absolute class, not the anomaly.
+
+Warm-season (May-Sep) summary per year, bottom O2; D5C5 test = P10 >= 5 mg/L AND P10 sat >= 60 %:
+           system  year  min  p10  p10_sat  days_lt2  days_lt4  run_lt4 D5C5                        cls_min
+       reanalysis  2014 3.94 5.68    61.28         0         2        2 pass      C hypoxia risk (2-4 mg/L)
+       reanalysis  2015 5.52 6.77    80.46         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2016 5.63 7.03    77.44         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2017 6.74 7.64    90.62         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2018 5.32 6.16    77.08         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2019 6.65 7.07    79.69         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2020 6.20 7.27    88.27         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2021 6.67 7.77    81.69         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2022 3.86 6.46    72.74         0         1        1 pass      C hypoxia risk (2-4 mg/L)
+       reanalysis  2023 5.25 6.65    76.03         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+       reanalysis  2024 4.32 5.09    57.20         0         0        0 FAIL   B below GES level (4-5 mg/L)
+analysis/forecast  2025 4.88 5.69    62.58         0         0        0 pass   B below GES level (4-5 mg/L)
+analysis/forecast  2026 5.91 6.44    69.61         0         0        0 pass A meets D5C5 level (>= 5 mg/L)
+Reanalysis 1993-2024 (May-Sep): years with any day < 2 mg/L: 0; years with min < 4 mg/L: 8; D5C5 fails: 7 of 32 years
+  (official NIMRD 2018-2023 bottom-water P10 at 20-50 m: 5.44 mg/L, 54.3 % saturation)
+
+Low-O2 episodes (< 4 mg/L) in the analysis/forecast since 2024-12, with attribution test:
+  2024-12-17..2024-12-20 (4 d): min 3.34 mg/L, bottom T change over 7 d -1.5 C, S(24 m) max 19.11, surface-bottom dT +0.3 C -> deep-water intrusion / upwelling (cold, saline): NATURAL
+  2025-11-27..2025-11-28 (2 d): min 3.25 mg/L, bottom T change over 7 d -4.6 C, S(24 m) max 19.14, surface-bottom dT +4.6 C -> deep-water intrusion / upwelling (cold, saline): NATURAL
+  2026-01-01..2026-01-05 (5 d): min 1.41 mg/L, bottom T change over 7 d -0.5 C, S(24 m) max 19.88, surface-bottom dT -1.3 C -> deep-water intrusion / upwelling (cold, saline): NATURAL
+  2026-01-10..2026-01-11 (2 d): min 3.14 mg/L, bottom T change over 7 d -0.0 C, S(24 m) max 19.31, surface-bottom dT -1.1 C -> deep-water intrusion / upwelling (cold, saline): NATURAL
+  2026-11-20..2026-11-27 (8 d): min 2.53 mg/L, bottom T change over 7 d -4.4 C, S(24 m) max 19.47, surface-bottom dT +1.7 C -> deep-water intrusion / upwelling (cold, saline): NATURAL
+  Rule: O2 < 4 mg/L with bottom T falling > 1.5 C/week or S(24 m) > 18.5 = shelf-break water (natural);
+        with a warm stratified column (Ts - Tb > 2 C) in May-Oct = organic-matter decay (pressure-related).
+
+Observed bottom O2 (deepest bottle >= 15 m, Jul-Oct, <= 30 km from Constanta), EMODnet Chemistry:
+      casts  median   p10  share<2  share<4
+time                                       
+1960     56    7.78  4.02     0.02     0.11
+1970    101    7.49  2.66     0.07     0.22
+1980     89    6.43  3.32     0.04     0.15
+1990     34    7.54  4.04     0.00     0.12
+2000      5    6.26  6.00     0.00     0.00
+2020      2    3.61  3.35     0.00     1.00
+STATUS: COMPUTED (0 s)
+
+====================================================================================================
+C2  Surface O2 saturation (EUXRoOB03 OSAT; bgc_o2 + phy_temp + phy_sal)
+====================================================================================================
+Validation of our saturation formula against the buoy's own OSAT (EUXRoOB03, 3 m, daily):
+  computed %sat (Garcia&Gordon 1992) vs buoy OSAT            n=  317 obs=  95.26 mod=  95.06 bias= -0.20 rmse= 0.74 r= 0.98 [%]
+
+EUXRoOB03 monthly means (measured):
+time     2025-01-31  2025-02-28  2025-03-31  2025-04-30  2025-05-31  2025-06-30  2025-07-31  2025-08-31  2025-09-30  2025-10-31  2025-11-30  2025-12-31  2026-01-31  2026-02-28  2026-03-31  2026-04-30  2026-05-31  2026-06-30  2026-07-31  2026-08-31
+do_mg_L        9.24        9.49        9.87        9.77        9.00        8.23        7.23        7.01        7.24        7.75        8.04        8.53        9.54         NaN         NaN         NaN         NaN         NaN         NaN        7.10
+sat_pct       93.28       92.98       96.90       98.60       98.89      101.78       96.49       95.68       93.77       92.21       91.56       90.13       89.78         NaN         NaN         NaN         NaN         NaN         NaN       94.38
+temp          10.54        9.11        8.90       10.44       14.65       21.24       25.37       25.79       22.96       18.49       16.37       13.18        9.21         NaN         NaN         NaN         NaN         NaN         NaN       24.23
+sal           18.54       18.61       18.46       18.48       17.99       15.95       18.41       18.40       18.29       18.11       17.85       16.72         NaN         NaN         NaN         NaN         NaN         NaN         NaN       18.61
+
+Model surface O2 saturation at Constanta, last 30 days: mean 99.1 %, range 93.8-105.2 %
+Model days per flag since 2024-12: {'normal': 672, 'supersat >120% (bloom)': 57, 'undersat <80% (respiration/upwelling)': 1}
+STATUS: COMPUTED (0 s)
+
+====================================================================================================
+C3/C4  Nutrients DIN, PO4, Si and ratios N:P, Si:N (EMODnet Chemistry samples + DIVAnd)
+====================================================================================================
+Observed surface (0-5 m) medians by decade, <= 30 km from Constanta (EMODnet Chemistry, mmol m-3):
+      n_po4   no3   nh4    din   po4     si    N:P  Si:N
+time                                                    
+1960    256   NaN   NaN    NaN  0.10  28.50    NaN   NaN
+1970    739  9.37   NaN  11.03  0.73  38.10  25.98  2.52
+1980    529  2.91  3.46   8.40  0.21   5.10  36.15  0.78
+1990    163  2.90  2.43   5.54  0.22   4.55  26.38  0.81
+2000      0   NaN   NaN    NaN   NaN    NaN    NaN   NaN
+2020      0   NaN   NaN    NaN   NaN   0.45    NaN   NaN
+Last sample with nutrients in this circle: 1999-09-15
+
+DIVAnd 'Danube Delta' seasonal climatology at Constanta (NIMRD/EMODnet; DIN 1980-2022, PO4/Si 1970-2022):
+        din_0m  din_20m  po4_0m  po4_20m  si_0m  si_20m  N:P_0m  Si:N_0m
+season                                                                  
+winter   10.75     8.56    0.51     0.42  30.00   28.25   21.01     2.79
+spring   12.56     7.98    0.31     0.33  11.94   15.19   40.45     0.95
+summer    7.44     6.73    0.26     0.28   7.07   18.06   28.74     0.95
+autumn    8.05     5.98    0.32     0.36  11.56   17.75   24.89     1.44
+
+DIVAnd 'Black Sea' moving 6-year windows (surface), trusted (_L1, relerr < 0.3) values:
+  din: 1995: W 7.62 / S 4.72, 2005: W nan / S 6.51, 2015: W 5.77 / S 9.60, 2020: W nan / S 9.80
+  po4: 1985: W 0.17 / S 0.21, 1995: W 0.32 / S 0.26, 2005: W nan / S 0.13, 2015: W nan / S 0.11, 2020: W nan / S 0.12
+  si: 1985: W 8.45 / S 5.10, 1995: W 6.18 / S 4.58, 2005: W nan / S 2.71, 2015: W nan / S 3.13, 2020: W nan / S 5.55
+
+C3 nutrient status, latest trusted window per variable (DIVAnd Black Sea) vs Danube climatology:
+  winter DIN: 5.27 mmol m-3 (window centred 2016); Danube climatology 10.75 (ratio 0.49)
+  winter PO4: 0.29 mmol m-3 (window centred 2012); Danube climatology 0.51 (ratio 0.58)
+  winter Si: 15.44 mmol m-3 (window centred 2012); Danube climatology 30.00 (ratio 0.51)
+  summer 2020: DIN 9.80, PO4 0.12, Si 5.55 mmol m-3
+  summer DIN vs OFFICIAL marine threshold 10.5 (P75): ER 0.93 (good); vs coastal-water threshold 13.5: ER 0.73
+  summer PO4 vs OFFICIAL marine threshold 0.23 (P75): ER 0.51 (good); vs coastal-water threshold 0.3: ER 0.39
+  (official NIMRD 2018-2023 P75 on the shelf MT01: DIN 13.78, PO4 0.27 umol/L; offshore MT02: 2.53, 0.08)
+C4 stoichiometry, summer window 2020: N:P = 83.7 (Redfield 16), Si:N = 0.57 (Redfield ~1)
+C4 stoichiometry, latest common winter window: N:P = 17.9, Si:N = 2.93 (windows din 2016, po4 2012, si 2012)
+  NOTE: winter windows after ~2012-2016 are masked (relerr > 0.3: almost no winter cruises). Summer is the
+        only season with trusted values up to 2020. Latest bottle sample with nutrients here: 1999.
+STATUS: COMPUTED (0 s)
+
+====================================================================================================
+C5  Eutrophication index, simplified BEAST/HEAT (sat_chl_l4_my + bgc_o2 + DIVAnd)
+====================================================================================================
+  nutrients: DIN summer              9.80 umol/L (DIVAnd window 2020) / 10.5                            ER 0.93 -> good
+  nutrients: PO4 summer              0.12 umol/L (DIVAnd window 2020) / 0.23                            ER 0.51 -> good
+  direct: chl May-Sep (sat)          1.26 mg m-3 (May-Sep 2025 mean, 153 d) / 2.79                      ER 0.45 -> high
+  indirect: bottom O2 P10 (model)    5.0 / 5.69 mg/L (May-Sep 2025 P10, bgc_o2)                         ER 0.88 -> good
+  category ER (mean within category): nutrients 0.72, direct 0.45, indirect 0.88
+  EUTROPHICATION INDEX (one-out-all-out across categories) = 0.88 -> GOOD (driven by 'indirect')
+  Confidence: LOW-MEDIUM. Nutrients are a 6-year gridded climatology (window centred 2020), O2 is model-only
+  at the bottom, chl is satellite (case-2 water; Danube CDOM/TSM can bias it). Thresholds are the official
+  Romanian MSFD marine-water values, but the statistics differ (DIVAnd mean vs official P75).
+  Official BEAST 2020-2022 (NIMRD): ~50 % of stations / ~59 % of the RO EEZ area in good status; shelf to 50-60 m
+  and the southern coast (WWTPs, ports) not good.
+
+  Replay with OFFICIAL 2018-2023 shelf (MT01) statistics:
+    nutrients: DIN P75 13.78           ER 1.31 -> moderate
+    nutrients: PO4 P75 0.27            ER 1.17 -> moderate
+    direct: chl P75 south 0.69         ER 0.25 -> high
+    indirect: O2 P10 5.51 mg/L         ER 0.91 -> good
+    indirect: O2 sat P10 57.3 %        ER 1.05 -> moderate
+    index = 1.24 -> MODERATE (driven by 'nutrients'); official BEAST for the shelf: not good -> AGREES
+STATUS: COMPUTED (0 s)
+
+====================================================================================================
+C6  pH / carbonate watch (bgc_car vs rea_bgc_car)
+====================================================================================================
+Model surface pH (total scale) on 2026-11-23: 8.202; DIC 3214 umol/L, TA 3454 umol/L
+Last 30 days: mean anomaly vs reanalysis 1993-2022 -0.031 (z -0.26)
+  reanalysis 1993-2023 trend ph: -0.0068 per decade (annual means)
+  reanalysis 1993-2023 trend dic: +0.0415 per decade (annual means)
+  reanalysis 1993-2023 trend alk: +0.0443 per decade (annual means)
+  reanalysis monthly mean pH: 1:8.23 2:8.24 3:8.24 4:8.24 5:8.17 6:8.15 7:8.19 8:8.26 9:8.27 10:8.32 11:8.33 12:8.29
+Observed pH samples within 30 km (EMODnet): n=4, years [2021]
+STATUS: COMPUTED (0 s)
+
+====================================================================================================
+C7  Bathing-water class (emodnet_layers bathing_waters)
+====================================================================================================
+  49 RO sites, seasons 2007-2024 (867 site-years); per-year class from the layer's 'status' field
+  Directive 2006/7/EC seasons:
+  class  1 - Excellent  2 - Good  3 - Sufficient  4 - Poor  share_excellent
+  year                                                                     
+  2015              15        23              10         1             0.31
+  2016              34        15               0         0             0.69
+  2017              25        23               1         0             0.51
+  2018              28        19               2         0             0.57
+  2019              38        10               1         0             0.78
+  2020              35        13               1         0             0.71
+  2021              42         7               0         0             0.86
+  2022              45         4               0         0             0.92
+  2023              34        15               0         0             0.69
+  2024              41         8               0         0             0.84
+  EEA country factsheet 2025 (official): 2022 45 Exc/4 Good, 2023 34/15, 2024 41/8 -> MATCH
+  sites downgraded 2023 -> 2024: 0; never Excellent since 2015: 1
+    never Excellent: CORDON VENUS SATURN II ACTETIS (43.830, 28.591)
+Contaminants (MSFD D8/D9) and bathing microbiology are lab-based: no live feed. Dashboard shows the
+official BWD class per site and a 'needs sampling' marker for D8/D9 (see chemical.md section 6).
+STATUS: COMPUTED (0 s)
+
+====================================================================================================
+R   Model vs observation reliability, O2 and nutrients
+====================================================================================================
+1) Analysis/forecast minus reanalysis, Constanta cell, overlap 2024-10-03..2024-12-31 (daily):
+  anfc vs rea o2                                             n=   90 obs=   9.32 mod=   9.11 bias= -0.21 rmse= 0.91 r=-0.25 [mg/L]
+  anfc vs rea o2_bottom                                      n=   90 obs=   8.47 mod=   6.43 bias= -2.04 rmse= 3.08 r= 0.47 [mg/L]
+  anfc vs rea no3                                            n=   90 obs=   0.01 mod=   1.29 bias= +1.29 rmse= 2.44 r= 0.30 [mmol m-3]
+  anfc vs rea po4                                            n=   90 obs=   0.40 mod=   0.14 bias= -0.26 rmse= 0.32 r=-0.09 [mmol m-3]
+
+2) Reanalysis vs bottle samples (<= 30 km, same day; 1993-2021):
+  rea surface O2 vs bottles 0-5 m                            n=   41 obs=  11.20 mod=   9.74 bias= -1.46 rmse= 2.31 r= 0.63 [mg/L]
+  rea surface NO3 vs bottles 0-5 m                           n=   35 obs=   3.46 mod=  28.41 bias=+24.95 rmse=31.13 r= 0.36 [mmol m-3]
+  rea surface PO4 vs bottles 0-5 m                           n=   38 obs=   0.28 mod=   0.10 bias= -0.18 rmse= 0.38 r=-0.09 [mmol m-3]
+  rea o2_bottom vs deepest bottle (>= 15 m)                  n=   40 obs=   8.60 mod=   7.90 bias= -0.70 rmse= 2.00 r= 0.65 [mg/L]
+
+3) Model surface O2 vs buoys (daily means, model at the buoy position):
+  rea_bgc_o2 vs EUXRo03 (2013-06..2023-11)                   n= 1842 obs=   9.22 mod=   8.90 bias= -0.32 rmse= 1.44 r= 0.65 [mg/L]
+  bgc_o2 vs EUXRoOB03 (2025-01..2026-09)                     n=  349 obs=   8.70 mod=   8.85 bias= +0.15 rmse= 0.37 r= 0.93 [mg/L]
+  bgc_o2 vs EUXRoOB02 (2025-01..2026-09)                     n=  338 obs=   8.00 mod=   8.75 bias= +0.75 rmse= 1.54 r= 0.70 [mg/L]
+  bgc_o2 vs EUXRoCB02 (2026-09..2026-11)                     n=   26 obs=   5.53 mod=   7.55 bias= +2.01 rmse= 3.26 r= 0.67 [mg/L]
+    EUXRoCB02 notes: ["DOXY: median 4.90 << 100 so treated as mg/L despite units 'mmole/m3'"]; median OSAT 3.6 (should be ~80-110 %), median sal 7.63
+
+3a) Live: forecast surface O2 vs GeoEcoMar ERDDAP buoy EUXRoOB03 (DOXY in umol/L), this month:
+  bgc_o2 vs OB03 (GeoEcoMar ERDDAP, live)                    n=   23 obs=   8.51 mod=   8.95 bias= +0.45 rmse= 0.45 r= 0.89 [mg/L]
+
+3b) Reanalysis at Constanta 2018-2023 vs OFFICIAL NIMRD 2018-2023 station statistics (NIMRD 2024 study):
+  surface NO3  rea median  15.94, P75  27.86 | official shelf MT01 median 1.72, P75 3.62; coastal CT median 3.67, P90 22.27  [umol/L]
+  surface PO4  rea median   0.04, P75   0.32 | official shelf median 0.08, P75 0.27; coastal median 0.17, P90 0.91  [umol/L]
+  bottom O2 May-Sep  rea mean 8.31, P10 6.77, min 3.86 | official 20-50 m: mean 8.02, P10 5.44, min 3.33; coastal P10 5.44; shelf P10 5.51  [mg/L]
+  -> reanalysis NO3 is ~9x the observed shelf median; PO4 and bottom O2 are of the right order
+
+4) Seasonal cycle of surface NO3 at Constanta, three sources (mmol m-3):
+time                         1      2          3          4      5          6          7      8      9      10     11     12
+bottles 1980-99 (median)    NaN   2.32   4.380000   6.860000   4.54   2.140000   2.550000   2.83   2.63    NaN    NaN    NaN
+reanalysis 1993-2023      24.33  22.50  23.969999  24.110001  29.10  24.040001  18.690001  17.49  12.79  13.45  15.26  17.08
+anfc 2024-26               1.88   6.91   4.960000   0.310000   0.00   0.000000   0.000000   0.00   0.00   0.16   0.26   3.34
+  reanalysis annual-mean NO3 2019-2024: 2019: 16.79, 2020: 18.51, 2021: 19.47, 2022: 18.49, 2023: 17.13, 2024: 0.23
+STATUS: COMPUTED (1 s)
+
+====================================================================================================
+D   Danube discharge as natural-variability covariate
+====================================================================================================
+Danube discharge, last 30 days mean 2954 m3/s vs 11-month 1997-2024 mean 5199 (ratio 0.57)
+r(spring Mar-Jun Danube discharge, Jul-Oct min bottom O2 in reanalysis) = -0.52 (n=27 years)
+  -> high-discharge springs precede lower late-summer bottom O2: discharge is a covariate the anomaly
+     detector must account for before calling a low-O2 event 'degradation'.
+STATUS: COMPUTED (0 s)

@@ -1,0 +1,51 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "runtimeExecutable": ".venv/bin/streamlit",
+      "runtimeArgs": [
+        "run",
+        "src/app.py",
+        "--server.port",
+        "8501",
+        "--server.headless",
+        "true",
+        "--browser.gatherUsageStats",
+        "false"
+      ],
+      "port": 8501
+    },
+    {
+      "name": "viz-static",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "--bind",
+        "127.0.0.1",
+        "--directory",
+        "docs/viz"
+      ],
+      "port": 8765
+    },
+    {
+      "name": "viz-st",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "-m",
+        "streamlit",
+        "run",
+        "scripts/viz/st_vectorviz_check.py",
+        "--server.port",
+        "8766",
+        "--server.headless",
+        "true",
+        "--browser.gatherUsageStats",
+        "false"
+      ],
+      "port": 8766
+    }
+  ]
+}

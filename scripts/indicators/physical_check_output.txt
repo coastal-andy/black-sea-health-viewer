@@ -1,0 +1,266 @@
+Physical indicator check at Constanta (44.17 N, 28.72 E), run 2026-11-23 15:31, reference date 2026-11-23
+Copernicus login present: True
+
+====================================================================================================
+P1  SST anomaly, marine heatwaves and cold spells [sst_l4_rep + sst_l4_nrt]
+====================================================================================================
+REP : cmems_SST_BS_SST_L4_REP_OBSERVATIONS_010_022 | cell 44.179N 28.725E (1.11 km) 1982-01-01..2026-10-24
+NRT : SST_BS_SST_L4_NRT_OBSERVATIONS_010_006_a_V2 | cell 44.188N 28.750E (3.08 km) ..2026-11-23
+NRT - REP over the overlap (54 days): bias +0.53 C, sd 0.65 C -> NRT appended after REP ends, bias removed
+Climatology [1991, 2020] (30 years) at 44.17927N 28.725E
+  clim 02-15: mean 4.37  p10 2.45  p90 6.50  sd 1.55
+  clim 05-15: mean 15.21  p10 12.85  p90 18.13  sd 2.00
+  clim 08-15: mean 24.83  p10 23.11  p90 26.37  sd 1.29
+  clim 11-23: mean 11.61  p10 9.71  p90 13.50  sd 1.47
+
+Last 7 days (SST, anomaly, z, threshold p90):
+              sst  anom     z    p90
+time                                
+2026-11-17  14.09  1.63  1.13  14.34
+2026-11-18  13.84  1.52  1.06  14.20
+2026-11-19  13.54  1.36  0.94  14.05
+2026-11-20  13.46  1.42  0.98  13.91
+2026-11-21  13.41  1.51  1.04  13.77
+2026-11-22  13.39  1.64  1.12  13.63
+2026-11-23  13.39  1.78  1.21  13.50
+
+Marine heatwaves 1982-2026: 86 events; cold spells: 94 events
+Heatwaves since late June:
+  none in the last 150 days
+Last 4 heatwaves on record:
+     start        end  days  peak_anom  mean_anom category
+2025-11-19 2025-12-07    19       3.48       2.86 moderate
+2025-12-12 2025-12-23    12       2.54       2.21 moderate
+2026-01-08 2026-01-14     7       2.43       2.16 moderate
+2026-04-02 2026-04-06     5       2.94       2.30 moderate
+Heatwave ongoing on 2026-11-23: False
+Most recent cold spells:
+     start        end  days  peak_anom  mean_anom category
+2021-10-08 2021-10-19    12      -2.67      -2.37 moderate
+2023-07-27 2023-08-11    16      -4.66      -3.19   strong
+2025-05-18 2025-05-23     6      -3.78      -3.22 moderate
+
+Annual-mean SST trend 1982-2025: +0.53 +- 0.13 C per decade (95 % CI, lag-1 r -0.01)
+MHW days per year: 1982-1991 mean 3, 2016-2025 mean 71; trend +18.7 +- 7.1 days per decade
+Note: a fixed 1991-2020 baseline mixes long-term warming into the heatwave count (Hobday 2016 'fixed baseline').
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+P2  Bottom temperature anomaly [phy_temp bottomT vs rea_phy_temp]
+====================================================================================================
+Model: cmems_mod_blk_phy-temp_anfc_2.5km_P1D-m | cell 44.175N 28.725E (0.68 km)
+Climatology: rea_phy_temp bottomT [1993, 2022]
+                value   clim   std    p10    p90  anom     z
+time                                                        
+2026-08-25  12.310000  15.31  5.14   9.08  22.95 -2.99 -0.58
+2026-09-04  22.389999  15.62  5.14   9.29  23.13  6.76  1.32
+2026-09-14  16.030001  15.93  4.94   9.62  22.78  0.10  0.02
+2026-09-24  17.190001  16.02  4.51   9.92  21.83  1.17  0.26
+2026-10-04  20.100000  15.96  3.84  10.25  20.41  4.14  1.08
+2026-10-14  19.160000  15.48  3.06  10.85  18.88  3.69  1.20
+2026-10-24  17.700001  14.64  2.56  10.79  17.42  3.06  1.19
+2026-11-03  15.280000  13.64  2.19  10.46  16.13  1.63  0.74
+2026-11-13  14.890000  12.44  2.03   9.49  14.80  2.45  1.21
+2026-11-23  12.580000  11.32  1.76   8.87  13.53  1.26  0.72
+
+anfc - reanalysis bottomT, Dec 2024-Jul 2025 (243 days): bias +0.41 C, RMSD 0.61 C, r 0.96
+Bottom-water heatwave (Hobday recipe on bottomT) in the window:
+     start        end  days  peak_anom  mean_anom category
+2026-10-20 2026-10-27     8       3.21       3.06 moderate
+2026-11-13 2026-11-19     7       2.91       2.59 moderate
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+P3  Stratification (delta sigma-theta) and mixed-layer depth [phy_temp, phy_sal, phy_mld + rea_*]
+====================================================================================================
+Bottom salinity level: 26.49094581604004 m at 44.175N 28.725E
+Delta sigma-theta (bottom - surface, kg/m3) every 10 days:
+                  t_s        t_b        s_s        s_b  dsig_T  dsig_S  dsig  clim   p10   p90
+time                                                                                          
+2026-08-25  24.730000  12.310000  16.770000  18.840000    2.72    1.60  4.32  3.30  1.62  4.77
+2026-09-04  24.440001  22.389999  16.959999  17.760000    0.55    0.61  1.16  2.77  1.11  4.08
+2026-09-14  23.520000  16.030001  17.719999  18.570000    1.75    0.65  2.40  2.19  0.58  3.48
+2026-09-24  22.480000  17.190001  18.170000  18.580000    1.24    0.31  1.56  1.70  0.19  2.99
+2026-10-04  20.020000  20.100000  16.830000  17.160000   -0.02    0.25  0.23  1.31  0.05  2.59
+2026-10-14  19.150000  19.160000  17.330000  17.330000   -0.00    0.01  0.00  1.04  0.01  2.25
+2026-10-24  17.000000  17.700001  17.230000  17.490000   -0.15    0.20  0.05  0.85  0.00  1.96
+2026-11-03  15.270000  15.280000  16.200001  16.200001   -0.00    0.00  0.00  0.67  0.00  1.65
+2026-11-13  14.330000  14.890000  16.930000  17.570000   -0.10    0.49  0.39  0.55  0.00  1.39
+2026-11-23  13.890000  12.580000  17.799999  18.830000    0.22    0.79  1.01  0.49  0.00  1.20
+
+Reanalysis 1993-2022 monthly delta sigma (median / p90): 1:0.1/1.3  2:0.2/0.9  3:0.3/1.1  4:0.8/2.2  5:2.2/4.2  6:3.7/5.7  7:4.0/6.2  8:3.7/5.8  9:2.3/3.6  10:0.8/2.3  11:0.3/1.3  12:0.2/1.1
+Share of the haline part in summer stratification (Jun-Aug, reanalysis): 37%
+
+Mixed-layer depth (model, m) vs 1993-2022 climatology, every 15 days:
+                value  clim  std   p10   p90
+time                                        
+2026-08-25  10.200000  11.9  2.7  10.2  15.7
+2026-09-09  11.100000  12.8  3.6  10.2  18.1
+2026-09-24  19.200001  14.2  4.8  10.2  22.2
+2026-10-09  10.200000  15.3  5.6  10.3  25.9
+2026-10-24  20.700001  16.3  6.2  10.2  27.0
+2026-11-08  10.900000  16.8  6.4  10.3  27.3
+2026-11-23  12.500000  16.3  6.2  10.3  27.2
+Note: water depth at the cell is ~26.5 m, so MLD near 26 m means the column is fully mixed.
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+P4  Upwelling index [sst_l4_rep/nrt coast vs offshore + ERA5 wind via Open-Meteo]
+====================================================================================================
+coast  : cmems_SST_BS_SST_L4_REP_OBSERVATIONS_010_022 | cell 44.179N 28.725E (1.11 km)
+offshore: cmems_SST_BS_SST_L4_REP_OBSERVATIONS_010_022 | cell 44.179N 29.275E (2.24 km)
+
+Upwelling days (Jun-Sep, coast - offshore SST <= -2 C): mean 4.8 per summer 1991-2020; max 23 in 2003; with coastal SST also below p10: 1.9
+Per summer 2016-2026: 2016:2, 2017:10, 2018:0, 2019:0, 2020:1, 2021:6, 2022:3, 2023:20, 2024:6, 2025:12, 2026:13
+Typical summer coast - offshore difference (median Jun-Sep 1991-2020): -0.39 C; min -5.4 C on 2017-07-01
+Trend in upwelling days 1982-2025: +1.5 +- 1.5 days per decade
+
+Ekman upwelling index (alongshore wind, coastline 10 deg; + = offshore transport), summers 2015-2025:
+  median -7.48 m3/s per 100 m; p90 +13.67
+  SST-detected upwelling days 2015-2025: 60; of these preceded by favourable wind (3-day mean UI > 0): 88%
+  correlation daily dT vs 3-day lagged UI: r = -0.44 (negative r = wind-driven cooling)
+
+Last 5 days coast - offshore SST (NRT): 2026-11-19: -0.05, 2026-11-20: -0.12, 2026-11-21: -0.15, 2026-11-22: -0.17, 2026-11-23: -0.23
+Outside Jun-Sep the coastal strip is naturally colder than offshore (shallow cooling), so the flag is summer-only.
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+P5  Danube freshwater influence [danube_discharge (GloFAS) + phy_sal / rea_phy_sal]
+====================================================================================================
+GloFAS: (45.225006, 28.675003) 1997-01-01..2026-12-13 (forecast after 2026-11-23)
+Long-term mean 1997-2025: 6611 m3/s
+Recent and forecast (every 7 days):
+              value     clim      std      p10      p90  ratio
+time                                                          
+2026-10-12  2064.38  5610.08  1912.79  3657.64  8795.44   0.37
+2026-10-19  2083.49  5445.67  1792.59  3541.62  8382.81   0.38
+2026-10-26  2599.16  5265.83  1725.00  3447.00  8046.30   0.49
+2026-11-02  2505.11  5162.94  1744.24  3398.35  7891.53   0.49
+2026-11-09  3458.39  5141.72  1801.38  3276.24  7894.08   0.67
+2026-11-16  2830.39  5185.95  1812.46  3224.58  7843.88   0.55
+2026-11-23  4215.97  5314.23  1811.56  3285.89  7876.07   0.79
+2026-11-30  5596.58  5458.13  1818.82  3338.18  7994.68   1.03
+2026-12-07  4896.79  5513.12  1813.44  3342.64  7966.92   0.89
+Annual means: min 4838 (2003), max 9042 (2010); 2026 to date 4348
+
+Surface salinity (model) vs 1993-2022 reanalysis climatology, every 15 days:
+                value   clim   std    p10    p90  anom
+time                                                  
+2026-08-25  16.770000  16.12  1.20  14.25  17.50  0.65
+2026-09-09  17.450001  16.46  1.07  14.89  17.70  0.99
+2026-09-24  18.170000  16.68  0.95  15.30  17.79  1.49
+2026-10-09  17.240000  16.71  0.98  15.28  17.81  0.53
+2026-10-24  17.230000  16.79  0.93  15.46  17.85  0.44
+2026-11-08  16.440001  16.93  0.81  15.96  17.91 -0.49
+2026-11-23  17.799999  16.98  0.88  15.86  17.95  0.82
+Known offset: anfc - reanalysis surface salinity about -0.44 (Dec 2024-Jul 2025, docs/data_sources/copernicus.md)
+
+Monthly anomaly correlation, Danube discharge (leading) vs surface salinity at Constanta (reanalysis), 1997-2022:
+  lag 0 mo: r=-0.30  lag 1 mo: r=-0.49  lag 2 mo: r=-0.38  lag 3 mo: r=-0.26
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+P6  Transparency and light at the seabed [sat_kd490_my]
+====================================================================================================
+Reference: cmems_obs-oc_blk_bgc-transp_my_l3-multi-1km_P1D | cell 44.172N 28.724E (0.0 km) n valid days 3718
+  clim mid-01: geometric mean Kd490 0.301 1/m  (p10 0.158, p90 0.732)
+  clim mid-04: geometric mean Kd490 0.383 1/m  (p10 0.144, p90 1.219)
+  clim mid-07: geometric mean Kd490 0.267 1/m  (p10 0.122, p90 0.809)
+  clim mid-10: geometric mean Kd490 0.367 1/m  (p10 0.161, p90 1.267)
+Recent: cmems_obs-oc_blk_bgc-transp_my_l3-multi-1km_P1D | cell 44.172N 28.724E (0.0 km)
+49 valid days in the last 90; last 8:
+            kd490  ratio_to_clim  z_log  kd_par  z_eu_1pct_m  secchi_m_c1.1  secchi_m_c1.7  light_at_10m_pct  light_at_20m_pct
+time                                                                                                                          
+2026-11-05  0.300          0.657 -0.276   0.347       13.265          3.169          4.897             3.107             0.097
+2026-11-06  0.233          0.507 -0.434   0.286       16.080          3.841          5.936             5.705             0.325
+2026-11-07  0.184          0.398 -0.573   0.241       19.094          4.561          7.049             8.965             0.804
+2026-11-08  0.259          0.559 -0.353   0.310       14.860          3.550          5.486             4.510             0.203
+2026-11-09  0.481          1.034  0.020   0.509        9.054          2.163          3.342             0.618             0.004
+2026-11-10  0.274          0.588 -0.306   0.324       14.218          3.396          5.249             3.921             0.154
+2026-11-11  0.289          0.617 -0.271   0.337       13.672          3.266          5.047             3.445             0.119
+2026-11-15  0.449          0.955 -0.023   0.480        9.588          2.290          3.539             0.821             0.007
+Warm-season (May-Sep) 2018-2022 satellite at Constanta: median Kd_PAR 0.281 1/m -> Secchi(1.7/Kd_PAR) median 6.0 m, p10 2.5 m (n 542)
+  factor that reproduces the INCDM coastal median Secchi of 4.0 m: c = 1.12 (vs 1.7 assumed)
+
+Habitat light depths from the 1998-2022 Kd490 climatology (Kd_PAR via Morel 2007), annual median [May-Sep median]:
+  Constanta  (cmems_obs-oc_blk_bgc-transp_my_l3-multi-1km_P1D | cell 44.172N 28.724E (0.0 km)): seagrass 11 %: 6.2 [6.5] m; leathery algae 0.5 %: 15.0 [15.6] m; red algae 0.1 %: 19.5 [20.3] m
+  Vama Veche (cmems_obs-oc_blk_bgc-transp_my_l3-multi-1km_P1D | cell 43.747N 28.598E (0.0 km)): seagrass 11 %: 6.5 [7.4] m; leathery algae 0.5 %: 15.5 [17.7] m; red algae 0.1 %: 20.3 [23.0] m
+  climatological light at  5 m: 8.1-21.1 % of surface PAR over the year (days above 11 %: 275)
+  climatological light at 10 m: 0.7-4.4 % of surface PAR over the year (days above 11 %: 0)
+  climatological light at 15 m: 0.1-0.9 % of surface PAR over the year (days above 11 %: 0)
+  climatological light at 20 m: 0.0-0.2 % of surface PAR over the year (days above 11 %: 0)
+STATUS: COMPUTED LIVE (5 s)
+
+====================================================================================================
+P7  Storms, resuspension and sea level [wav, Open-Meteo marine, IOC-csta2, phy_ssh]
+====================================================================================================
+CMEMS waves: cmems_mod_blk_wav_anfc_2.5km_PT1H-i | cell 44.175N 28.725E (0.68 km)
+Open-Meteo marine cell: (44.208336, 28.791672) waves from 2021-10-01 03:00:00
+Hs 2021-10..now (Open-Meteo, hourly): median 0.58 m, p95 1.66 m, p99 2.24 m, max 4.24 m on 2023-11-19
+Storm events (Hs > p95 for >= 6 h): 82 in 5.1 years; mean peak Hs 2.23 m
+  near-bed orbital velocity at 10.0 m (last 90 d + forecast): median 0.161, max 1.167 m/s on 2026-11-02; hours > 0.10 m/s: 1579, > 0.20 m/s: 943
+  near-bed orbital velocity at 20.0 m (last 90 d + forecast): median 0.044, max 0.565 m/s on 2026-11-02; hours > 0.10 m/s: 643, > 0.20 m/s: 267
+  near-bed orbital velocity at 26.5 m (last 90 d + forecast): median 0.018, max 0.388 m/s on 2026-09-28; hours > 0.10 m/s: 323, > 0.20 m/s: 98
+Daily max Hs (CMEMS model), last 7 days + forecast:
+time
+2026-11-17    1.40
+2026-11-18    0.88
+2026-11-19    0.93
+2026-11-20    1.29
+2026-11-21    0.41
+2026-11-22    0.92
+2026-11-23    1.73
+2026-11-24    0.91
+2026-11-25    0.59
+2026-11-26    1.10
+2026-11-27    1.99
+2026-11-28    2.13
+Freq: D
+
+Tide gauge IOC-csta2 (Constanta), last 30 days, 370 hourly values, local datum (absolute level not meaningful):
+  range 0.37 m; residual vs running 30-day median: max +0.14 m on 2026-10-28 00:00:00, min -0.22 m
+  model SSH (phy_ssh) same period: range 0.33 m; daily obs vs model r = 0.89
+STATUS: COMPUTED LIVE (1 s)
+
+====================================================================================================
+Context: surface currents [phy_cur]
+====================================================================================================
+Model: cmems_mod_blk_phy-cur_anfc_2.5km_P1D-m | cell 44.175N 28.725E (0.68 km) | depth 0.50 m
+Surface current, last 30 days: mean speed 0.16 m/s, max 0.48; mean alongshore -0.04 m/s (negative = towards SSW); share of days flowing south: 58%
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+Context: turbidity and suspended matter [spm_dineof (open_data), sat_hr_l3]
+====================================================================================================
+SPM (NOAA DINEOF gap-filled): noaacwNPPN20S3AspmSCIDINEOF2kmDaily | pixel 44.177N 28.719E (0.79 km)
+  last 60 d: median 0.97 g/m3, max 1.27 on 2026-10-28, last 2026-11-05 0.96
+High-res L3 (~100 m) turbidity/SPM: 5 usable days in 60; 2026-10-05: TUR 2.3 FNU / SPM 1.4, 2026-10-15: TUR 4.0 FNU / SPM 2.3, 2026-10-25: TUR 3.0 FNU / SPM 1.7, 2026-11-12: TUR 1.9 FNU / SPM 1.1
+STATUS: COMPUTED LIVE (4 s)
+
+====================================================================================================
+Context: observed vs model vs satellite temperature [insitu 15480, phy_temp, sst_l4_nrt]
+====================================================================================================
+Coastal station 15480 (NIMH Constanta, in situ) vs model (phy_temp 0.5 m) vs satellite (sst_l4_nrt), 29 common days:
+  model     - station: bias +3.50 C, RMSD 3.71 C, r 0.72
+  satellite - station: bias +3.90 C, RMSD 4.18 C, r 0.54
+            station_15480  model  satellite
+time                                       
+2026-11-18          11.03  14.44      14.37
+2026-11-19          11.47  14.19      14.07
+2026-11-20          11.60  14.24      13.99
+2026-11-21          11.33  13.94      13.94
+2026-11-22          10.95  13.98      13.92
+STATUS: COMPUTED LIVE (0 s)
+
+====================================================================================================
+Validation: physics reanalysis vs NIMRD casts [EMODnet Chemistry CT1/CT2, rea_phy_temp, rea_phy_sal]
+====================================================================================================
+CT1 (44.167N 28.756E, casts to 30 m) -> model cmems_mod_blk_phy-temp_my_2.5km_P1D-m | cell 44.175N 28.750E (1.05 km)
+CT2 (44.167N 28.924E, casts to 40 m) -> model cmems_mod_blk_phy-temp_my_2.5km_P1D-m | cell 44.175N 28.925E (0.93 km)
+Reanalysis minus NIMRD casts, 1993-1999 (CT1 + CT2):
+              n  bias  rmsd     r
+kind                             
+bottom T   26.0  0.50  2.62  0.89
+surface S  41.0  0.28  1.19  0.84
+surface T  44.0  0.19  1.12  0.99
+STATUS: COMPUTED LIVE (0 s)

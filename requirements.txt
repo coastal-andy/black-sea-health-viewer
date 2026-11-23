@@ -1,0 +1,33 @@
+# core data
+pandas>=2.2
+numpy>=1.26
+xarray>=2024.6
+netCDF4>=1.7
+openpyxl>=3.1
+scikit-learn>=1.5
+# external marine data sources and GIS
+copernicusmarine>=2.5
+erddapy>=3.3
+owslib>=0.36
+requests>=2.32
+geopandas>=1.2
+shapely>=2.1
+pyproj>=3.7
+scipy>=1.14
+pyyaml>=6.0
+pymupdf>=1.24
+# dashboard + maps
+streamlit>=1.45
+streamlit-folium>=0.22
+folium>=0.17
+plotly>=5.24
+# vision
+pillow>=10.4
+opencv-python-headless>=4.10
+torch>=2.5
+torchvision>=0.20
+ultralytics>=8.3
+open_clip_torch>=2.29
+# LLM layer
+anthropic>=0.40
+clip @ git+https://github.com/ultralytics/CLIP.git  # needed by YOLO-World set_classes
