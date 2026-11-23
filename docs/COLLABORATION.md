@@ -9,6 +9,8 @@ Two people, two branches, merged through pull requests into `main`.
 
 The two sides talk only through the interfaces in [plan/WORKFLOW.md](plan/WORKFLOW.md): `indicators.card()`, `datahub.get_series()`, the `data/zones/*.geojson` fields, and `vectorviz.field_layer()`. As long as neither person renames those, the branches don't conflict.
 
+Both people's Claude sessions follow [CLAUDE.md](../CLAUDE.md) at the repo root. Claude Code loads it automatically, so the sessions know the branch areas, the interfaces and the git routine.
+
 ## Daily routine
 1. Start of each work block: `git switch <your-branch>`, then `git pull origin main` to get the other person's merged work.
 2. Work in small steps, and commit often with clear messages.
