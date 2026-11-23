@@ -352,7 +352,10 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
                 continue
             try:
                 ds = vv.load_field(kind, A.BBOX_RO, day) if hasattr(vv, "load_field") else None
-                vv.field_layer(m, ds, kind, day)
+                try:
+                    vv.field_layer(m, ds, kind, day, legend=legend, legend_theme=dict(tokens(theme), font=FONT_UI))
+                except TypeError:  # older vectorviz without legend_theme
+                    vv.field_layer(m, ds, kind, day)
             except Exception as ex:
                 msgs.append(f"{kind.capitalize()} layer failed: {str(ex)[:120]}")
     if "insitu" in layers:

@@ -14,7 +14,7 @@ from viewer import adapters as A
 from viewer import maps as M
 from viewer import panels as PN
 from viewer import profiles as P
-from viewer.style import OVERLAP, SECTOR, esc, pill
+from viewer.style import table_html, OVERLAP, SECTOR, esc, pill
 
 PRESSURES = {
     "ports": ["Ship traffic and underwater noise", "Oil and fuel spills, ballast water (new non-native species)",
@@ -191,7 +191,7 @@ def methods_screen(profile):
         cols = ["key", "origin", "product", "dataset_id", "variables", "resolution_deg", "frequency", "reference_years"]
         if not detail:
             cols = ["origin", "product", "variables", "reference_years"]
-        st.dataframe(cat[cols], hide_index=True, width="stretch", height=320)
+        st.markdown(table_html(cat[cols], height=320), unsafe_allow_html=True)
         st.markdown("**Other sources**")
         st.markdown(
             "- EMODnet Physics: buoys, coastal stations, tide gauges near Romania (ERDDAP, no login); QC flags 1 and 2 kept.\n"
@@ -209,7 +209,7 @@ def methods_screen(profile):
             t = t.map(A.strip_md)
             if not detail:
                 t = t[["Indicator", "Reference / threshold", "Evidence", "Confidence"]]
-            st.dataframe(t, hide_index=True, width="stretch", height=420)
+            st.markdown(table_html(t, height=420), unsafe_allow_html=True)
         st.markdown("**Reference periods**: satellite SST 1991-2020 (WMO standard); satellite chlorophyll and Kd490 "
                     "1998-2022; model reanalysis 1993-2022; Danube discharge 1997-2025.")
     with tabs[2]:
@@ -221,13 +221,13 @@ def methods_screen(profile):
         t = (sl.get("4. Data quality register (what to trust)") or [None])[0]
         if t is not None:
             st.markdown("**Data quality register**")
-            st.dataframe(t.map(A.strip_md), hide_index=True, width="stretch")
+            st.markdown(table_html(t.map(A.strip_md)), unsafe_allow_html=True)
         p = A.platforms()
         if len(p):
             st.markdown("**In-situ platforms and their status**")
             show = p[["id", "name", "type", "lat", "lon", "time_end", "trust", "trust_note"]].rename(
                 columns={"time_end": "last data", "trust": "status", "trust_note": "note"})
-            st.dataframe(show, hide_index=True, width="stretch", height=300)
+            st.markdown(table_html(show, height=300), unsafe_allow_html=True)
     with tabs[3]:
         st.markdown("One rule chain for all cards, applied in order. 'Pressure' is used only when no natural driver explains the event.")
         path = A.DOCS / "indicators" / "SHORTLIST.md"
@@ -237,7 +237,7 @@ def methods_screen(profile):
     with tabs[4]:
         t = (sl.get('5. "Investigate" recommendations (the decision output)') or [None])[0]
         if t is not None:
-            st.dataframe(t.map(A.strip_md), hide_index=True, width="stretch")
+            st.markdown(table_html(t.map(A.strip_md)), unsafe_allow_html=True)
     with tabs[5]:
         st.markdown(
             "- The model's chlorophyll, bottom oxygen and nutrients disagree with its own reanalysis: we use satellite and "

@@ -13,6 +13,7 @@ from viewer import overview as OV
 from viewer import panels as PN
 from viewer import profiles as P
 from viewer import screens as SC
+from viewer import seabed as SB
 from viewer import shell as SH
 from viewer import water as WQ
 from viewer.style import esc, theme_name
@@ -120,10 +121,7 @@ def water():
 
 # ------------------------------------------------------------------------------------------ Coast and seabed
 def seabed():
-    ss = st.session_state
-    with st.container(key="page_body"):
-        SH.page_head("Coast and seabed", "Seabed")
-        PN.vector_view(ss.sel, ss.profile)
+    SB.page()
 
 
 # ------------------------------------------------------------------------------------------ Pressures

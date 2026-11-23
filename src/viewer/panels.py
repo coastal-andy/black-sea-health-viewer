@@ -9,7 +9,7 @@ import streamlit as st
 
 from viewer import adapters as A
 from viewer import profiles as P
-from viewer.style import ORIGIN, ORIGIN_LABEL, OI, STATUS, esc, origin_tag, pill, plotly_layout, theme_name, tokens
+from viewer.style import table_html, ORIGIN, ORIGIN_LABEL, OI, STATUS, esc, origin_tag, pill, plotly_layout, theme_name, tokens
 
 FONT = dict(family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif", size=12, color="#1C2430")
 VIEWS = ["Health cards", "Compare sources", "Anomaly", "Long-term trend", "Obs vs model", "Waves and currents"]
@@ -86,7 +86,7 @@ def compare_view(sel, var, profile):
                      "Latest": f"{last.iloc[-1]:.2f} {v['unit']}" if len(last) else "-",
                      "Date": f"{last.index[-1]:%d %b %Y}" if len(last) else "-",
                      "Where": _src_line(it["meta"], detail) or "-", "Note": it.get("note") or ""})
-    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    st.markdown(table_html(pd.DataFrame(rows)), unsafe_allow_html=True)
     if any(it.get("untrusted") for it in items):
         st.caption("Dotted line: buoy under quality control. Do not use it for decisions yet.")
 
@@ -212,7 +212,7 @@ def obs_model_view(sel, var, profile):
         st.info("The observation and the model do not overlap in time at this point.")
         return
     v = A.VARIABLES[var]
-    st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+    st.markdown(table_html(pd.DataFrame(rows)), unsafe_allow_html=True)
     ob, mt = figs[0]
     j = mt["joined"]
     lo, hi = float(np.nanmin(j.values)), float(np.nanmax(j.values))
@@ -288,7 +288,7 @@ def vector_view(sel, profile):
         return
     try:
         if len(dfs) > 1 and hasattr(vv, "combined_chart"):
-            fig = vv.combined_chart(dfs)
+            fig = plotly_layout(vv.combined_chart(dfs, theme=theme_name()))
         else:
             k, df = next(iter(dfs.items()))
             fig = plotly_layout(vv.point_chart(df, k, theme=theme_name()))

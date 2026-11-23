@@ -66,6 +66,36 @@ def _fmt(x, unit="", sign=False) -> str:
     return f"{s} {unit}".strip()
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def _series_status_cached(var, lat, lon, day):
+    items = A.series_for(var, lat, lon)
+    clim = A.soft(A.climatology, var, lat, lon)
+    main = _main_item(items)
+    if main is None:
+        return "no_data", ""
+    s = main["series"]
+    s = s[s.index <= pd.Timestamp(A.today())].dropna()
+    if not len(s):
+        return "no_data", ""
+    last, when = float(s.iloc[-1]), s.index[-1]
+    unit = A.VARIABLES[var]["unit"]
+    status = "no_data"
+    if clim is not None:
+        c = clim.reindex(A.doy365(pd.DatetimeIndex([when])))
+        lo, hi = c["p10"].iloc[0], c["p90"].iloc[0]
+        if pd.notna(lo) and pd.notna(hi):
+            status = "normal" if lo <= last <= hi else "watch"
+    return status, PN._num(last, unit)
+
+
+def _series_status(var, sel):
+    """For variables without a health card: latest value, and normal / watch from the usual p10-p90 range."""
+    try:
+        return _series_status_cached(var, round(sel["lat"], 4), round(sel["lon"], 4), str(A.today().date()))
+    except Exception:
+        return "no_data", ""
+
+
 # ------------------------------------------------------------------------------------------ left list
 def _pick(k):
     st.session_state["w_var"] = k
@@ -84,7 +114,7 @@ def var_list(sel, cards, current):
         status = c.get("status") if c else "no_data"
         val = PN._num(c.get("value"), c.get("unit") or "") if (c and c.get("value") is not None) else ""
         if c is None and var:
-            val = ""
+            status, val = _series_status(var, sel)
         active = " active" if k == current else ""
         with st.container(key=f"vrow_{k}"):
             st.markdown(f"<div class='bsv-vrow{active}'>{status_square(status)}<span class='nm'>{esc(name)}</span>"

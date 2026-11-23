@@ -133,7 +133,7 @@ header[data-testid="stHeader"] {{display:none !important;}}
 [data-testid="stMain"] {{background:{t['bg']};}}
 .block-container, [data-testid="stMainBlockContainer"] {{padding:0 !important; max-width:none !important;}}
 [data-testid="stElementContainer"]:has(> div > div > style), [data-testid="stElementContainer"]:has(style) {{display:none !important;}}
-[data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"]:has(> [data-testid="stHorizontalBlock"] .st-key-bsv_map) {{gap:0;}}
+[data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"]:has(> [data-testid="stHorizontalBlock"] [class*="st-key-bsv_map"]) {{gap:0;}}
 
 /* left icon rail (72 px) */
 section[data-testid="stSidebar"] {{width:72px !important; min-width:72px !important; max-width:72px !important;
@@ -165,8 +165,8 @@ section[data-testid="stSidebar"] div[style*="cursor: col-resize"], section[data-
 .st-key-theme_switch .bsv-lbl {{display:block; text-align:center; width:72px; margin-bottom:4px;}}
 
 /* docked panel on the right */
-[data-testid="stHorizontalBlock"]:has(> div > .st-key-bsv_panel), [data-testid="stHorizontalBlock"]:has(.st-key-bsv_map) {{flex-wrap:nowrap !important;}}
-div[data-testid="stColumn"]:has(.st-key-bsv_map) {{min-width:0 !important;}}
+[data-testid="stHorizontalBlock"]:has(> div > .st-key-bsv_panel), [data-testid="stHorizontalBlock"]:has([class*="st-key-bsv_map"]) {{flex-wrap:nowrap !important;}}
+div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{min-width:0 !important;}}
 div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{min-width:280px; background:{t['panel']}; border-left:1px solid {t['line']};
   height:100vh; overflow-y:auto; position:sticky; top:0;}}
 .st-key-bsv_panel {{padding:0 0 24px 0;}}
@@ -178,10 +178,12 @@ div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{min-width:280px; background
 .st-key-bsv_pad {{padding-top:10px; padding-bottom:10px;}}
 
 /* map column: map fills the height, tools float over it */
-div[data-testid="stColumn"]:has(.st-key-bsv_map) {{position:relative;}}
-.st-key-bsv_map iframe {{height:calc(100vh - 64px) !important; display:block;}}
-.st-key-bsv_map {{gap:0 !important;}}
-.st-key-bsv_map [data-testid="stElementContainer"] {{margin:0;}}
+div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}}
+[class*="st-key-bsv_map"] iframe {{height:calc(100vh - 64px) !important; display:block;}}
+.st-key-bsv_map_po iframe {{height:calc(100vh - 222px) !important;}}
+.st-key-bsv_map_pc iframe {{height:calc(100vh - 57px) !important;}}
+[class*="st-key-bsv_map"] {{gap:0 !important;}}
+[class*="st-key-bsv_map"] [data-testid="stElementContainer"] {{margin:0;}}
 .st-key-map_tools {{position:absolute; left:16px; top:16px; z-index:20; width:min(380px, calc(100% - 96px)); gap:8px;
   background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:10px;}}
 .st-key-map_msgs {{position:absolute; left:16px; bottom:16px; z-index:20; max-width:60%;}}
@@ -289,6 +291,8 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .bsv-table th {{text-align:left; font-weight:500; font-size:10.5px; letter-spacing:1px; text-transform:uppercase;
   color:{t['muted']}; padding:6px 10px 6px 0; border-bottom:1px solid {t['line']};}}
 .bsv-table td {{padding:8px 10px 8px 0; border-bottom:1px solid {t['line2']}; vertical-align:top;}}
+.bsv-tablebox {{margin:4px 0 14px 0;}}
+.bsv-tablebox thead th {{position:sticky; top:0; background:{t['bg']};}}
 .bsv-table td.n {{font-family:{FONT_NUM}; font-size:15px; white-space:nowrap;}}
 .bsv-chain {{margin:4px 0 0 18px; padding:0; font-size:13.5px; line-height:1.5; color:{t['soft']};}}
 .bsv-chain li {{margin:4px 0;}}
@@ -296,6 +300,17 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .st-key-page_body [data-testid="stExpanderDetails"] {{padding:4px 0 14px 0 !important;}}
 .st-key-page_body [data-testid="stExpander"] details {{border-top:0 !important;}}
 .st-key-page_body [data-testid="stExpander"]:first-of-type details {{border-top:1px solid {t['line']} !important;}}
+/* Coast and seabed (B3) */
+.bsv-row.bsv-row4 {{grid-template-columns:minmax(0,1fr) auto 12px;}}
+.st-key-map_tools [data-testid="stButtonGroup"] > div {{gap:0; flex-wrap:nowrap;}}
+.st-key-map_tools [data-testid="stButtonGroup"] button {{flex:1 1 0; height:38px; padding:0 8px !important;}}
+.st-key-map_tools [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
+.st-key-depthpanel {{background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px 6px 16px; gap:0 !important;}}
+.st-key-dp_head {{height:56px; gap:16px !important; flex-wrap:nowrap !important;}}
+.st-key-dp_head [data-testid="stMarkdownContainer"] {{display:flex; gap:16px; align-items:baseline;}}
+.bsv-dp-t {{font-size:14px; font-weight:500; color:{t['text']}; white-space:nowrap;}}
+.st-key-profile_btn button {{height:32px; min-height:32px; padding:0 12px;}}
+.st-key-profile_btn button p {{font-size:12px !important; letter-spacing:1px; text-transform:uppercase; color:{t['soft']} !important;}}
 /* bottom timeline */
 .st-key-timeline {{height:64px; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
   flex-wrap:nowrap !important;}}
@@ -343,8 +358,12 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 [data-testid="stButtonGroup"] button[kind*="Active"], [data-testid="stButtonGroup"] button[aria-checked="true"] {{background:{t['raised']} !important; color:{t['text']} !important;}}
 [data-testid="stButtonGroup"] button p {{color:inherit !important;}}
 [data-testid="stExpander"] details {{border:0 !important; border-bottom:1px solid {t['line']} !important; border-radius:0 !important; background:transparent !important;}}
-[data-testid="stExpander"] summary {{padding:12px 22px !important; color:{t['text']} !important;}}
-[data-testid="stExpander"] summary:hover {{background:{t['row_open']};}}
+[data-testid="stExpander"] summary, [data-testid="stExpander"] details[open] > summary,
+[data-testid="stExpander"] summary:focus, [data-testid="stExpander"] summary:active {{padding:12px 22px !important;
+  color:{t['text']} !important; background:transparent !important; border-radius:0 !important;}}
+[data-testid="stExpander"] summary:hover, [data-testid="stExpander"] details[open] > summary:hover {{background:{t['row_open']} !important;}}
+[data-testid="stExpander"] summary svg {{fill:{t['muted']} !important; color:{t['muted']} !important;}}
+[data-testid="stExpander"] summary *:not(svg):not(path) {{background:transparent !important;}}
 [data-testid="stExpander"] summary p {{font-size:12px !important; letter-spacing:1.2px; text-transform:uppercase; color:{t['sub']} !important;}}
 [data-testid="stExpanderDetails"] {{padding:4px 22px 14px 22px !important;}}
 .stApp [data-testid="stTabs"] [data-baseweb="tab-list"] {{gap:0; border-bottom:1px solid {t['line']};}}
@@ -358,6 +377,15 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .stApp [data-baseweb="checkbox"] span, .stApp [data-baseweb="radio"] div {{border-color:{t['ctrl']};}}
 .stApp [data-testid="stAlert"] {{border-radius:4px; background:{t['row_open']} !important; color:{t['text']};}}
 .stApp [data-testid="stDataFrame"] {{border:1px solid {t['line']};}}
+.stApp [data-testid="stMetricValue"], .stApp [data-testid="stMetricValue"] * {{color:{t['text']} !important;
+  font-family:{FONT_NUM}; font-weight:500;}}
+.stApp [data-testid="stMetricLabel"], .stApp [data-testid="stMetricLabel"] * {{color:{t['muted']} !important;}}
+.stApp [data-testid="stAlert"] *, .stApp [data-testid="stCaptionContainer"] * {{color:inherit;}}
+.stApp [data-testid="stAlertContentInfo"], .stApp [data-testid="stAlertContentInfo"] * {{color:{t['text']} !important;}}
+.stApp [data-testid="stMarkdownContainer"] strong, .stApp [data-testid="stMarkdownContainer"] code {{color:{t['text']};}}
+.stApp [data-testid="stMarkdownContainer"] code {{background:{t['row_open']};}}
+.stApp [data-testid="stWidgetLabel"] p, .stApp [data-testid="stWidgetLabel"] label {{color:{t['sub']} !important;}}
+.stApp [data-baseweb="checkbox"] p, .stApp [data-testid="stRadio"] p {{color:{t['text']} !important;}}
 
 /* text styles */
 .bsv-title {{font-family:{FONT_NUM}; font-size:1.6rem; font-weight:500; margin:0; line-height:1.15; color:{t['text']};}}
@@ -448,6 +476,29 @@ def overlap_levels() -> dict:
 OVERLAP = {k: v[0] for k, v in overlap_levels().items()}
 
 CSS = css("dark")  # kept for older imports; app.py injects css(theme_name()) instead
+
+
+def table_html(df, height: int | None = None) -> str:
+    """A DataFrame as a flat themed HTML table (st.dataframe draws on a canvas and ignores the light theme)."""
+    import pandas as pd
+    head = "".join(f"<th>{esc(c)}</th>" for c in df.columns)
+    rows = []
+    for _, r in df.iterrows():
+        cells = []
+        for v in r.values:
+            if v is None or (isinstance(v, float) and pd.isna(v)):
+                v = ""
+            elif isinstance(v, pd.Timestamp):
+                v = v.strftime("%d %b %Y")
+            elif isinstance(v, float):
+                v = f"{v:.4g}"
+            elif isinstance(v, (list, tuple)):
+                v = ", ".join(map(str, v))
+            cells.append(f"<td>{esc(v)}</td>")
+        rows.append("<tr>" + "".join(cells) + "</tr>")
+    box = f"max-height:{height}px;overflow:auto" if height else "overflow-x:auto"
+    return (f"<div class='bsv-tablebox' style='{box}'><table class='bsv-table'><thead><tr>{head}</tr></thead>"
+            f"<tbody>{''.join(rows)}</tbody></table></div>")
 
 
 def esc(x) -> str:
