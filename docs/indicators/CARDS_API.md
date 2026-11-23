@@ -94,7 +94,21 @@ Offline: `MARINEKIT_OFFLINE=1` reads every cached file regardless of age. Withou
 
 ## Timing
 
-TIMING_TABLE
+Measured on 2026-11-23 with `MARINEKIT_OFFLINE=1` after `scripts/preload_cache.py`. Each run used a fresh Python process, so the figures include reading every parquet file once.
+
+| Case | Time |
+|---|---|
+| `import marinekit.indicators` | 0.3 s |
+| All 9 cards, Constanța, today | 1.1 s (first card 1.0 s: it computes the shared drivers; the others take 0.01-0.03 s) |
+| All 9 cards, Constanța, 2024-07-20 | 1.0 s |
+| All 9 cards, Mangalia / Sulina, today | 1.1 s / 0.9 s |
+| All 9 cards again in the same process (memory caches cleared) | 0.1 s |
+| `zone_cards(polygon)`, sample point already cached | 0.1 s |
+| `compare_sources("sst", ...)`, `obs_vs_model("o2", ...)` on `recent_window(60)` at a station | < 0.05 s |
+| A point or year not in the cache (network) | 3-8 s per series; 30-70 s for all cards the first time |
+| `preload_cache.py`, first run (20 points) / re-run | 25 min / 1-7 min |
+
+Targets (WORKFLOW: about 3 s per card, about 10 s per point) are met for every cached point. Clicking a new point on the map needs the network once.
 
 ## Preload and tests
 
@@ -110,4 +124,12 @@ The preload covers the 7 `STATIONS` and one point per pressure-zone feature, all
 
 ## Known gaps
 
-KNOWN_GAPS
+- **Offline demo uses preloaded points.** A new map click or year fetches from the network once. Offline, use the 7 stations and the zone sample points, or run the preload with `--dates` for extra dates.
+- **Bottom oxygen is model only.** The forecast system runs about 2 mg/L below the reanalysis, so `z` is left empty for forecast values and rule 1 (model artefact) is always quoted first. The D5C5 season test is computed on the concentration part only, not the 60 % saturation part.
+- **Nutrients are historical.** The value is the latest DIVAnd 6-year window (centred 2020 at Constanța). Near the shore, where those windows are masked, it falls back to the 2000-2022 seasonal climatology. The marine-water thresholds are applied everywhere; the coastal ones (13.5 / 0.30) are listed in `reference`. Rule 7 (wastewater) cannot fire on live data.
+- **Offshore buoys come from the GeoEcoMar ERDDAP.** It is read directly in `datahub.py`; DOXY has no QC there, and salinity is derived from conductivity with PSS-78. The Copernicus In Situ TAC returns nothing for EUXRoOB01-03, and EMODnet stops in September 2026. Every station is more than 30 km from a buoy, so `auto` uses the model for O2, and `obs_vs_model` samples the model at the buoy position (said in `note`). Check: model minus EUXRoOB03 surface O2, last 60 days, bias +0.42 mg/L, r 0.98, n 61.
+- **Fixed corrections** come from the Constanța checks and are applied at every point: SST NRT minus 0.53 °C, forecast bottom temperature minus 0.41 °C, Secchi factor 1.1.
+- **Clarity** uses cloud-gappy L3 Kd490 (value up to 16 days old) until the L4 gap-free product takes over on 2026-11-24.
+- **Drivers:** upwelling is tested only in June-September, against a point 0.58° east. Bottom salinity is read about 2 m above the EMODnet depth, and the model may take it from a neighbouring cell.
+- **Biodiversity** is presence only, in a ±0.15° x ±0.2° box (OBIS checklist). The watch rule (a species new to the Romanian coast since 2015, or invaders inside a port or shipyard zone) is ours.
+- **Pressure zones** are read from `data/zones/sector_zones.geojson` once per process. A long-running app picks up a new zone file only after a restart.

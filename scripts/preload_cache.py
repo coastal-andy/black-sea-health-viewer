@@ -108,6 +108,11 @@ def main() -> int:
     pts = [(n, la, lo, True) for n, (la, lo) in STATIONS.items()]
     if not a.no_zones:
         pts += [(n, la, lo, False) for n, (la, lo) in zone_points().items()]
+        # representative sites per sector, as shown on the viewer's Sectors screen
+        sites = ROOT / "data" / "zones" / "sector_sites.json"
+        if sites.exists():
+            import json
+            pts += [(f"site {s['sector']}/{s['name']}", s["lat"], s["lon"], False) for s in json.loads(sites.read_text())]
     print(f"Preloading {len(pts)} points x {len(ind.CARDS)} cards x {len(dates)} date(s): {', '.join(dates)}; "
           f"offline={dh.OFFLINE}; workers={a.workers}", flush=True)
     t0 = time.time()

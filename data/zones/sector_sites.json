@@ -1,0 +1,142 @@
+[
+ {
+  "sector": "ports",
+  "name": "Mangalia",
+  "lat": 43.8063,
+  "lon": 28.5913,
+  "why": "port area (official), 4 sectors overlap"
+ },
+ {
+  "sector": "ports",
+  "name": "Constanta",
+  "lat": 44.1381,
+  "lon": 28.6571,
+  "why": "port area (official), 3 sectors overlap"
+ },
+ {
+  "sector": "ports",
+  "name": "Midia",
+  "lat": 44.3447,
+  "lon": 28.6783,
+  "why": "port area (official)"
+ },
+ {
+  "sector": "ports",
+  "name": "Bazinul Mare",
+  "lat": 45.1556,
+  "lon": 29.6788,
+  "why": "port area (mapped)"
+ },
+ {
+  "sector": "shipyards",
+  "name": "Doc uscat \"Sorena\"",
+  "lat": 44.1614,
+  "lon": 28.656,
+  "why": "shipyard (mapped), 3 sectors overlap"
+ },
+ {
+  "sector": "shipyards",
+  "name": "Damen Shipyards Mangalia",
+  "lat": 43.7985,
+  "lon": 28.5674,
+  "why": "shipyard (mapped)"
+ },
+ {
+  "sector": "shipyards",
+  "name": "Central Platform Complex PFCP + PFS-1 + PFS-2 (m",
+  "lat": 44.5239,
+  "lon": 29.5669,
+  "why": "offshore platform (official), 2 sectors overlap"
+ },
+ {
+  "sector": "shipyards",
+  "name": "Neptun Alpha production platform (Neptun Deep)",
+  "lat": 44.0475,
+  "lon": 30.5875,
+  "why": "offshore platform (official), 1 sectors overlap"
+ },
+ {
+  "sector": "tourism",
+  "name": "Eforie Nord I Debarcader",
+  "lat": 44.0692,
+  "lon": 28.6406,
+  "why": "bathing water (official), 4 sectors overlap"
+ },
+ {
+  "sector": "tourism",
+  "name": "Mangalia",
+  "lat": 43.8104,
+  "lon": 28.587,
+  "why": "bathing water (official), 4 sectors overlap"
+ },
+ {
+  "sector": "tourism",
+  "name": "Plaja Mamaia V Castel",
+  "lat": 44.2388,
+  "lon": 28.6285,
+  "why": "bathing water (official), 3 sectors overlap"
+ },
+ {
+  "sector": "tourism",
+  "name": "Sat De Vacanta Gura Portitei",
+  "lat": 44.6889,
+  "lon": 29.0056,
+  "why": "bathing water (official), 2 sectors overlap"
+ },
+ {
+  "sector": "fishing",
+  "name": "2 Mai",
+  "lat": 43.7864,
+  "lon": 28.5803,
+  "why": "landing point (assumed), 4 sectors overlap"
+ },
+ {
+  "sector": "fishing",
+  "name": "Eforie Nord (Belona)",
+  "lat": 44.0622,
+  "lon": 28.6413,
+  "why": "landing point (assumed), 4 sectors overlap"
+ },
+ {
+  "sector": "fishing",
+  "name": "Mamaia (bd. Mamaia 306/312D)",
+  "lat": 44.2342,
+  "lon": 28.6302,
+  "why": "landing point (assumed), 3 sectors overlap"
+ },
+ {
+  "sector": "fishing",
+  "name": "23 August",
+  "lat": 43.9173,
+  "lon": 28.632,
+  "why": "landing point (assumed), 2 sectors overlap"
+ },
+ {
+  "sector": "aquaculture",
+  "name": "Aquaculture perimeter P9 (Maty Fish SRL)",
+  "lat": 44.0804,
+  "lon": 28.6617,
+  "why": "aquaculture lease (official), 3 sectors overlap"
+ },
+ {
+  "sector": "aquaculture",
+  "name": "Aquaculture perimeter P13 (Bistromar La Timona S",
+  "lat": 43.8348,
+  "lon": 28.6467,
+  "why": "aquaculture lease (official), 3 sectors overlap"
+ },
+ {
+  "sector": "aquaculture",
+  "name": "Aquaculture perimeter P28 (Nedsea SRL)",
+  "lat": 44.2152,
+  "lon": 28.6503,
+  "why": "aquaculture lease (official), 3 sectors overlap"
+ },
+ {
+  "sector": "aquaculture",
+  "name": "Aquaculture perimeter P11 (Deltaica Seafood SRL)",
+  "lat": 44.6463,
+  "lon": 29.2064,
+  "why": "aquaculture lease (official), 1 sectors overlap"
+ }
+]
