@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from viewer import adapters as A
-from viewer.style import OVERLAP, SECTOR, OI, esc, overlap_levels
+from viewer.style import FONT_UI, OVERLAP, SECTOR, OI, esc, overlap_levels, theme_name, tokens
 
 log = logging.getLogger("viewer")
 
@@ -29,16 +29,36 @@ GRIDDED = set(A.LAYERS)
 VECTOR = {"vec_waves": "waves", "vec_currents": "currents", "vec_wind": "wind"}
 
 
-def base_map(lat, lon, zoom) -> folium.Map:
+def base_map(lat, lon, zoom, theme: str | None = None) -> folium.Map:
+    """Basemap matched to the viewer theme: Esri dark grey (dark) or light grey canvas (light), others in the layer list."""
+    t = tokens(theme)
     m = folium.Map(location=[lat, lon], zoom_start=zoom, tiles=None, control_scale=True, max_zoom=16, min_zoom=5,
                    prefer_canvas=False)  # SVG renderer: needed for the hatch patterns
+    # Esri dark / light grey canvas (no API key needed; CARTO tiles now ask for one), with its label layer on top
+    folium.TileLayer(ESRI.format(f"Canvas/World_{t['basemap']}_Gray_Base"), attr="Esri, HERE, Garmin, OpenStreetMap",
+                     name="Basemap (matches the theme)", max_native_zoom=16, max_zoom=16, show=True).add_to(m)
+    folium.TileLayer(ESRI.format(f"Canvas/World_{t['basemap']}_Gray_Reference"), attr="Esri", name="Place names",
+                     overlay=True, control=False, max_native_zoom=16, max_zoom=16, show=True, pane="shadowPane"
+                     ).add_to(m)
     folium.TileLayer(ESRI.format("Ocean/World_Ocean_Base"), attr="Esri, GEBCO, NOAA, DeLorme",
-                     name="Ocean basemap (bathymetry)", max_native_zoom=10, max_zoom=16, show=True).add_to(m)
-    folium.TileLayer(ESRI.format("Canvas/World_Light_Gray_Base"), attr="Esri, HERE, DeLorme",
-                     name="Light grey basemap", max_native_zoom=16, max_zoom=16, show=False).add_to(m)
+                     name="Ocean basemap (bathymetry)", max_native_zoom=10, max_zoom=16, show=False).add_to(m)
     folium.TileLayer("OpenStreetMap", name="OpenStreetMap", show=False).add_to(m)
     folium.TileLayer(ESRI.format("World_Imagery"), attr="Esri World Imagery", name="Satellite image",
                      max_zoom=16, show=False).add_to(m)
+    # fill the iframe height (the viewer sets the iframe to the page height) and theme the Leaflet controls
+    m.get_root().header.add_child(folium.Element(
+        f"<style>html,body{{background:{t['bg']};}} .folium-map{{height:100vh !important;}}"
+        f".leaflet-container{{background:{t['bg']};font-family:{FONT_UI};}}"
+        f".leaflet-bar a,.leaflet-control-layers{{background:{t['overlay']} !important;color:{t['text']} !important;"
+        f"border-color:{t['ctrl']} !important;border-radius:4px !important;}}"
+        f".leaflet-bar{{border:1px solid {t['ctrl']} !important;border-radius:4px !important;box-shadow:none !important;}}"
+        f".leaflet-control-layers{{box-shadow:none !important;border:1px solid {t['ctrl']} !important;}}"
+        f".leaflet-control-layers label{{color:{t['text']};}}"
+        f".leaflet-control-attribution{{background:{t['overlay']} !important;color:{t['muted']} !important;}}"
+        f".leaflet-control-attribution a{{color:{t['muted']} !important;}}"
+        f".leaflet-control-scale-line{{background:transparent;color:{t['muted']};border-color:{t['muted']};}}"
+        f".leaflet-popup-content-wrapper,.leaflet-popup-tip,.leaflet-tooltip{{background:{t['panel']};color:{t['text']};"
+        f"border-radius:4px;border:1px solid {t['ctrl']};box-shadow:none;}}</style>"))
     return m
 
 
@@ -211,10 +231,10 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
         ticks = "".join(f"<span>{_fmt(t)}</span>" for t in _ticks(fd))
         src = f"{fd['origin']}, {fd['time']}" + (f" - {fd['dataset']}" if detail else "")
         parts.append(
-            f"<div style='font-weight:650'>{esc(fd['title'])} ({esc(fd['unit'])})</div>"
+            f"<div style='font-weight:600'>{esc(fd['title'])} ({esc(fd['unit'])})</div>"
             f"<div style='height:10px;width:190px;background:linear-gradient(to right,{grad});border-radius:2px'></div>"
             f"<div style='display:flex;justify-content:space-between;width:190px;font-size:11px'>{ticks}</div>"
-            f"<div style='color:#666;font-size:10.5px;margin-bottom:4px'>{esc(src)}{' - log scale' if fd['log'] else ''}</div>")
+            f"<div style='opacity:0.75;font-size:10.5px;margin-bottom:4px'>{esc(src)}{' - log scale' if fd['log'] else ''}</div>")
     if "overlap" in layers:
         lv = overlap_levels()
         present = sorted(levels or lv)
@@ -229,14 +249,14 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
             return (f"<span style='display:inline-block;width:18px;height:10px;background:{col};"
                     f"opacity:{max(op, 0.55)};margin-right:5px;vertical-align:middle'></span>")
         rows = "".join(f"<div>{sw(n)}{esc(lv[n][2])}</div>" for n in present if n in lv)
-        parts.append(f"<div style='font-weight:650;margin-top:2px'>Sectors overlapping ({season}), of 5</div>{rows}")
+        parts.append(f"<div style='font-weight:600;margin-top:2px'>Sectors overlapping ({season}), of 5</div>{rows}")
     if "zones" in layers or "features" in layers:
         rows = "".join(f"<div><span style='display:inline-block;width:10px;height:10px;border:2px solid {c};"
                        f"margin-right:5px'></span>{esc(l)}</div>" for k, (l, c) in SECTOR.items())
-        parts.append(f"<div style='font-weight:650;margin-top:4px'>Sectors</div>{rows}"
-                     f"<div style='color:#666;font-size:10.5px'>dashed = location assumed, to confirm with NIMRD</div>")
+        parts.append(f"<div style='font-weight:600;margin-top:4px'>Sectors</div>{rows}"
+                     f"<div style='opacity:0.75;font-size:10.5px'>dashed = location assumed, to confirm with NIMRD</div>")
     if "insitu" in layers:
-        parts.append("<div style='font-weight:650;margin-top:4px'>In-situ</div>"
+        parts.append("<div style='font-weight:600;margin-top:4px'>In-situ</div>"
                      f"<div><span style='display:inline-block;width:10px;height:10px;border-radius:50%;background:{OI['blue']};"
                      "border:1px solid #1C2430;margin-right:5px'></span>trusted or not assessed</div>"
                      "<div><span style='display:inline-block;width:10px;height:10px;border-radius:50%;background:#9AA3AD;"
@@ -247,18 +267,19 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
     if not parts:
         return ""
     # collapsible, height-capped legend so it never hides the coast it explains
-    return ("<details open style='position:absolute;bottom:22px;right:10px;z-index:9999;background:rgba(255,255,255,0.94);"
-            "color:#1C2430;padding:6px 10px;border-radius:6px;font:11.5px/1.3 -apple-system,Segoe UI,sans-serif;"
-            "box-shadow:0 1px 4px rgba(0,0,0,.25);max-width:230px'>"
-            "<summary style='cursor:pointer;font-weight:650;color:#444'>Legend</summary>"
+    t = tokens()
+    return (f"<details open style='position:absolute;bottom:22px;right:10px;z-index:9999;background:{t['overlay']};"
+            f"color:{t['text']};padding:8px 12px;border-radius:4px;border:1px solid {t['ctrl']};"
+            f"font:12px/1.35 {FONT_UI};max-width:240px'>"
+            f"<summary style='cursor:pointer;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']}'>Legend</summary>"
             "<div style='max-height:min(48vh,340px);overflow-y:auto;margin-top:4px'>" + "".join(parts) + "</div></details>")
 
 
 def build(view: dict, layers: set, day: str, season: str, sel: dict | None, detail: bool, tiles_mode: bool = False,
-          only_sector: str | None = None) -> tuple[folium.Map, dict | None, list[str]]:
+          only_sector: str | None = None, theme: str | None = None) -> tuple[folium.Map, dict | None, list[str]]:
     """Return (map, field dict or None, messages)."""
     msgs = []
-    m = base_map(view["lat"], view["lon"], view["zoom"])
+    m = base_map(view["lat"], view["lon"], view["zoom"], theme)
     stamp = A._zones_stamp()
     fd = None
     grid = [l for l in layers if l in GRIDDED]

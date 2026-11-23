@@ -9,7 +9,7 @@ import streamlit as st
 
 from viewer import adapters as A
 from viewer import profiles as P
-from viewer.style import ORIGIN, ORIGIN_LABEL, OI, STATUS, esc, origin_tag, pill
+from viewer.style import ORIGIN, ORIGIN_LABEL, OI, STATUS, esc, origin_tag, pill, plotly_layout, theme_name, tokens
 
 FONT = dict(family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif", size=12, color="#1C2430")
 VIEWS = ["Health cards", "Compare sources", "Anomaly", "Long-term trend", "Obs vs model", "Waves and currents"]
@@ -21,9 +21,9 @@ def _layout(fig, title="", ytitle="", height=360, log=False):
     fig.update_layout(template="simple_white", height=height, margin=dict(l=55, r=15, t=40 if title else 15, b=40),
                       title=dict(text=title, font=dict(size=14)), font=FONT, hovermode="x unified",
                       legend=dict(orientation="h", yanchor="bottom", y=1.0, x=0, font=dict(size=11)))
-    fig.update_yaxes(title=ytitle, gridcolor="#EEF1F4", showgrid=True, type="log" if log else "linear")
-    fig.update_xaxes(gridcolor="#EEF1F4", showgrid=False)
-    return fig
+    fig.update_yaxes(title=ytitle, showgrid=True, type="log" if log else "linear")
+    fig.update_xaxes(showgrid=False)
+    return plotly_layout(fig)
 
 
 def _src_line(meta: dict, detail: bool) -> str:
@@ -77,7 +77,7 @@ def compare_view(sel, var, profile):
     t = A.today()
     fig.add_vline(x=t, line=dict(color="#999", width=1, dash="dash"))
     _layout(fig, ytitle=var_label(var, profile), log=v.get("log", False))
-    st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+    st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     rows = []
     for it in items:
         s = it["series"]
@@ -122,7 +122,7 @@ def anomaly_view(sel, var, profile):
     fig.add_trace(go.Scatter(x=below.index, y=below.values, mode="markers", marker=dict(color=OI["sky"], size=5),
                              name="below usual"))
     _layout(fig, ytitle=var_label(var, profile), log=v.get("log", False))
-    st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+    st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     a = (s - c["mean"]).dropna()
     yrs = clim.attrs.get("years")
     cols = st.columns(4)
@@ -166,7 +166,7 @@ def trend_view(sel, var, profile):
                              line=dict(color=OI["vermillion"], width=2.4)))
     _layout(fig, ytitle=var_label(var, profile), log=False)
     fig.update_layout(hovermode="closest")
-    st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+    st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     c = st.columns(3)
     c[0].metric("Change per decade", f"{tr['slope_decade']:+.2f} {v['unit']}",
                 help="Slope of the straight line through the annual means, times ten years.")
@@ -224,7 +224,7 @@ def obs_model_view(sel, var, profile):
     _layout(fig, ytitle=f"Model ({v['unit']})", height=340)
     fig.update_xaxes(title=f"{ORIGIN_LABEL.get(ob['origin'])} ({v['unit']})")
     fig.update_layout(hovermode="closest")
-    st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+    st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     st.caption("Bias above zero means the model is too high. RMSE is the typical size of the error. "
                "r close to 1 means the model follows the ups and downs."
                + (f" Model: {mod['dataset']} ({_src_line(mod['meta'], True)})." if detail else ""))
@@ -257,7 +257,7 @@ def _obs_model_hub(r, var, profile, detail):
         _layout(fig, ytitle=f"Model ({unit})", height=340, log=lg)
         fig.update_xaxes(title=f"Observed ({unit})", type="log" if lg else "linear")
         fig.update_layout(hovermode="closest")
-        st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+        st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     st.caption("Bias above zero means the model is too high. RMSE is the typical size of the error. "
                "r close to 1 means the model follows the ups and downs."
                + (f" {r['note']}." if r.get("note") else "")
@@ -291,8 +291,8 @@ def vector_view(sel, profile):
             fig = vv.combined_chart(dfs)
         else:
             k, df = next(iter(dfs.items()))
-            fig = vv.point_chart(df, k)
-        st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+            fig = plotly_layout(vv.point_chart(df, k, theme=theme_name()))
+        st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
         st.caption("Arrows point where the water or air is going (up = north). For waves, a longer arrow means a "
                    "longer wave period (swell). The dashed line marks today; later values are forecast.")
     except Exception as ex:
@@ -318,7 +318,7 @@ def _num(x, unit=""):
 def _ttype_badge(tt: str) -> str:
     if not tt:
         return ""
-    col = "#0B6E4F" if "OFFICIAL" in tt else "#5A6573"
+    col = tokens()["normal"] if "OFFICIAL" in tt else tokens()["muted"]
     return (f"<span style='font-size:0.7rem;font-weight:650;color:{col};border:1px solid {col};border-radius:3px;"
             f"padding:0 4px;margin-left:4px'>{esc(tt)}</span>")
 

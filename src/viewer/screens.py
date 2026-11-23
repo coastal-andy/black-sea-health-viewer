@@ -115,7 +115,7 @@ def _tip(c) -> str:
 
 def site_rows(sites, all_cards, linked, profile):
     cols = linked or list(SHORT)
-    head = "".join(f"<th style='padding:4px 6px;font-size:0.78rem;color:#5A6573;font-weight:600'>{SHORT.get(k, k)}</th>"
+    head = "".join(f"<th style='padding:4px 6px;font-size:0.78rem;color:var(--bsv-muted);font-weight:600'>{SHORT.get(k, k)}</th>"
                    for k in cols)
     body = []
     for s, cs in zip(sites, all_cards):
@@ -129,11 +129,11 @@ def site_rows(sites, all_cards, linked, profile):
                 cells.append("<td style='padding:4px 6px'><span class='bsv-note'>computing</span></td>")
             else:
                 cells.append(f"<td style='padding:4px 6px' title='{esc(_tip(c))}'>{pill(c.get('status'))}</td>")
-        body.append(f"<tr style='border-top:1px solid #EEF1F4'><td style='padding:5px 6px'><b>{esc(s['name'])}</b><br>"
+        body.append(f"<tr style='border-top:1px solid var(--bsv-line2)'><td style='padding:5px 6px'><b>{esc(s['name'])}</b><br>"
                     f"<span class='bsv-note'>near {esc(s.get('near', ''))}, {s['lat']:.3f} N {s['lon']:.3f} E - "
                     f"{esc(s.get('why', ''))}</span></td>{''.join(cells)}</tr>")
     st.markdown(f"<div style='overflow-x:auto'><table style='border-collapse:collapse;width:100%'>"
-                f"<tr><th style='text-align:left;padding:4px 6px;font-size:0.78rem;color:#5A6573'>Site</th>{head}</tr>"
+                f"<tr><th style='text-align:left;padding:4px 6px;font-size:0.78rem;color:var(--bsv-muted)'>Site</th>{head}</tr>"
                 f"{''.join(body)}</table></div>", unsafe_allow_html=True)
     for s, cs in zip(sites, all_cards):
         if A.cards_pending(cs):

@@ -1,12 +1,19 @@
+# Direction B. The dark theme is the base for native widgets; the in-app Dark/Light switch
+# (src/viewer/style.py, THEMES) injects matching CSS, so in light mode the widgets are restyled by CSS.
 [theme]
-base = "light"
-primaryColor = "#0072B2"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F3F5F7"
-textColor = "#1C2430"
+base = "dark"
+primaryColor = "#4CC3E6"
+backgroundColor = "#06131D"
+secondaryBackgroundColor = "#0C1F2C"
+textColor = "#E6EEF3"
+borderColor = "#2A4558"
 font = "sans serif"
 baseRadius = "small"
 showSidebarBorder = true
+
+[theme.sidebar]
+backgroundColor = "#0A1B27"
+secondaryBackgroundColor = "#0C1F2C"
 
 [server]
 headless = true
