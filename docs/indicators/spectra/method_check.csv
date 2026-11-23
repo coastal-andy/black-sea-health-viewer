@@ -1,0 +1,12 @@
+series,method,planted,planted_value,recovered_value,rel_error_pct,significant,ok
+SYNTHETIC 40-year daily,Welch,annual,365.2 d,365.2 d,0.0,yes (11877 x background),True
+SYNTHETIC 40-year daily,Welch,semi-annual,182.6 d,182.4 d,0.1,yes (225 x background),True
+SYNTHETIC 40-year daily,Welch,6-year oscillation,2191.5 d,2208.0 d,0.8,yes (21 x background),True
+SYNTHETIC 40-year daily,OLS,linear trend,0.40 °C/decade,0.44 °C/decade,10.6,n/a,True
+"SYNTHETIC hourly, gap-free",Welch,diurnal 24 h,24.00 h,23.99 h,0.0,yes (58 x background),True
+"SYNTHETIC hourly, gap-free",Welch,inertial 44 N,17.27 h,17.28 h,0.0,yes (16 x background),True
+"SYNTHETIC hourly, gap-free",Welch,M2 tide,12.42 h,12.42 h,0.0,yes (6 x background),True
+"SYNTHETIC hourly, 15% gaps",Lomb-Scargle,diurnal 24 h,24.00 h,24.02 h,0.1,yes (34 x background),True
+"SYNTHETIC hourly, 15% gaps",Lomb-Scargle,inertial 44 N,17.27 h,17.29 h,0.1,yes (13 x background),True
+"SYNTHETIC hourly, 15% gaps",Lomb-Scargle,M2 tide,12.42 h,12.42 h,0.0,yes (4 x background),True
+"SYNTHETIC hourly, gap-free",Lomb-Scargle vs Welch,same spectrum,ratio 1,median ratio 1.000,0.0,n/a,True

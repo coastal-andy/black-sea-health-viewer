@@ -1,0 +1,471 @@
+variable,source,station,synthetic,method,period_days,power,significant_95,rank,spectrum,cycle,psd_over_background,psd_over_95_level,dof
+chl,in situ,EUXRo03,False,lomb-scargle,583.8759,135.41,True,1,full,other,2.415,1.305,9.6
+chl,in situ,EUXRo03,False,lomb-scargle,365.3333,79.319,True,2,full,annual,2.218,1.199,9.6
+chl,in situ,EUXRo03,False,lomb-scargle,9.6867,0.047012,True,3,anomalies,synoptic,1.72,1.215,36.1
+chl,in situ,EUXRo03,False,lomb-scargle,6.0951,0.022665,True,4,anomalies,synoptic,1.713,1.21,36.1
+chl,in situ,EUXRo03,False,lomb-scargle,2.9945,0.010096,True,5,anomalies,2-3 day,1.909,1.348,36.1
+chl,in situ,EUXRo03,False,lomb-scargle,2.8979,0.0090437,True,6,anomalies,2-3 day,1.819,1.285,36.1
+chl,in situ,EUXRo03,False,lomb-scargle,2.7652,0.0074543,True,7,anomalies,2-3 day,1.668,1.178,36.1
+chl,in situ,EUXRo03,False,lomb-scargle,182.6667,13.857,False,,full,semi-annual,1.146,0.619,9.6
+chl,model,EUXRo03,False,welch,387.5587,13.673,True,1,full,annual,30.524,16.493,9.6
+chl,model,EUXRo03,False,welch,181.5556,2.0374,True,2,full,semi-annual,4.578,2.474,9.6
+chl,model,EUXRo03,False,welch,122.0494,1.4679,True,3,full,3-4 month (seasonal harmonics),3.334,1.801,9.6
+chl,model,EUXRo03,False,welch,10.543,0.12054,True,4,anomalies,intraseasonal,1.47,1.038,36.1
+chl,model,EUXRo03,False,welch,6.6615,0.096455,True,5,anomalies,synoptic,1.686,1.19,36.1
+chl,model,EUXRo03,False,welch,6.3249,0.084625,True,6,anomalies,synoptic,1.733,1.224,36.1
+chl,model,EUXRo03,False,welch,4.556,0.047598,True,7,anomalies,synoptic,1.521,1.074,36.1
+chl,model,EUXRo03,False,welch,4.0851,0.039215,True,8,anomalies,synoptic,1.485,1.049,36.1
+chl,model,EUXRo03,False,welch,3.4967,0.033782,True,9,anomalies,synoptic,1.453,1.026,36.1
+chl,model,EUXRo03,False,welch,2.3716,0.02892,True,10,anomalies,2-3 day,1.709,1.207,36.1
+chl,model,EUXRo03,False,welch,2.8764,0.028359,True,11,anomalies,2-3 day,1.449,1.024,36.1
+chl,model,EUXRo03,False,welch,2.6833,0.027569,True,12,anomalies,2-3 day,1.518,1.072,36.1
+chl,model,EUXRo03,False,welch,2.766,0.027384,True,13,anomalies,2-3 day,1.484,1.048,36.1
+chl,model,EUXRo03,False,welch,2.3466,0.024101,True,14,anomalies,2-3 day,1.429,1.009,36.1
+chl,satellite,EUXRo03,False,welch,375.8169,8.3434,True,1,full,annual,27.732,14.984,9.6
+chl,satellite,EUXRo03,False,welch,184.1368,3.3736,True,2,full,semi-annual,11.296,6.103,9.6
+chl,satellite,EUXRo03,False,welch,21.1543,0.22313,True,3,anomalies,intraseasonal,1.422,1.004,36.1
+chl,satellite,EUXRo03,False,welch,13.6023,0.10823,True,4,anomalies,intraseasonal,1.475,1.042,36.1
+chl,satellite,EUXRo03,False,welch,10.1114,0.052002,True,5,anomalies,intraseasonal,1.642,1.159,36.1
+chl,satellite,EUXRo03,False,welch,5.3995,0.041453,True,6,anomalies,synoptic,1.799,1.27,36.1
+chl,satellite,EUXRo03,False,welch,7.5937,0.035737,True,7,anomalies,synoptic,1.498,1.058,36.1
+chl,satellite,EUXRo03,False,welch,5.6992,0.03563,True,8,anomalies,synoptic,1.504,1.062,36.1
+chl,satellite,EUXRo03,False,welch,4.9538,0.035616,True,9,anomalies,synoptic,1.595,1.126,36.1
+o2,in situ,EUXRo03,False,lomb-scargle,408.2572,353.5,True,1,full,annual,51.722,21.616,3.9
+o2,in situ,EUXRo03,False,lomb-scargle,182.6667,27.574,True,2,full,semi-annual,4.164,1.74,3.9
+o2,in situ,EUXRo03,False,lomb-scargle,141.1688,20.115,True,3,full,other,3.136,1.311,3.9
+o2,in situ,EUXRo03,False,lomb-scargle,6.5495,0.24018,True,4,anomalies,synoptic,1.563,1.004,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,2.3735,0.23489,True,5,anomalies,2-3 day,3.837,2.465,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,5.1586,0.16269,True,6,anomalies,synoptic,1.587,1.02,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,4.9256,0.15387,True,7,anomalies,synoptic,1.617,1.039,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,4.7954,0.15291,True,8,anomalies,synoptic,1.627,1.045,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,2.328,0.14748,True,9,anomalies,2-3 day,2.461,1.581,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,3.3508,0.14612,True,10,anomalies,synoptic,2.027,1.302,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,3.0893,0.13614,True,11,anomalies,synoptic,1.915,1.23,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,3.9502,0.13591,True,12,anomalies,synoptic,1.607,1.032,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,2.7206,0.12123,True,13,anomalies,2-3 day,1.884,1.21,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,2.1128,0.10377,True,14,anomalies,2-3 day,1.761,1.131,20.9
+o2,in situ,EUXRo03,False,lomb-scargle,2.1892,0.099545,True,15,anomalies,2-3 day,1.67,1.073,20.9
+o2,model,EUXRo03,False,welch,365.8435,754.15,True,1,full,annual,41.766,22.567,9.6
+o2,model,EUXRo03,False,welch,182.4149,31.958,True,2,full,semi-annual,6.663,3.6,9.6
+o2,model,EUXRo03,False,welch,126.0407,6.1376,True,3,full,3-4 month (seasonal harmonics),2.846,1.538,9.6
+o2,model,EUXRo03,False,welch,19.4086,0.10682,True,4,anomalies,intraseasonal,1.463,1.033,36.1
+o2,model,EUXRo03,False,welch,10.9364,0.047319,True,5,anomalies,intraseasonal,1.939,1.37,36.1
+o2,model,EUXRo03,False,welch,8.382,0.023303,True,6,anomalies,synoptic,1.72,1.214,36.1
+o2,model,EUXRo03,False,welch,7.7452,0.019872,True,7,anomalies,synoptic,1.63,1.151,36.1
+o2,model,EUXRo03,False,welch,6.0819,0.013301,True,8,anomalies,synoptic,1.463,1.033,36.1
+o2,model,EUXRo03,False,welch,5.3032,0.011982,True,9,anomalies,synoptic,1.702,1.202,36.1
+o2,model,EUXRo03,False,welch,4.5513,0.0088062,True,10,anomalies,synoptic,1.857,1.311,36.1
+o2,model,EUXRo03,False,welch,4.2518,0.0078549,True,11,anomalies,synoptic,1.964,1.387,36.1
+o2,model,EUXRo03,False,welch,3.7132,0.0045564,True,12,anomalies,synoptic,1.71,1.208,36.1
+o2,model,EUXRo03,False,welch,3.5111,0.003879,True,13,anomalies,synoptic,1.66,1.172,36.1
+o2,model,EUXRo03,False,welch,3.4401,0.0037416,True,14,anomalies,synoptic,1.662,1.174,36.1
+o2,model,EUXRo03,False,welch,3.1747,0.0027322,True,15,anomalies,synoptic,1.577,1.114,36.1
+o2,model,EUXRo03,False,welch,2.9674,0.0024629,True,16,anomalies,2-3 day,1.674,1.182,36.1
+o2,model,EUXRo03,False,welch,3.0393,0.0023612,True,17,anomalies,synoptic,1.546,1.092,36.1
+sal,in situ,EUXRo03,False,lomb-scargle,14.2815,0.62923,True,1,anomalies,intraseasonal,1.913,1.181,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,11.6433,0.46207,True,2,anomalies,intraseasonal,2.029,1.253,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,7.9055,0.17301,True,3,anomalies,synoptic,2.084,1.287,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,5.0676,0.10531,True,4,anomalies,synoptic,2.188,1.351,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,4.4553,0.075047,True,5,anomalies,synoptic,2.243,1.384,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,4.6987,0.061556,True,6,anomalies,synoptic,1.7,1.049,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,2.434,0.02127,True,7,anomalies,2-3 day,1.621,1.001,17.1
+sal,in situ,EUXRo03,False,lomb-scargle,365.3333,110.92,False,,full,annual,1.476,0.753,7.7
+sal,in situ,EUXRo03,False,lomb-scargle,182.6667,37.215,False,,full,semi-annual,1.037,0.529,7.7
+sal,model,EUXRo03,False,welch,13.9794,0.23743,True,1,anomalies,intraseasonal,1.502,1.061,36.1
+sal,model,EUXRo03,False,welch,7.8372,0.11121,True,2,anomalies,synoptic,1.909,1.348,36.1
+sal,model,EUXRo03,False,welch,6.2271,0.060382,True,3,anomalies,synoptic,1.655,1.169,36.1
+sal,model,EUXRo03,False,welch,6.001,0.056221,True,4,anomalies,synoptic,1.974,1.394,36.1
+sal,model,EUXRo03,False,welch,5.3414,0.028286,True,5,anomalies,synoptic,1.669,1.179,36.1
+sal,model,EUXRo03,False,welch,4.7734,0.017139,True,6,anomalies,synoptic,1.641,1.159,36.1
+sal,model,EUXRo03,False,welch,4.1794,0.010329,True,7,anomalies,synoptic,1.44,1.017,36.1
+sal,model,EUXRo03,False,welch,3.2527,0.0083197,True,8,anomalies,synoptic,2.058,1.454,36.1
+sal,model,EUXRo03,False,welch,2.7999,0.0062219,True,9,anomalies,2-3 day,2.093,1.478,36.1
+sal,model,EUXRo03,False,welch,2.6431,0.0050379,True,10,anomalies,2-3 day,1.92,1.356,36.1
+sal,model,EUXRo03,False,welch,365.3333,9.4755,False,,full,annual,1.402,0.757,9.6
+sal,model,EUXRo03,False,welch,182.6667,5.0746,False,,full,semi-annual,1.002,0.541,9.6
+sst,in situ,EUXRo03,False,lomb-scargle,396.9613,20319.0,True,1,full,annual,42.989,23.228,9.6
+sst,in situ,EUXRo03,False,lomb-scargle,182.6667,771.34,True,2,full,semi-annual,6.144,3.32,9.6
+sst,in situ,EUXRo03,False,lomb-scargle,101.2644,49.05,True,3,anomalies,3-4 month (seasonal harmonics),1.886,1.332,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,12.6622,1.5697,True,4,anomalies,intraseasonal,1.48,1.045,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,9.2573,0.80945,True,5,anomalies,synoptic,1.665,1.176,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,9.0102,0.80487,True,6,anomalies,synoptic,1.794,1.267,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,6.5503,0.36026,True,7,anomalies,synoptic,1.454,1.027,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,5.8127,0.27262,True,8,anomalies,synoptic,1.536,1.085,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,5.2169,0.22326,True,9,anomalies,synoptic,1.474,1.041,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,4.2493,0.16345,True,10,anomalies,synoptic,1.447,1.022,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,4.0008,0.14472,True,11,anomalies,synoptic,1.652,1.166,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,3.8387,0.13877,True,12,anomalies,synoptic,2.022,1.428,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,3.0157,0.065938,True,13,anomalies,synoptic,1.526,1.078,36.1
+sst,in situ,EUXRo03,False,lomb-scargle,2.6624,0.059689,True,14,anomalies,2-3 day,1.591,1.123,36.1
+sst,model,EUXRo03,False,welch,364.8019,30678.0,True,1,full,annual,96.951,52.385,9.6
+sst,model,EUXRo03,False,welch,180.7042,653.21,True,2,full,semi-annual,7.772,4.199,9.6
+sst,model,EUXRo03,False,welch,98.4902,40.416,True,3,anomalies,3-4 month (seasonal harmonics),1.633,1.153,36.1
+sst,model,EUXRo03,False,welch,12.3403,1.1187,True,4,anomalies,intraseasonal,1.467,1.036,36.1
+sst,model,EUXRo03,False,welch,11.4465,0.78842,True,5,anomalies,intraseasonal,1.452,1.025,36.1
+sst,model,EUXRo03,False,welch,7.7953,0.40186,True,6,anomalies,synoptic,1.512,1.068,36.1
+sst,model,EUXRo03,False,welch,7.2747,0.39022,True,7,anomalies,synoptic,1.751,1.237,36.1
+sst,model,EUXRo03,False,welch,5.8566,0.20252,True,8,anomalies,synoptic,1.525,1.077,36.1
+sst,model,EUXRo03,False,welch,5.0706,0.13562,True,9,anomalies,synoptic,1.579,1.115,36.1
+sst,model,EUXRo03,False,welch,4.0263,0.083851,True,10,anomalies,synoptic,1.721,1.216,36.1
+sst,model,EUXRo03,False,welch,2.6746,0.033585,True,11,anomalies,2-3 day,1.753,1.238,36.1
+sst,model,EUXRo03,False,welch,2.9427,0.031111,True,12,anomalies,2-3 day,1.495,1.056,36.1
+sst,model,EUXRo03,False,welch,2.7408,0.030356,True,13,anomalies,2-3 day,1.57,1.109,36.1
+sst,satellite,EUXRo03,False,welch,364.5791,29320.0,True,1,full,annual,37.636,20.336,9.6
+sst,satellite,EUXRo03,False,welch,180.8011,713.34,True,2,full,semi-annual,3.447,1.863,9.6
+sst,satellite,EUXRo03,False,welch,97.3325,46.674,True,3,anomalies,3-4 month (seasonal harmonics),1.824,1.288,36.1
+sst,satellite,EUXRo03,False,welch,27.7314,5.6941,True,4,anomalies,intraseasonal,1.514,1.069,36.1
+sst,satellite,EUXRo03,False,welch,12.7559,2.2642,True,5,anomalies,intraseasonal,1.694,1.197,36.1
+sst,satellite,EUXRo03,False,welch,8.9857,1.2426,True,6,anomalies,synoptic,1.779,1.256,36.1
+sst,satellite,EUXRo03,False,welch,7.2016,0.70198,True,7,anomalies,synoptic,1.527,1.078,36.1
+sst,satellite,EUXRo03,False,welch,5.8654,0.37146,True,8,anomalies,synoptic,1.48,1.045,36.1
+sst,satellite,EUXRo03,False,welch,3.86,0.25142,True,9,anomalies,synoptic,2.215,1.564,36.1
+sst,satellite,EUXRo03,False,welch,4.0946,0.21837,True,10,anomalies,synoptic,1.779,1.257,36.1
+chl,in situ,EUXRoOB01,False,lomb-scargle,300.6282,58.338,True,1,full,annual,4.814,1.607,2.0
+chl,in situ,EUXRoOB01,False,lomb-scargle,319.3333,58.338,True,2,full,annual,4.814,1.607,2.0
+chl,in situ,EUXRoOB01,False,lomb-scargle,16.6425,0.32634,True,3,anomalies,intraseasonal,2.425,1.237,7.7
+chl,in situ,EUXRoOB01,False,lomb-scargle,10.6319,0.16394,True,4,anomalies,intraseasonal,2.286,1.166,7.7
+chl,in situ,EUXRoOB01,False,lomb-scargle,4.8002,0.055506,True,5,anomalies,synoptic,2.583,1.318,7.7
+chl,in situ,EUXRoOB01,False,lomb-scargle,4.6094,0.051361,True,6,anomalies,synoptic,2.476,1.264,7.7
+chl,in situ,EUXRoOB01,False,lomb-scargle,5.1639,0.049805,True,7,anomalies,synoptic,2.318,1.183,7.7
+chl,in situ,EUXRoOB01,False,lomb-scargle,3.5433,0.032178,True,8,anomalies,synoptic,2.298,1.172,7.7
+chl,in situ,EUXRoOB01,False,lomb-scargle,191.6,24.538,False,,full,semi-annual,2.583,0.862,2.0
+chl,model,EUXRoOB01,False,welch,174.9046,9.3847,True,1,full,semi-annual,7.015,2.342,2.0
+chl,model,EUXRoOB01,False,welch,309.0996,9.1039,True,2,full,annual,6.711,2.24,2.0
+chl,model,EUXRoOB01,False,welch,319.6667,9.1039,True,3,full,annual,6.711,2.24,2.0
+chl,model,EUXRoOB01,False,welch,19.691,0.77188,True,4,anomalies,intraseasonal,2.802,1.43,7.7
+chl,model,EUXRoOB01,False,welch,32.4578,0.70835,True,5,anomalies,intraseasonal,2.106,1.075,7.7
+chl,model,EUXRoOB01,False,welch,10.4043,0.26056,True,6,anomalies,intraseasonal,2.198,1.122,7.7
+chl,model,EUXRoOB01,False,welch,6.9773,0.16008,True,7,anomalies,synoptic,2.171,1.108,7.7
+chl,model,EUXRoOB01,False,welch,4.9554,0.13181,True,8,anomalies,synoptic,2.596,1.325,7.7
+chl,model,EUXRoOB01,False,welch,4.5025,0.092853,True,9,anomalies,synoptic,1.997,1.019,7.7
+chl,model,EUXRoOB01,False,welch,3.8783,0.079638,True,10,anomalies,synoptic,2.405,1.227,7.7
+chl,model,EUXRoOB01,False,welch,3.4723,0.058489,True,11,anomalies,synoptic,2.167,1.106,7.7
+chl,model,EUXRoOB01,False,welch,3.5459,0.054954,True,12,anomalies,synoptic,2.048,1.045,7.7
+chl,satellite,EUXRoOB01,False,welch,184.1107,9.1012,True,1,full,semi-annual,21.14,7.057,2.0
+chl,satellite,EUXRoOB01,False,welch,319.6667,2.1606,True,2,full,annual,4.984,1.664,2.0
+chl,satellite,EUXRoOB01,False,welch,33.9669,0.46932,True,3,anomalies,intraseasonal,3.87,1.975,7.7
+chl,satellite,EUXRoOB01,False,welch,16.2819,0.2739,True,4,anomalies,intraseasonal,2.542,1.297,7.7
+chl,satellite,EUXRoOB01,False,welch,9.9627,0.12027,True,5,anomalies,synoptic,2.515,1.283,7.7
+chl,satellite,EUXRoOB01,False,welch,3.8416,0.050571,True,6,anomalies,synoptic,2.252,1.149,7.7
+chl,satellite,EUXRoOB01,False,welch,3.2341,0.049519,True,7,anomalies,synoptic,2.791,1.424,7.7
+chl,satellite,EUXRoOB01,False,welch,2.0746,0.038252,True,8,anomalies,2-3 day,2.396,1.222,7.7
+chl,satellite,EUXRoOB01,False,welch,3.1064,0.035545,True,9,anomalies,synoptic,2.025,1.033,7.7
+chl,satellite,EUXRoOB01,False,welch,2.4518,0.032732,True,10,anomalies,2-3 day,2.015,1.028,7.7
+o2,in situ,EUXRoOB01,False,lomb-scargle,426.0072,634.53,True,1,full,annual,20.349,6.793,2.0
+o2,in situ,EUXRoOB01,False,lomb-scargle,320.0,406.32,True,2,full,annual,14.555,4.859,2.0
+o2,in situ,EUXRoOB01,False,lomb-scargle,194.0822,70.976,True,3,full,semi-annual,3.395,1.133,2.0
+o2,in situ,EUXRoOB01,False,lomb-scargle,6.3706,0.21725,True,4,anomalies,synoptic,2.151,1.098,7.7
+o2,in situ,EUXRoOB01,False,lomb-scargle,3.2345,0.072769,True,5,anomalies,synoptic,2.582,1.318,7.7
+o2,in situ,EUXRoOB01,False,lomb-scargle,3.1465,0.067622,True,6,anomalies,synoptic,2.397,1.223,7.7
+o2,in situ,EUXRoOB01,False,lomb-scargle,3.354,0.063027,True,7,anomalies,synoptic,2.091,1.067,7.7
+o2,in situ,EUXRoOB01,False,lomb-scargle,2.2417,0.054269,True,8,anomalies,2-3 day,2.14,1.092,7.7
+o2,model,EUXRoOB01,False,welch,385.0262,378.82,True,1,full,annual,8.818,2.943,2.0
+o2,model,EUXRoOB01,False,welch,57.1479,1.9093,True,2,anomalies,intraseasonal,1.985,1.013,7.7
+o2,model,EUXRoOB01,False,welch,8.3592,0.086702,True,3,anomalies,synoptic,2.424,1.237,7.7
+o2,model,EUXRoOB01,False,welch,4.5569,0.038169,True,4,anomalies,synoptic,2.897,1.478,7.7
+o2,model,EUXRoOB01,False,welch,3.977,0.021873,True,5,anomalies,synoptic,2.383,1.216,7.7
+o2,model,EUXRoOB01,False,welch,3.746,0.016528,True,6,anomalies,synoptic,2.045,1.043,7.7
+o2,model,EUXRoOB01,False,welch,3.1747,0.012785,True,7,anomalies,synoptic,2.174,1.109,7.7
+o2,model,EUXRoOB01,False,welch,2.9681,0.010259,True,8,anomalies,2-3 day,1.979,1.01,7.7
+o2,model,EUXRoOB01,False,welch,2.1229,0.0081265,True,9,anomalies,2-3 day,2.038,1.04,7.7
+o2,model,EUXRoOB01,False,welch,192.2,16.211,False,,full,semi-annual,0.964,0.322,2.0
+sal,in situ,EUXRoOB01,False,lomb-scargle,16.6566,2.6426,True,1,anomalies,intraseasonal,2.289,1.168,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,8.4238,0.89511,True,2,anomalies,synoptic,2.551,1.302,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,7.1716,0.59298,True,3,anomalies,synoptic,2.227,1.136,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,3.1641,0.17478,True,4,anomalies,synoptic,4.22,2.154,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,3.9809,0.154,True,5,anomalies,synoptic,2.028,1.035,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,3.218,0.1301,True,6,anomalies,synoptic,2.932,1.496,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,2.574,0.10071,True,7,anomalies,2-3 day,3.017,1.539,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,3.324,0.099878,True,8,anomalies,synoptic,2.047,1.045,7.7
+sal,in situ,EUXRoOB01,False,lomb-scargle,319.6667,621.62,False,,full,annual,1.008,0.337,2.0
+sal,in situ,EUXRoOB01,False,lomb-scargle,191.8,595.95,False,,full,semi-annual,2.329,0.778,2.0
+sal,model,EUXRoOB01,False,welch,416.1833,61.894,True,1,full,annual,4.697,1.568,2.0
+sal,model,EUXRoOB01,False,welch,15.2172,0.35253,True,2,anomalies,intraseasonal,2.355,1.202,7.7
+sal,model,EUXRoOB01,False,welch,10.1594,0.21469,True,3,anomalies,intraseasonal,2.243,1.144,7.7
+sal,model,EUXRoOB01,False,welch,4.7765,0.04354,True,4,anomalies,synoptic,2.947,1.504,7.7
+sal,model,EUXRoOB01,False,welch,4.2977,0.03378,True,5,anomalies,synoptic,3.692,1.884,7.7
+sal,model,EUXRoOB01,False,welch,2.9657,0.010283,True,6,anomalies,2-3 day,2.862,1.46,7.7
+sal,model,EUXRoOB01,False,welch,192.0,0.36099,False,,full,semi-annual,0.045,0.015,2.0
+sst,in situ,EUXRoOB01,False,lomb-scargle,320.0,11833.0,True,1,full,annual,33.955,11.335,2.0
+sst,in situ,EUXRoOB01,False,lomb-scargle,192.0,934.33,True,2,full,semi-annual,7.155,2.388,2.0
+sst,in situ,EUXRoOB01,False,lomb-scargle,19.2149,5.2399,True,3,anomalies,intraseasonal,2.128,1.086,7.7
+sst,in situ,EUXRoOB01,False,lomb-scargle,12.3827,2.0245,True,4,anomalies,intraseasonal,2.048,1.045,7.7
+sst,in situ,EUXRoOB01,False,lomb-scargle,10.7952,1.4716,True,5,anomalies,intraseasonal,2.107,1.075,7.7
+sst,in situ,EUXRoOB01,False,lomb-scargle,7.0538,0.55948,True,6,anomalies,synoptic,2.113,1.078,7.7
+sst,in situ,EUXRoOB01,False,lomb-scargle,3.9394,0.20521,True,7,anomalies,synoptic,2.674,1.364,7.7
+sst,in situ,EUXRoOB01,False,lomb-scargle,4.1905,0.18913,True,8,anomalies,synoptic,2.173,1.109,7.7
+sst,in situ,EUXRoOB01,False,lomb-scargle,3.6726,0.13006,True,9,anomalies,synoptic,2.069,1.056,7.7
+sst,model,EUXRoOB01,False,welch,358.3113,22145.0,True,1,full,annual,46.144,15.403,2.0
+sst,model,EUXRoOB01,False,welch,192.2,588.88,True,2,full,semi-annual,3.275,1.093,2.0
+sst,model,EUXRoOB01,False,welch,10.7932,1.6146,True,3,anomalies,intraseasonal,2.593,1.323,7.7
+sst,model,EUXRoOB01,False,welch,6.4307,0.44717,True,4,anomalies,synoptic,1.991,1.016,7.7
+sst,model,EUXRoOB01,False,welch,4.0376,0.36568,True,5,anomalies,synoptic,3.168,1.616,7.7
+sst,model,EUXRoOB01,False,welch,4.8299,0.33108,True,6,anomalies,synoptic,2.112,1.078,7.7
+sst,model,EUXRoOB01,False,welch,3.6364,0.21524,True,7,anomalies,synoptic,2.327,1.187,7.7
+sst,model,EUXRoOB01,False,welch,3.2004,0.20091,True,8,anomalies,synoptic,2.689,1.372,7.7
+sst,model,EUXRoOB01,False,welch,3.5811,0.20085,True,9,anomalies,synoptic,2.303,1.175,7.7
+sst,model,EUXRoOB01,False,welch,3.328,0.16639,True,10,anomalies,synoptic,2.247,1.147,7.7
+sst,model,EUXRoOB01,False,welch,2.2872,0.099086,True,11,anomalies,2-3 day,2.184,1.115,7.7
+sst,satellite,EUXRoOB01,False,welch,358.8947,21941.0,True,1,full,annual,32.209,10.752,2.0
+sst,satellite,EUXRoOB01,False,welch,18.6433,4.9691,True,2,anomalies,intraseasonal,2.372,1.21,7.7
+sst,satellite,EUXRoOB01,False,welch,12.6753,2.0888,True,3,anomalies,intraseasonal,1.965,1.003,7.7
+sst,satellite,EUXRoOB01,False,welch,6.5146,1.1257,True,4,anomalies,synoptic,3.144,1.605,7.7
+sst,satellite,EUXRoOB01,False,welch,4.4372,0.41815,True,5,anomalies,synoptic,2.009,1.025,7.7
+sst,satellite,EUXRoOB01,False,welch,3.7766,0.29326,True,6,anomalies,synoptic,1.991,1.016,7.7
+sst,satellite,EUXRoOB01,False,welch,2.0848,0.19113,True,7,anomalies,2-3 day,2.566,1.31,7.7
+sst,satellite,EUXRoOB01,False,welch,2.5748,0.17833,True,8,anomalies,2-3 day,2.018,1.03,7.7
+sst,satellite,EUXRoOB01,False,welch,192.2,541.47,False,,full,semi-annual,2.121,0.708,2.0
+chl,in situ,EUXRoOB02,False,lomb-scargle,523.2189,56.58,True,1,full,other,4.25,1.419,2.0
+chl,in situ,EUXRoOB02,False,lomb-scargle,423.0,56.58,True,2,full,annual,4.25,1.419,2.0
+chl,in situ,EUXRoOB02,False,lomb-scargle,196.0875,30.087,True,3,full,semi-annual,3.268,1.091,2.0
+chl,in situ,EUXRoOB02,False,lomb-scargle,70.2275,4.944,True,4,anomalies,intraseasonal,4.378,2.064,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,38.0339,1.013,True,5,anomalies,intraseasonal,2.573,1.213,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,21.3105,0.45066,True,6,anomalies,intraseasonal,3.191,1.505,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,8.7861,0.15946,True,7,anomalies,synoptic,3.91,1.844,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,10.4976,0.15681,True,8,anomalies,intraseasonal,2.928,1.38,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,5.6088,0.070674,True,9,anomalies,synoptic,4.066,1.917,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,5.0278,0.058493,True,10,anomalies,synoptic,3.694,1.742,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,3.8666,0.027022,True,11,anomalies,synoptic,3.289,1.551,5.8
+chl,in situ,EUXRoOB02,False,lomb-scargle,3.17,0.021254,True,12,anomalies,synoptic,3.729,1.758,5.8
+chl,model,EUXRoOB02,False,welch,384.7108,7.241,True,1,full,annual,14.874,4.965,2.0
+chl,model,EUXRoOB02,False,welch,216.0504,3.7647,True,2,full,other,7.777,2.596,2.0
+chl,model,EUXRoOB02,False,welch,211.75,3.7647,True,3,full,other,7.777,2.596,2.0
+chl,model,EUXRoOB02,False,welch,33.4416,0.69458,True,4,anomalies,intraseasonal,3.551,1.675,5.8
+chl,model,EUXRoOB02,False,welch,22.463,0.28123,True,5,anomalies,intraseasonal,2.527,1.192,5.8
+chl,model,EUXRoOB02,False,welch,7.8173,0.1909,True,6,anomalies,synoptic,3.171,1.495,5.8
+chl,model,EUXRoOB02,False,welch,4.9897,0.097928,True,7,anomalies,synoptic,3.8,1.792,5.8
+chl,model,EUXRoOB02,False,welch,3.7654,0.078919,True,8,anomalies,synoptic,3.478,1.64,5.8
+chl,satellite,EUXRoOB02,False,welch,189.5113,4.0528,True,1,full,semi-annual,11.991,4.003,2.0
+chl,satellite,EUXRoOB02,False,welch,352.375,3.6445,True,2,full,annual,10.712,3.576,2.0
+chl,satellite,EUXRoOB02,False,welch,13.3772,0.13526,True,3,anomalies,intraseasonal,2.13,1.005,5.8
+chl,satellite,EUXRoOB02,False,welch,3.9566,0.062941,True,4,anomalies,synoptic,3.173,1.496,5.8
+chl,satellite,EUXRoOB02,False,welch,6.0831,0.061176,True,5,anomalies,synoptic,2.264,1.068,5.8
+chl,satellite,EUXRoOB02,False,welch,2.8451,0.037101,True,6,anomalies,2-3 day,2.269,1.07,5.8
+chl,satellite,EUXRoOB02,False,welch,2.4556,0.035629,True,7,anomalies,2-3 day,2.297,1.083,5.8
+chl,satellite,EUXRoOB02,False,welch,2.1736,0.035545,True,8,anomalies,2-3 day,2.592,1.222,5.8
+chl,satellite,EUXRoOB02,False,welch,2.0543,0.033685,True,9,anomalies,2-3 day,2.518,1.187,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,424.1117,691.98,True,1,full,annual,4.274,1.427,2.0
+o2,in situ,EUXRoOB02,False,lomb-scargle,174.0846,96.774,True,2,full,semi-annual,3.415,1.14,2.0
+o2,in situ,EUXRoOB02,False,lomb-scargle,7.1579,0.14295,True,3,anomalies,synoptic,2.291,1.08,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,5.4207,0.11468,True,4,anomalies,synoptic,2.326,1.097,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,2.085,0.10534,True,5,anomalies,2-3 day,6.272,2.958,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,3.3945,0.074392,True,6,anomalies,synoptic,2.671,1.259,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,3.6811,0.072686,True,7,anomalies,synoptic,2.155,1.016,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,2.8279,0.069245,True,8,anomalies,2-3 day,3.353,1.581,5.8
+o2,in situ,EUXRoOB02,False,lomb-scargle,2.6471,0.056823,True,9,anomalies,2-3 day,2.809,1.324,5.8
+o2,model,EUXRoOB02,False,welch,396.271,344.33,True,1,full,annual,8.987,3.0,2.0
+o2,model,EUXRoOB02,False,welch,10.8225,0.09028,True,2,anomalies,intraseasonal,3.04,1.433,5.8
+o2,model,EUXRoOB02,False,welch,8.3307,0.04071,True,3,anomalies,synoptic,2.536,1.196,5.8
+o2,model,EUXRoOB02,False,welch,5.6776,0.027991,True,4,anomalies,synoptic,2.951,1.391,5.8
+o2,model,EUXRoOB02,False,welch,3.7969,0.010381,True,5,anomalies,synoptic,4.632,2.184,5.8
+o2,model,EUXRoOB02,False,welch,4.0817,0.0064851,True,6,anomalies,synoptic,2.201,1.038,5.8
+o2,model,EUXRoOB02,False,welch,3.5222,0.0044301,True,7,anomalies,synoptic,2.592,1.222,5.8
+o2,model,EUXRoOB02,False,welch,2.4384,0.0034151,True,8,anomalies,2-3 day,3.335,1.573,5.8
+o2,model,EUXRoOB02,False,welch,2.3582,0.0022944,True,9,anomalies,2-3 day,2.336,1.101,5.8
+o2,model,EUXRoOB02,False,welch,169.4,10.934,False,,full,semi-annual,1.63,0.544,2.0
+sal,in situ,EUXRoOB02,False,lomb-scargle,423.0,1796.4,True,1,full,annual,7.621,2.544,2.0
+sal,in situ,EUXRoOB02,False,lomb-scargle,2.9912,0.15217,True,2,anomalies,2-3 day,3.002,1.416,5.8
+sal,in situ,EUXRoOB02,False,lomb-scargle,2.8332,0.11793,True,3,anomalies,2-3 day,2.609,1.23,5.8
+sal,in situ,EUXRoOB02,False,lomb-scargle,2.8917,0.11313,True,4,anomalies,2-3 day,2.398,1.13,5.8
+sal,in situ,EUXRoOB02,False,lomb-scargle,2.788,0.11038,True,5,anomalies,2-3 day,2.446,1.153,5.8
+sal,in situ,EUXRoOB02,False,lomb-scargle,2.9486,0.10805,True,6,anomalies,2-3 day,2.264,1.067,5.8
+sal,in situ,EUXRoOB02,False,lomb-scargle,211.5,338.07,False,,full,other,2.723,0.909,2.0
+sal,model,EUXRoOB02,False,welch,33.8162,0.71914,True,1,anomalies,intraseasonal,3.592,1.694,5.8
+sal,model,EUXRoOB02,False,welch,6.9998,0.079989,True,2,anomalies,synoptic,2.725,1.285,5.8
+sal,model,EUXRoOB02,False,welch,6.6072,0.065923,True,3,anomalies,synoptic,2.37,1.117,5.8
+sal,model,EUXRoOB02,False,welch,6.2983,0.04634,True,4,anomalies,synoptic,2.177,1.026,5.8
+sal,model,EUXRoOB02,False,welch,5.2014,0.042802,True,5,anomalies,synoptic,6.149,2.899,5.8
+sal,model,EUXRoOB02,False,welch,4.6728,0.018497,True,6,anomalies,synoptic,3.326,1.568,5.8
+sal,model,EUXRoOB02,False,welch,3.5302,0.010343,True,7,anomalies,synoptic,3.764,1.775,5.8
+sal,model,EUXRoOB02,False,welch,3.7887,0.0089048,True,8,anomalies,synoptic,2.802,1.321,5.8
+sal,model,EUXRoOB02,False,welch,2.7232,0.0035592,True,9,anomalies,2-3 day,2.346,1.106,5.8
+sal,model,EUXRoOB02,False,welch,2.1228,0.0026495,True,10,anomalies,2-3 day,2.353,1.109,5.8
+sal,model,EUXRoOB02,False,welch,423.5,27.518,False,,full,annual,1.487,0.496,2.0
+sal,model,EUXRoOB02,False,welch,169.4,0.99876,False,,full,semi-annual,0.154,0.051,2.0
+sst,in situ,EUXRoOB02,False,lomb-scargle,433.0918,24417.0,True,1,full,annual,28.269,9.437,2.0
+sst,in situ,EUXRoOB02,False,lomb-scargle,423.0,24417.0,True,2,full,annual,28.269,9.437,2.0
+sst,in situ,EUXRoOB02,False,lomb-scargle,9.1116,1.1135,True,3,anomalies,synoptic,2.227,1.05,5.8
+sst,in situ,EUXRoOB02,False,lomb-scargle,5.6336,0.69082,True,4,anomalies,synoptic,2.551,1.203,5.8
+sst,in situ,EUXRoOB02,False,lomb-scargle,3.9305,0.35933,True,5,anomalies,synoptic,2.515,1.186,5.8
+sst,in situ,EUXRoOB02,False,lomb-scargle,3.7584,0.32523,True,6,anomalies,synoptic,3.066,1.446,5.8
+sst,in situ,EUXRoOB02,False,lomb-scargle,2.0858,0.19068,True,7,anomalies,2-3 day,4.522,2.132,5.8
+sst,in situ,EUXRoOB02,False,lomb-scargle,2.7858,0.13577,True,8,anomalies,2-3 day,2.552,1.203,5.8
+sst,in situ,EUXRoOB02,False,lomb-scargle,169.2,441.1,False,,full,semi-annual,2.917,0.974,2.0
+sst,model,EUXRoOB02,False,welch,365.8668,20230.0,True,1,full,annual,26.688,8.909,2.0
+sst,model,EUXRoOB02,False,welch,169.4,509.3,True,2,full,semi-annual,3.837,1.281,2.0
+sst,model,EUXRoOB02,False,welch,24.5686,4.6883,True,3,anomalies,intraseasonal,2.203,1.039,5.8
+sst,model,EUXRoOB02,False,welch,16.5217,3.8385,True,4,anomalies,intraseasonal,2.553,1.204,5.8
+sst,model,EUXRoOB02,False,welch,10.3328,1.1623,True,5,anomalies,intraseasonal,2.16,1.019,5.8
+sst,model,EUXRoOB02,False,welch,7.8235,0.85718,True,6,anomalies,synoptic,2.6,1.226,5.8
+sst,model,EUXRoOB02,False,welch,6.3903,0.51074,True,7,anomalies,synoptic,2.441,1.151,5.8
+sst,model,EUXRoOB02,False,welch,4.9111,0.28486,True,8,anomalies,synoptic,2.688,1.268,5.8
+sst,model,EUXRoOB02,False,welch,3.7941,0.2635,True,9,anomalies,synoptic,3.59,1.693,5.8
+sst,model,EUXRoOB02,False,welch,3.7433,0.24493,True,10,anomalies,synoptic,3.693,1.741,5.8
+sst,model,EUXRoOB02,False,welch,4.0474,0.2072,True,11,anomalies,synoptic,2.583,1.218,5.8
+sst,model,EUXRoOB02,False,welch,3.317,0.20542,True,12,anomalies,synoptic,3.752,1.769,5.8
+sst,model,EUXRoOB02,False,welch,2.0662,0.16223,True,13,anomalies,2-3 day,3.933,1.855,5.8
+sst,model,EUXRoOB02,False,welch,3.2368,0.16096,True,14,anomalies,synoptic,2.984,1.407,5.8
+sst,model,EUXRoOB02,False,welch,2.0965,0.15464,True,15,anomalies,2-3 day,3.749,1.768,5.8
+sst,model,EUXRoOB02,False,welch,2.2484,0.10893,True,16,anomalies,2-3 day,2.602,1.227,5.8
+sst,satellite,EUXRoOB02,False,welch,363.6247,19527.0,True,1,full,annual,16.581,5.535,2.0
+sst,satellite,EUXRoOB02,False,welch,8.8864,1.2179,True,2,anomalies,synoptic,2.125,1.002,5.8
+sst,satellite,EUXRoOB02,False,welch,5.7064,0.81609,True,3,anomalies,synoptic,2.757,1.3,5.8
+sst,satellite,EUXRoOB02,False,welch,3.8264,0.44045,True,4,anomalies,synoptic,2.506,1.181,5.8
+sst,satellite,EUXRoOB02,False,welch,3.5373,0.4094,True,5,anomalies,synoptic,2.801,1.321,5.8
+sst,satellite,EUXRoOB02,False,welch,2.0763,0.18759,True,6,anomalies,2-3 day,2.607,1.229,5.8
+sst,satellite,EUXRoOB02,False,welch,169.4,468.38,False,,full,semi-annual,2.272,0.758,2.0
+chl,in situ,EUXRoOB03,False,lomb-scargle,247.9982,181.06,True,1,full,other,4.132,1.379,2.0
+chl,in situ,EUXRoOB03,False,lomb-scargle,192.0,104.63,True,2,full,semi-annual,3.629,1.211,2.0
+chl,in situ,EUXRoOB03,False,lomb-scargle,44.3364,2.8722,True,3,anomalies,intraseasonal,2.304,1.176,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,21.6043,0.83013,True,4,anomalies,intraseasonal,3.78,1.929,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,10.2269,0.11603,True,5,anomalies,intraseasonal,2.35,1.199,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,7.1377,0.085044,True,6,anomalies,synoptic,3.099,1.581,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,4.9965,0.055199,True,7,anomalies,synoptic,3.53,1.801,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,4.6679,0.035525,True,8,anomalies,synoptic,2.186,1.115,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,3.1209,0.028336,True,9,anomalies,synoptic,3.364,1.717,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,3.3314,0.026907,True,10,anomalies,synoptic,3.031,1.547,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,3.4287,0.02583,True,11,anomalies,synoptic,2.711,1.383,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,3.1703,0.025613,True,12,anomalies,synoptic,2.994,1.528,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,2.8369,0.014439,True,13,anomalies,2-3 day,2.187,1.116,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,2.0356,0.012638,True,14,anomalies,2-3 day,2.541,1.297,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,2.2807,0.011097,True,15,anomalies,2-3 day,1.991,1.016,7.7
+chl,in situ,EUXRoOB03,False,lomb-scargle,320.0,131.03,False,,full,annual,1.782,0.595,2.0
+chl,model,EUXRoOB03,False,welch,385.1477,7.2893,True,1,full,annual,19.71,6.579,2.0
+chl,model,EUXRoOB03,False,welch,187.4669,4.0852,True,2,full,semi-annual,11.127,3.714,2.0
+chl,model,EUXRoOB03,False,welch,18.1234,0.21185,True,3,anomalies,intraseasonal,2.366,1.207,7.7
+chl,model,EUXRoOB03,False,welch,9.116,0.16681,True,4,anomalies,synoptic,3.039,1.551,7.7
+chl,model,EUXRoOB03,False,welch,3.2244,0.091563,True,5,anomalies,synoptic,4.088,2.086,7.7
+chl,model,EUXRoOB03,False,welch,2.7461,0.051216,True,6,anomalies,2-3 day,3.016,1.539,7.7
+chl,model,EUXRoOB03,False,welch,2.9023,0.040224,True,7,anomalies,2-3 day,2.248,1.147,7.7
+chl,satellite,EUXRoOB03,False,welch,367.4134,7.6459,True,1,full,annual,50.074,16.715,2.0
+chl,satellite,EUXRoOB03,False,welch,194.4568,3.1278,True,2,full,semi-annual,20.55,6.86,2.0
+chl,satellite,EUXRoOB03,False,welch,16.684,0.1845,True,3,anomalies,intraseasonal,3.035,1.549,7.7
+chl,satellite,EUXRoOB03,False,welch,19.9829,0.16478,True,4,anomalies,intraseasonal,2.184,1.114,7.7
+chl,satellite,EUXRoOB03,False,welch,18.2132,0.14621,True,5,anomalies,intraseasonal,2.094,1.068,7.7
+chl,satellite,EUXRoOB03,False,welch,6.0706,0.057187,True,6,anomalies,synoptic,2.443,1.246,7.7
+chl,satellite,EUXRoOB03,False,welch,5.7675,0.04502,True,7,anomalies,synoptic,2.028,1.035,7.7
+chl,satellite,EUXRoOB03,False,welch,3.2192,0.041687,True,8,anomalies,synoptic,2.898,1.479,7.7
+chl,satellite,EUXRoOB03,False,welch,3.9787,0.038316,True,9,anomalies,synoptic,2.337,1.192,7.7
+chl,satellite,EUXRoOB03,False,welch,3.6896,0.03232,True,10,anomalies,synoptic,2.232,1.139,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,403.1953,616.55,True,1,full,annual,30.959,10.334,2.0
+o2,in situ,EUXRoOB03,False,lomb-scargle,21.7608,1.5831,True,2,anomalies,intraseasonal,3.041,1.552,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,11.6688,0.47846,True,3,anomalies,intraseasonal,2.128,1.086,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,8.2488,0.36735,True,4,anomalies,synoptic,2.834,1.446,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,7.0187,0.16454,True,5,anomalies,synoptic,2.051,1.047,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,5.6303,0.10072,True,6,anomalies,synoptic,2.237,1.141,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,3.649,0.073345,True,7,anomalies,synoptic,2.974,1.518,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,4.5666,0.068771,True,8,anomalies,synoptic,2.113,1.078,7.7
+o2,in situ,EUXRoOB03,False,lomb-scargle,192.0,1.2174,False,,full,semi-annual,0.091,0.03,2.0
+o2,model,EUXRoOB03,False,welch,390.6262,369.94,True,1,full,annual,8.149,2.72,2.0
+o2,model,EUXRoOB03,False,welch,37.9614,0.30975,True,2,anomalies,intraseasonal,2.841,1.449,7.7
+o2,model,EUXRoOB03,False,welch,20.3758,0.24494,True,3,anomalies,intraseasonal,1.998,1.019,7.7
+o2,model,EUXRoOB03,False,welch,7.066,0.067554,True,4,anomalies,synoptic,4.308,2.198,7.7
+o2,model,EUXRoOB03,False,welch,9.9088,0.051784,True,5,anomalies,synoptic,1.965,1.003,7.7
+o2,model,EUXRoOB03,False,welch,6.807,0.039926,True,6,anomalies,synoptic,2.889,1.474,7.7
+o2,model,EUXRoOB03,False,welch,4.4578,0.030182,True,7,anomalies,synoptic,4.056,2.069,7.7
+o2,model,EUXRoOB03,False,welch,4.3653,0.028675,True,8,anomalies,synoptic,4.139,2.112,7.7
+o2,model,EUXRoOB03,False,welch,4.2463,0.015026,True,9,anomalies,synoptic,2.352,1.2,7.7
+o2,model,EUXRoOB03,False,welch,3.6619,0.0074709,True,10,anomalies,synoptic,2.002,1.022,7.7
+o2,model,EUXRoOB03,False,welch,2.7989,0.0056731,True,11,anomalies,2-3 day,3.17,1.617,7.7
+o2,model,EUXRoOB03,False,welch,2.6785,0.0036994,True,12,anomalies,2-3 day,2.3,1.174,7.7
+o2,model,EUXRoOB03,False,welch,2.7273,0.0032901,True,13,anomalies,2-3 day,1.966,1.003,7.7
+o2,model,EUXRoOB03,False,welch,192.2,16.681,False,,full,semi-annual,1.817,0.606,2.0
+sal,in situ,EUXRoOB03,False,lomb-scargle,3.8005,0.068956,True,1,anomalies,synoptic,2.007,1.024,7.7
+sal,in situ,EUXRoOB03,False,lomb-scargle,3.3032,0.051635,True,2,anomalies,synoptic,2.332,1.19,7.7
+sal,in situ,EUXRoOB03,False,lomb-scargle,2.2109,0.028111,True,3,anomalies,2-3 day,2.43,1.24,7.7
+sal,in situ,EUXRoOB03,False,lomb-scargle,2.3479,0.024899,True,4,anomalies,2-3 day,2.016,1.029,7.7
+sal,in situ,EUXRoOB03,False,lomb-scargle,2.0817,0.022355,True,5,anomalies,2-3 day,2.065,1.054,7.7
+sal,in situ,EUXRoOB03,False,lomb-scargle,319.6667,30.255,False,,full,annual,0.2,0.067,2.0
+sal,in situ,EUXRoOB03,False,lomb-scargle,191.8,150.3,False,,full,semi-annual,1.968,0.657,2.0
+sal,model,EUXRoOB03,False,welch,441.4944,17.797,True,1,full,annual,8.606,2.873,2.0
+sal,model,EUXRoOB03,False,welch,320.0,10.035,True,2,full,annual,4.99,1.666,2.0
+sal,model,EUXRoOB03,False,welch,10.4157,0.14208,True,3,anomalies,intraseasonal,2.352,1.2,7.7
+sal,model,EUXRoOB03,False,welch,9.4222,0.13895,True,4,anomalies,synoptic,2.508,1.28,7.7
+sal,model,EUXRoOB03,False,welch,6.9267,0.068968,True,5,anomalies,synoptic,2.091,1.067,7.7
+sal,model,EUXRoOB03,False,welch,5.4705,0.04231,True,6,anomalies,synoptic,1.973,1.007,7.7
+sal,model,EUXRoOB03,False,welch,4.5653,0.035586,True,7,anomalies,synoptic,3.289,1.678,7.7
+sal,model,EUXRoOB03,False,welch,4.2525,0.019613,True,8,anomalies,synoptic,2.282,1.164,7.7
+sal,model,EUXRoOB03,False,welch,3.5372,0.01947,True,9,anomalies,synoptic,5.033,2.568,7.7
+sal,model,EUXRoOB03,False,welch,3.4314,0.017366,True,10,anomalies,synoptic,4.649,2.373,7.7
+sal,model,EUXRoOB03,False,welch,192.0,1.1648,False,,full,semi-annual,0.63,0.21,2.0
+sst,in situ,EUXRoOB03,False,lomb-scargle,434.2267,19241.0,True,1,full,annual,21.823,7.285,2.0
+sst,in situ,EUXRoOB03,False,lomb-scargle,320.0,12036.0,True,2,full,annual,28.533,9.525,2.0
+sst,in situ,EUXRoOB03,False,lomb-scargle,17.4328,5.4224,True,3,anomalies,intraseasonal,2.551,1.302,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,16.1353,3.3235,True,4,anomalies,intraseasonal,2.021,1.031,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,7.9747,1.2979,True,5,anomalies,synoptic,3.558,1.816,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,7.1911,0.53668,True,6,anomalies,synoptic,2.006,1.023,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,4.4397,0.30921,True,7,anomalies,synoptic,2.671,1.363,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,3.8737,0.23746,True,8,anomalies,synoptic,2.35,1.199,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,3.1928,0.17362,True,9,anomalies,synoptic,3.126,1.595,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,3.6148,0.17063,True,10,anomalies,synoptic,1.988,1.014,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,2.8534,0.11809,True,11,anomalies,2-3 day,2.686,1.371,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,2.907,0.10723,True,12,anomalies,2-3 day,2.431,1.24,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,2.6219,0.088035,True,13,anomalies,2-3 day,2.08,1.061,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,2.0857,0.079965,True,14,anomalies,2-3 day,1.996,1.018,7.7
+sst,in situ,EUXRoOB03,False,lomb-scargle,192.0,380.97,False,,full,semi-annual,2.41,0.805,2.0
+sst,model,EUXRoOB03,False,welch,364.4161,21125.0,True,1,full,annual,38.451,12.835,2.0
+sst,model,EUXRoOB03,False,welch,172.8888,512.58,True,2,full,semi-annual,3.56,1.188,2.0
+sst,model,EUXRoOB03,False,welch,17.9991,3.6832,True,3,anomalies,intraseasonal,2.113,1.078,7.7
+sst,model,EUXRoOB03,False,welch,10.9204,1.4568,True,4,anomalies,intraseasonal,2.122,1.083,7.7
+sst,model,EUXRoOB03,False,welch,7.007,0.6027,True,5,anomalies,synoptic,2.14,1.092,7.7
+sst,model,EUXRoOB03,False,welch,5.7561,0.39808,True,6,anomalies,synoptic,2.17,1.107,7.7
+sst,model,EUXRoOB03,False,welch,4.0324,0.30649,True,7,anomalies,synoptic,2.751,1.404,7.7
+sst,model,EUXRoOB03,False,welch,4.8481,0.28551,True,8,anomalies,synoptic,2.096,1.07,7.7
+sst,model,EUXRoOB03,False,welch,4.7526,0.27695,True,9,anomalies,synoptic,2.066,1.054,7.7
+sst,model,EUXRoOB03,False,welch,3.6458,0.20356,True,10,anomalies,synoptic,2.212,1.129,7.7
+sst,model,EUXRoOB03,False,welch,2.8655,0.16458,True,11,anomalies,2-3 day,2.67,1.363,7.7
+sst,model,EUXRoOB03,False,welch,3.0969,0.1547,True,12,anomalies,synoptic,2.378,1.213,7.7
+sst,model,EUXRoOB03,False,welch,2.0946,0.14295,True,13,anomalies,2-3 day,2.969,1.515,7.7
+sst,model,EUXRoOB03,False,welch,2.2554,0.11641,True,14,anomalies,2-3 day,2.41,1.23,7.7
+sst,model,EUXRoOB03,False,welch,2.1892,0.10717,True,15,anomalies,2-3 day,2.219,1.132,7.7
+sst,satellite,EUXRoOB03,False,welch,364.1824,20601.0,True,1,full,annual,35.305,11.785,2.0
+sst,satellite,EUXRoOB03,False,welch,174.1065,525.01,True,2,full,semi-annual,3.433,1.146,2.0
+sst,satellite,EUXRoOB03,False,welch,16.0259,4.3955,True,3,anomalies,intraseasonal,2.14,1.092,7.7
+sst,satellite,EUXRoOB03,False,welch,7.1828,1.0666,True,4,anomalies,synoptic,2.585,1.319,7.7
+sst,satellite,EUXRoOB03,False,welch,5.7229,0.56175,True,5,anomalies,synoptic,1.976,1.008,7.7
+sst,satellite,EUXRoOB03,False,welch,3.7994,0.2899,True,6,anomalies,synoptic,2.014,1.028,7.7
+sst,satellite,EUXRoOB03,False,welch,3.3483,0.28973,True,7,anomalies,synoptic,2.342,1.195,7.7
+sst,satellite,EUXRoOB03,False,welch,3.3025,0.23152,True,8,anomalies,synoptic,1.971,1.006,7.7
+sst,synthetic,SYNTHETIC_40yr_daily,True,welch,365.235,154210.0,True,1,full,annual,11877.175,5600.295,5.8
+sst,synthetic,SYNTHETIC_40yr_daily,True,welch,182.4468,2809.5,True,2,full,semi-annual,224.747,105.972,5.8
+sst,synthetic,SYNTHETIC_40yr_daily,True,welch,2207.9764,279.93,True,3,full,multi-year,21.288,10.038,5.8
+sst,synthetic,SYNTHETIC_40yr_daily,True,welch,300.7117,47.784,True,4,full,annual,3.701,1.745,5.8
+sst,synthetic,SYNTHETIC_40yr_daily,True,welch,270.8077,33.16,True,5,full,other,2.581,1.217,5.8
+sst,synthetic,SYNTHETIC_40yr_daily,True,welch,232.5083,27.048,True,6,full,other,2.121,1.0,5.8
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.9996,0.91844,True,1,anomalies,diurnal,57.981,42.135,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.7199,0.1293,True,2,anomalies,inertial,15.902,11.556,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,1.926,0.059031,True,3,anomalies,2-3 day,1.414,1.028,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.5173,0.019724,True,4,anomalies,semi-diurnal tide M2,5.945,4.32,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.4221,0.0037236,True,5,anomalies,other sub-daily,1.634,1.188,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.3526,0.0024354,True,6,anomalies,other sub-daily,1.414,1.028,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.3084,0.0020535,True,7,anomalies,other sub-daily,1.55,1.127,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.2904,0.0018185,True,8,anomalies,other sub-daily,1.484,1.078,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.2589,0.0015863,True,9,anomalies,other sub-daily,1.634,1.187,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.2205,0.0012232,True,10,anomalies,other sub-daily,1.488,1.082,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.2056,0.0012155,True,11,anomalies,other sub-daily,1.519,1.104,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.1493,0.00097584,True,12,anomalies,other sub-daily,1.775,1.29,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.1081,0.0007508,True,13,anomalies,other sub-daily,1.692,1.23,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.1189,0.00069057,True,14,anomalies,other sub-daily,1.501,1.091,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.1028,0.00066455,True,15,anomalies,other sub-daily,1.523,1.107,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.1145,0.00064515,True,16,anomalies,other sub-daily,1.413,1.027,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.0943,0.0006218,True,17,anomalies,other sub-daily,1.424,1.035,43.7
+sst,synthetic,SYNTHETIC_hourly_gapfree,True,welch,0.0925,0.00061236,True,18,anomalies,other sub-daily,1.403,1.019,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,1.0006,0.74748,True,1,anomalies,diurnal,34.341,24.956,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.7205,0.10291,True,2,anomalies,inertial,12.718,9.242,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.5174,0.015743,True,3,anomalies,semi-diurnal tide M2,4.118,2.993,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.5569,0.0064015,True,4,anomalies,other sub-daily,1.529,1.111,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.4231,0.0045249,True,5,anomalies,other sub-daily,1.976,1.436,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.3891,0.0028809,True,6,anomalies,other sub-daily,1.556,1.131,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.352,0.0022947,True,7,anomalies,other sub-daily,1.436,1.044,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.308,0.0017734,True,8,anomalies,other sub-daily,1.435,1.043,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.2622,0.0016728,True,9,anomalies,other sub-daily,1.609,1.169,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.2056,0.0012689,True,10,anomalies,other sub-daily,1.68,1.221,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.2204,0.0011567,True,11,anomalies,other sub-daily,1.419,1.031,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.1921,0.0010767,True,12,anomalies,other sub-daily,1.478,1.074,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.1796,0.0010054,True,13,anomalies,other sub-daily,1.465,1.065,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.1493,0.00086747,True,14,anomalies,other sub-daily,1.631,1.185,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.1281,0.00077704,True,15,anomalies,other sub-daily,1.619,1.177,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.108,0.00069789,True,16,anomalies,other sub-daily,1.584,1.151,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.0924,0.00068125,True,17,anomalies,other sub-daily,1.571,1.142,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.0943,0.00061725,True,18,anomalies,other sub-daily,1.417,1.029,43.7
+sst,synthetic,SYNTHETIC_hourly_gaps,True,lomb-scargle,0.0836,0.00059952,True,19,anomalies,other sub-daily,1.408,1.023,43.7
