@@ -315,6 +315,7 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .st-key-map_tools [data-testid="stButtonGroup"] button {{flex:1 1 0; height:38px; padding:0 8px !important;}}
 .st-key-map_tools [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
 .st-key-depthpanel {{background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px 6px 16px; gap:0 !important;}}
+.st-key-bsv_map_po .st-key-map_msgs, .st-key-bsv_map_pc .st-key-map_msgs {{bottom:auto; top:120px;}}
 .st-key-dp_head {{height:56px; gap:16px !important; flex-wrap:nowrap !important;}}
 .st-key-dp_head [data-testid="stMarkdownContainer"] {{display:flex; gap:16px; align-items:baseline;}}
 .bsv-dp-t {{font-size:14px; font-weight:500; color:{t['text']}; white-space:nowrap;}}

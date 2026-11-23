@@ -125,7 +125,7 @@ def _tiles(m, lay, day, opacity, msgs):
     return dict(title=L["title"], unit=L["unit"], origin=L["origin"], service_colours=True, time=day)
 
 
-DEPTH_STOPS = [0, 10, 20, 50, 100, 200, 500, 1000, 2200]  # m; the shelf gets most of the ramp
+DEPTH_STOPS = [0, 10, 20, 50, 100, 200, 500, 1000, 2000]  # m; the shelf gets most of the ramp, deeper = last colour
 
 
 def _depth_colours() -> list[str]:
@@ -165,21 +165,23 @@ def depth_legend_html() -> str:
     cols = _depth_colours()
     n = len(DEPTH_STOPS) - 1
     grad = ", ".join(f"{c} {100 * i / n:.1f}%" for i, c in enumerate(cols))
-    show = {0, 20, 100, 200, 2200}
+    show = {0: "0", 50: "50", 100: "100", 200: "200", 2000: "2000+"}  # at their stop positions on the ramp
     ticks = "".join(
         f"<span style='position:absolute;left:{100 * i / n:.1f}%;transform:translateX("
-        f"{'0' if i == 0 else ('-100%' if i == n else '-50%')})'>{z}</span>"
+        f"{'0' if i == 0 else ('-100%' if i == n else '-50%')})'>{show[z]}</span>"
         for i, z in enumerate(DEPTH_STOPS) if z in show)
+    marks = "".join(f"<span style='position:absolute;left:{100 * i / n:.1f}%;top:0;width:1px;height:4px;"
+                    f"background:{t['muted']}'></span>" for i, z in enumerate(DEPTH_STOPS) if z in show)
     return (f"<details open class='bsv-legend' style='position:absolute;bottom:26px;right:10px;z-index:9999;"
             f"background:{t['overlay']};color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;"
-            f"border:1px solid {t['ctrl']};font:12px/1.35 {FONT_UI};max-width:250px'>"
+            f"border:1px solid {t['ctrl']};font:12px/1.35 {FONT_UI};max-width:320px'>"
             f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"
             f"color:{t['muted']}'>{LEGEND_SUMMARY}</summary>"
             f"<span style='display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']};"
             "margin:8px 0 4px 0'>Depth, m &middot; EMODnet DTM</span>"
-            f"<div style='height:8px;width:220px;background:linear-gradient(to right,{grad});opacity:0.85'></div>"
-            f"<div style='position:relative;height:16px;width:220px;font-family:{FONT_NUM};font-size:12.5px;"
-            f"margin-top:2px'>{ticks}</div>"
+            f"<div style='height:8px;width:290px;background:linear-gradient(to right,{grad});opacity:0.85'></div>"
+            f"<div style='position:relative;height:4px;width:290px'>{marks}</div>"
+            f"<div style='position:relative;height:16px;width:290px;font-family:{FONT_NUM};font-size:12px'>{ticks}</div>"
             f"<div style='font-size:10.5px;color:{t['muted']}'>Scale stretched for the shelf (0-200 m). Lines: "
             "depth contours. Needs the internet (EMODnet map service).</div></details>")
 
@@ -410,8 +412,9 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
 
 def build(view: dict, layers: set, day: str, season: str, sel: dict | None, detail: bool, tiles_mode: bool = False,
           only_sector: str | None = None, theme: str | None = None,
-          legend: bool = True, extra=None) -> tuple[folium.Map, dict | None, list[str]]:
-    """Return (map, field dict or None, messages). extra(m), if given, adds page-specific layers."""
+          legend: bool = True, extra=None, vec_time=None) -> tuple[folium.Map, dict | None, list[str]]:
+    """Return (map, field dict or None, messages). extra(m), if given, adds page-specific layers. vec_time: the time
+    step for the waves / currents / wind layers (default: the day at 00:00)."""
     msgs = []
     m = base_map(view["lat"], view["lon"], view["zoom"], theme)
     stamp = A._zones_stamp()
@@ -462,11 +465,12 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
                 msgs.append("Waves, currents and wind: the vector module is not ready yet.")
                 continue
             try:
-                ds = vv.load_field(kind, A.BBOX_RO, day) if hasattr(vv, "load_field") else None
+                ds = vv.load_field(kind, A.BBOX_RO, vec_time or day) if hasattr(vv, "load_field") else None
                 try:
-                    vv.field_layer(m, ds, kind, day, legend=legend, legend_theme=dict(tokens(theme), font=FONT_UI))
+                    vv.field_layer(m, ds, kind, vec_time or day, legend=legend,
+                                   legend_theme=dict(tokens(theme), font=FONT_UI))
                 except TypeError:  # older vectorviz without legend_theme
-                    vv.field_layer(m, ds, kind, day)
+                    vv.field_layer(m, ds, kind, vec_time or day)
             except Exception as ex:
                 msgs.append(f"{kind.capitalize()} layer failed: {str(ex)[:120]}")
     if "insitu" in layers:

@@ -128,12 +128,29 @@ def _compass(deg):
     return vv.compass(deg) if vv is not None and hasattr(vv, "compass") else f"{deg:.0f} deg"
 
 
-def sea_state(sel, day):
-    """Rows: key -> (title, value, sub line, origin, time, why it matters)."""
-    when = pd.Timestamp(day) + pd.Timedelta(hours=12)
+def map_time(field, day):
+    """One time step for the map and the panel: 12:00 UTC of the day. If that step cannot be loaded for the map
+    within 25 s (first download, or offline), both use 00:00 UTC, the step the map used before."""
+    T = pd.Timestamp(day) + pd.Timedelta(hours=12)
+    if field in ("waves", "wind"):
+        try:
+            A.timed(_load_field_cached, field, str(T), timeout=25)
+        except Exception:
+            T = pd.Timestamp(day)
+    return T
+
+
+@st.cache_data(ttl=6 * 3600, show_spinner=False, max_entries=32)
+def _load_field_cached(kind, when):
+    return _vv().load_field(kind, A.BBOX_RO, when)
+
+
+def sea_state(sel, day, when=None):
+    """Rows: key -> (title, value, sub line, origin, time, why it matters), all at the time step `when`."""
+    when = pd.Timestamp(when) if when is not None else pd.Timestamp(day) + pd.Timedelta(hours=12)
     rows = {}
     w = _at(_point("waves", sel["lat"], sel["lon"]), when)
-    c = _at(_point("currents", sel["lat"], sel["lon"]), when)
+    c = _at(_point("currents", sel["lat"], sel["lon"]), when.normalize())  # daily mean of that day, as on the map
     wd = _at(_point("wind", sel["lat"], sel["lon"]), when)
     if w:
         r, t = w
@@ -141,7 +158,8 @@ def sea_state(sel, day):
                          f"height · period · from {_compass(r.wave_dir)}", "model", t, why_waves(r))
     if c:
         r, t = c
-        rows["currents"] = ("Surface current", f"{r.current_speed:.2f} m/s", f"flowing towards {_compass(r.dir_to)}",
+        rows["currents"] = ("Surface current", f"{r.current_speed:.2f} m/s",
+                            f"flowing towards {_compass(r.dir_to)} · daily mean",
                             "model", t, why_current(r, wd[0] if wd else None))
     if wd:
         r, t = wd
@@ -243,15 +261,17 @@ def page():
                 SH.place_picker()
                 st.segmented_control("Field", list(FIELDS), key="w_field", format_func=FIELDS.get, required=True,
                                      label_visibility="collapsed", width="stretch")
-            extra = {"depth": _depth_legend, "wind": lambda mm: _wind_labels(mm, day_s, msgs_extra)}.get(field)
+            T = map_time(field, day_s)
+            ss["_sea_time"] = str(T)  # the panel reads the same time step
+            extra = {"depth": _depth_legend, "wind": lambda mm: _wind_labels(mm, T, msgs_extra, sel)}.get(field)
             msgs_extra = []
             m, fd, msgs = M.build(ss.view, {LAYER[field]}, day_s, season, None, detail, theme=theme_name(),
-                                  legend=True, extra=extra)
+                                  legend=True, extra=extra, vec_time=str(T))
             msgs = msgs + msgs_extra
             fg = __import__("folium").FeatureGroup(name="Selection")
             M.add_selection(fg, sel)
             out = st_folium(m, height=640, use_container_width=True,
-                            key=f"seamap_{field}_{day_s}_{ss.get('map_nonce', 0)}_{theme_name()}",
+                            key=f"seamap_{field}_{T:%Y%m%d%H}_{ss.get('map_nonce', 0)}_{theme_name()}",
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
             if msgs:
                 with st.container(key="map_msgs"):
@@ -272,9 +292,9 @@ def page():
 @st.fragment
 def sea_panel(sel, day_s, profile):
     """Right panel. A fragment: opening a row or the chart section does not redraw the map."""
-    rows = sea_state(sel, day_s)
-    t = next((r[4] for r in rows.values() if r[4] is not None), None)
-    when = f"{pd.Timestamp(t):%d %b %H:%M}" if t is not None else day_s
+    T = pd.Timestamp(st.session_state.get("_sea_time") or (pd.Timestamp(day_s) + pd.Timedelta(hours=12)))
+    rows = sea_state(sel, day_s, T)
+    when = f"{T:%d %b %H:%M} UTC, currents as daily mean"
     st.markdown(f"<div class='bsv-sec'><div class='bsv-lbl'>Sea state &middot; {esc(when)}</div>"
                 f"<div class='bsv-place'>{esc(sel['name'])}</div>"
                 "<p class='bsv-vsub'>How the water moves and how deep it is. Values come from the Copernicus "
@@ -294,32 +314,44 @@ def _depth_legend(m):
     m.get_root().html.add_child(folium.Element(M.depth_legend_html()))
 
 
-def _wind_labels(m, day, msgs):
+def _wind_labels(m, when, msgs, sel=None):
     """Wind has no gridded source in vectorviz (Open-Meteo reference points only): label each point with its speed,
-    so the few points are easy to read, and say why there is no field."""
+    and add the selected place with the same value as the panel (same source, same time step)."""
     import folium
     t = tokens()
-    vv = _vv()
     try:
-        ds = vv.load_field("wind", A.BBOX_RO, day)
+        ds = _load_field_cached("wind", str(when))
     except Exception as ex:
         msgs.append(f"Wind not available: vectorviz.load_field('wind') failed ({str(ex)[:100]}).")
         return
     if "time" in ds.dims:
         ds = ds.isel(time=0)
+
+    def label(lat, lon, text, strong=False):
+        folium.Marker([lat, lon], icon=folium.DivIcon(
+            icon_size=(150, 20), icon_anchor=(-18, 10),
+            html=f"<div style='font:{600 if strong else 500} 12px sans-serif;color:{t['text']};background:{t['overlay']};"
+                 f"border:1px solid {t['accent'] if strong else t['ctrl']};border-radius:4px;padding:1px 6px;"
+                 f"white-space:nowrap;display:inline-block'>{text}</div>")).add_to(m)
+
     n = 0
     for i in range(ds.sizes.get("station", 0)):
         sp, frm = float(ds.wind_speed.values[i]), float(ds.wind_dir.values[i])
         if not np.isfinite(sp):
             continue
         n += 1
-        folium.Marker([float(ds.lat.values[i]), float(ds.lon.values[i])], icon=folium.DivIcon(
-            icon_size=(110, 20), icon_anchor=(-18, 10),
-            html=f"<div style='font:600 12px sans-serif;color:{t['text']};background:{t['overlay']};"
-                 f"border:1px solid {t['ctrl']};border-radius:4px;padding:1px 6px;white-space:nowrap;"
-                 f"display:inline-block'>{sp:.1f} m/s from {_compass(frm)}</div>")).add_to(m)
-    msgs.append(f"Wind: model values at {n} reference points (Open-Meteo). There is no gridded wind field, so the "
-                "map shows points, not a coloured field." if n else
-                "Wind not available here: Open-Meteo returned no values (offline and not in the cache?).")
+        label(float(ds.lat.values[i]), float(ds.lon.values[i]), f"{sp:.1f} m/s from {_compass(frm)}")
+    if sel is not None:
+        w = _at(_point("wind", sel["lat"], sel["lon"]), when)
+        if w:
+            r, _ = w
+            label(sel["lat"], sel["lon"], f"Here: {r.wind_speed:.1f} m/s from {_compass(r.wind_dir)}", strong=True)
+    if not n:
+        msgs.append("Wind not available here: Open-Meteo returned no values (offline and not in the cache?).")
+    m.get_root().html.add_child(folium.Element(
+        f"<div style='position:absolute;left:10px;bottom:62px;z-index:9998;max-width:260px;background:{t['overlay']};"
+        f"color:{t['sub']};border:1px solid {t['ctrl']};border-radius:4px;padding:5px 8px;font:11.5px/1.35 sans-serif'>"
+        f"Wind: Open-Meteo model values at {n} reference points and at the selected place, {pd.Timestamp(when):%d %b %H:%M} "
+        "UTC. There is no gridded wind field, so the map shows points.</div>"))
 
 
