@@ -223,12 +223,12 @@ div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}
 .bsv-count {{display:inline-flex; align-items:center;}}
 .bsv-count.bsv-dim {{color:{t['muted']};}}
 [class*="st-key-crow_"] {{position:relative; gap:0 !important;}}
-.bsv-row {{display:grid; grid-template-columns:8px minmax(0,1fr) auto 12px; column-gap:12px; row-gap:2px; align-items:baseline;
+.bsv-row {{display:grid; grid-template-columns:8px minmax(min-content,1fr) auto 12px; column-gap:12px; row-gap:2px; align-items:baseline;
   padding:12px 18px 12px 22px; border-bottom:1px solid {t['line2']};}}
 .bsv-row.open {{background:{t['row_open']}; border-bottom-color:transparent;}}
 [class*="st-key-crow_"]:hover .bsv-row {{background:{t['row_open']};}}
 .bsv-row .bsv-sq {{margin:0; align-self:center;}}
-.bsv-rt {{font-size:14.5px; font-weight:500; color:{t['text']};}}
+.bsv-rt {{font-size:14.5px; font-weight:500; color:{t['text']}; overflow-wrap:normal; word-break:normal; hyphens:manual;}}
 .bsv-rv {{font-family:{FONT_NUM}; font-size:22px; font-weight:500; white-space:nowrap; color:{t['text']};}}
 .bsv-chev {{display:flex; align-items:center; align-self:center; color:{t['muted']};}}
 .bsv-rl {{font-size:12.5px; line-height:1.35; color:{t['sub']}; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}}
@@ -335,13 +335,13 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .bsv-sites-head {{display:flex; justify-content:space-between; align-items:flex-end; padding:18px 18px 8px 22px;}}
 .bsv-sites-head .cols, .bsv-site .cols {{display:grid; grid-template-columns:repeat(4, 52px); text-align:center;}}
 .bsv-sites-head .cols span {{font-size:9.5px; letter-spacing:0.3px; text-transform:uppercase; color:{t['muted']};}}
-.bsv-site {{display:grid; grid-template-columns:12px minmax(0,1fr) auto; column-gap:10px; align-items:center;
+.bsv-site {{display:grid; grid-template-columns:12px minmax(min-content,1fr) auto; column-gap:10px; align-items:center;
   padding:12px 18px 12px 22px; border-bottom:1px solid {t['line2']};}}
 .bsv-site.open {{background:{t['row_open']}; border-bottom-color:transparent;}}
 [class*="st-key-crow_site"]:hover .bsv-site {{background:{t['row_open']};}}
 .bsv-site .nm {{display:flex; flex-direction:column; min-width:0;}}
-.bsv-site .t {{font-size:14.5px; font-weight:500; color:{t['text']};}}
-.bsv-site .n {{font-size:12px; color:{t['sub']};}}
+.bsv-site .t {{font-size:14.5px; font-weight:500; color:{t['text']}; overflow-wrap:normal; word-break:normal;}}
+.bsv-site .n {{font-size:12px; color:{t['sub']}; overflow-wrap:anywhere;}}
 .bsv-site .cell {{display:flex; justify-content:center;}}
 .bsv-site .cell .bsv-sq {{margin:0;}}
 .bsv-det1 {{display:flex; flex-direction:column; gap:6px; font-size:12.5px; line-height:1.45; color:{t['soft']};}}
@@ -465,6 +465,51 @@ button p {{color:inherit;}}
 .bsv-card .src {{color:{t['muted']}; font-size:11.5px; margin-top:6px; border-top:1px solid {t['line2']}; padding-top:4px;}}
 .bsv-card summary {{cursor:pointer;}}
 .stApp table {{color:{t['text']};}}
+/* responsive: 900-1199 px a narrower docked panel; below 900 px the map on top, the panel below, full width */
+@media (max-width: 1199px) {{
+  div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{flex:0 0 330px !important; width:330px !important;
+    min-width:330px !important; max-width:330px !important;}}
+  div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{flex:1 1 auto !important; width:auto !important;}}
+  div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{flex:0 0 240px !important; width:240px !important; min-width:240px !important;}}
+  .st-key-page_body:has(.bsv-whead) {{padding:20px 24px 40px 24px;}}
+  .bsv-stat .v {{font-size:28px;}}
+  .bsv-sites-head .cols, .bsv-site .cols {{grid-template-columns:repeat(4, 36px);}}
+  .bsv-sites-head .cols span {{font-size:8.5px; letter-spacing:0;}}
+  .bsv-site {{column-gap:8px; padding:12px 12px 12px 16px;}}
+  .bsv-sites-head {{padding:18px 12px 8px 16px;}}
+}}
+@media (max-width: 899px) {{
+  /* Streamlit's mobile layout lays the main area under the sidebar: keep it beside the 72 px rail */
+  [data-testid="stMain"] {{position:relative !important; left:0 !important; margin-left:72px !important;
+    width:calc(100vw - 72px) !important; max-width:calc(100vw - 72px) !important;}}
+  section[data-testid="stSidebar"] {{position:fixed !important; left:0; top:0; height:100vh !important; box-shadow:none !important;}}
+  [data-testid="stHorizontalBlock"]:has([class*="st-key-bsv_map"]), [data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) {{
+    flex-direction:column !important; flex-wrap:nowrap !important; gap:0 !important;}}
+  div[data-testid="stColumn"]:has(.st-key-bsv_panel), div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]),
+  div[data-testid="stColumn"]:has(.st-key-bsv_aside), [data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) > div[data-testid="stColumn"] {{
+    flex:1 1 auto !important; width:100% !important; min-width:0 !important; max-width:none !important;}}
+  div[data-testid="stColumn"]:has(.st-key-bsv_panel), div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{
+    height:auto !important; position:static !important; overflow:visible !important; border-left:0 !important;
+    border-right:0 !important; border-top:1px solid {t['line']};}}
+  [class*="st-key-bsv_map"] iframe, .st-key-bsv_map_po iframe, .st-key-bsv_map_pc iframe, .st-key-bsv_map_full iframe {{
+    height:55vh !important;}}
+  .st-key-map_tools {{width:calc(100% - 88px);}}
+  .st-key-map_tools_wide {{max-width:calc(100% - 80px);}}
+  .st-key-map_tools_wide [data-testid="stButtonGroup"] button {{padding:0 8px !important;}}
+  .st-key-timeline {{height:64px; padding:0 10px; flex-wrap:nowrap !important; gap:10px !important;}}
+  .st-key-tl_track {{flex:1 1 0 !important; min-width:0 !important;}}
+  .st-key-legend_btn {{flex:0 0 auto !important; width:auto !important;}}
+  .st-key-dp_head {{height:auto; min-height:56px; flex-wrap:wrap !important; padding:6px 0;}}
+  .st-key-dp_head [data-testid="stMarkdownContainer"] {{flex-wrap:wrap; gap:4px 12px;}}
+  .st-key-page_body:has(.bsv-whead) {{padding:18px 16px 40px 16px;}}
+  .bsv-stats {{grid-template-columns:repeat(2, minmax(0,1fr));}}
+  .bsv-stat:nth-child(3) {{border-left:0 !important; padding-left:0;}}
+  .bsv-stats3 {{grid-template-columns:repeat(3, minmax(0,1fr));}}
+  .bsv-stats3 .bsv-stat:nth-child(3) {{border-left:1px solid {t['line']} !important; padding-left:18px;}}
+  .bsv-whead .bsv-place {{font-size:30px;}}
+  .st-key-wtabs [data-testid="stButtonGroup"] > div {{flex-wrap:wrap;}}
+  .st-key-legend_btn button {{height:34px; padding:0 10px;}}
+}}
 </style>
 """
     # no blank lines: a blank line would end the HTML block and Markdown would print the rest as text
