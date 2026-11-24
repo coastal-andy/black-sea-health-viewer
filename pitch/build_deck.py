@@ -415,8 +415,31 @@ def slide_close(prs):
     notes(s, "Andrei. Read the blue box as the closing sentence. Then questions: see Q&A in pitch/PLAN.md.")
 
 
+def fill_title(prs):
+    """Her slide 1 is an empty title layout: fill it in her title style, only if still empty."""
+    s = prs.slides[0]
+    if any(sh.has_text_frame and sh.text_frame.text.strip() for sh in s.shapes):
+        return
+    for sh in list(s.shapes):
+        if sh.is_placeholder:
+            sh._element.getparent().remove(sh._element)
+    text(s, 0.9, 2.0, 11.5, 3.2, [
+        [("BLACK SEA HEALTH VIEWER", {"size": 48, "bold": True, "color": BLUE, "after": 6})],
+        [("ECOSYSTEM HEALTH FOR FIVE BLUE-ECONOMY SECTORS", {"size": 24, "bold": True, "color": GREEN,
+                                                             "after": 18})],
+        [("Is a change on the Romanian coast natural, or a pressure? How sure are we? What should be "
+          "checked next?", {"size": 20, "color": INK})],
+    ])
+    text(s, 0.9, 5.9, 11.5, 0.8, "EfxINNOs Hackathon Romania  |  Challenge 04: Ecosystem Health  |  "
+         "Constanța, 24 November 2026", size=14, color=MUTED)
+    notes(s, "Teammate. One sentence: a map-first viewer that says, for each place and day, whether the water is "
+             "normal, whether a change is natural or a likely pressure, how much to trust each number, and "
+             "what to check next.")
+
+
 def main(src, out):
     prs = Presentation(src)
+    fill_title(prs)
     for fn in (slide_pressure, slide_architecture, slide_decision, slide_prototype, slide_validation,
                slide_impact, slide_close):
         fn(prs)
