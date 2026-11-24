@@ -5,7 +5,7 @@ For a fresh Claude session taking over as coordinator. Read this, then `CLAUDE.m
 Last update: 23 Nov 2026, late evening (Day 1 of the hackathon), second coordinator. Pitch: Day 2 (24 Nov), 11:00, in Constanța.
 
 ## Update 24 Nov, 10:15 (third coordinator): read this first
-- **Viewer frozen for the pitch** at 925b32e (local tag `pitch-demo`); the server on 8502 runs that code. Don't edit `src/viewer/` or restart 8502 until after the pitch.
+- **Viewer frozen for the pitch** at c549de2 (local tag `pitch-demo`; soft pressure map is the default); the server on 8502 runs that code. Don't edit `src/viewer/` or restart 8502 until after the pitch.
 - Done since the sections below: direction B rebuild merged into `main` (pull request 1). On `design` since then: aligned rows, resizable and foldable panels, Copernicus tiles clamped to the latest published day, soft-edged pressure map (Edges: Soft / Sharp, default Sharp, `?edges=soft`), and EN / RO (`?lang=ro`).
 - Joseph's data work (validation, spectra, seasonal gate, trust flags, Methods content) is merged into `main` (pull request 3, 17ee449). By Andrei's decision it is used **in the pitch slides only** for now; it is not wired into the viewer.
 - Pitch: `pitch/PLAN.md` and the 11-slide `pitch/efxinnos_pitch.pptx` (third teammate's deck is the master file). Speakers: teammate (title, problem, sectors), Joseph (architecture, methods, validation), Andrei (demo, impact, close).
