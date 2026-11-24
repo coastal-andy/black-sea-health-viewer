@@ -15,6 +15,9 @@ Source choice for source="auto" follows docs/indicators/SHORTLIST.md section 4 (
   * Nitrate / phosphate: never the model as absolute values. "auto" gives bottle samples (EMODnet Chemistry) and the
     DIVAnd climatology; the model is only available on explicit request and is labelled "not usable as absolute".
   * The coastal buoys EUXRoCB01-03 and NIMH station 15480 are flagged untrusted and are never picked by "auto".
+  * Per-variable sensor flags (VARIABLE_TRUST): buoy chlorophyll (fluorescence) at EUXRoOB01-03 and EUXRo03 is
+    "indicative", buoy salinity at EUXRoOB01-03 is "untrusted". "auto" skips them (chl -> satellite, then model;
+    sal -> model); source="buoy" and compare_sources still return them, with that trust and the reason in notes.
 
 Every returned DataFrame has one column named after the variable, a daily DatetimeIndex and attrs with:
 variable, unit, source_id, label, origin (satellite|model|reanalysis|in-situ|derived), evidence
@@ -76,6 +79,29 @@ PLATFORMS = {
     "15480": dict(lat=44.2, lon=28.6, trust="untrusted", kind="shore station",
                   note="NIMH shore station: ~3.5 C colder than open water; air and harbour context only"),
 }
+
+# Per-variable trust of a platform, overriding the platform-level trust for that one variable (SHORTLIST section 4,
+# evidence in docs/indicators/validation/interpretation.md and metrics.csv). A flagged platform is still returned on
+# explicit request (source="buoy", compare_sources) with this trust and reason in attrs, but "auto" never picks it.
+_CHL_FLUO = ("indicative", "buoy chlorophyll is fluorescence, not calibrated against bottles: reads 2-3x satellite and "
+             "model at EUXRoOB01-03 (2024-2026), R2 0.00 against satellite at EUXRo03 (2013-2023); comparison only")
+_SAL_FOUL = ("untrusted", "buoy salinity shows fouling-like drops to 13-15 PSU lasting weeks to months "
+             "(R2 0.00-0.17 against the model); not used, the model is the salinity source")
+VARIABLE_TRUST: dict[tuple[str, str], tuple[str, str]] = {
+    ("EUXRoOB01", "chl"): _CHL_FLUO, ("EUXRoOB02", "chl"): _CHL_FLUO, ("EUXRoOB03", "chl"): _CHL_FLUO,
+    ("EUXRo03", "chl"): _CHL_FLUO,
+    ("EUXRoOB01", "sal"): _SAL_FOUL, ("EUXRoOB02", "sal"): _SAL_FOUL, ("EUXRoOB03", "sal"): _SAL_FOUL,
+}
+AUTO_EXCLUDED_TRUST = ("indicative", "untrusted", "not_usable_absolute")   # per-variable flags that "auto" skips
+
+
+def variable_trust(platform: str, variable: str) -> tuple[str, str | None]:
+    """(trust, reason) of one platform for one variable: the VARIABLE_TRUST flag if any, else the platform trust."""
+    if (platform, variable) in VARIABLE_TRUST:
+        return VARIABLE_TRUST[(platform, variable)]
+    p = PLATFORMS.get(platform, {})
+    return p.get("trust", "good"), p.get("note")
+
 
 EVIDENCE = {"satellite": "satellite", "model": "model", "reanalysis": "model", "in-situ": "measured",
             "derived": "model"}
@@ -544,8 +570,14 @@ def _openmeteo_frame(lat, lon, start: str, end: str, bucket: int) -> pd.DataFram
     return od.marine_weather(lat, lon, start, end, freq="hourly")
 
 
-def _fetch_one(spec: dict, lat, lon, start, end) -> tuple[pd.Series, dict]:
-    """Returns (daily series, attrs) for one source spec."""
+def _auto_buoys(lat, lon, variable: str | None, max_km: float | None = None) -> list[tuple[str, float]]:
+    """Trusted offshore buoys near the point, minus those flagged for this variable in VARIABLE_TRUST."""
+    return [(p, d) for p, d in nearest_platforms(lat, lon, "good", max_km)
+            if variable is None or variable_trust(p, variable)[0] not in AUTO_EXCLUDED_TRUST]
+
+
+def _fetch_one(spec: dict, lat, lon, start, end, variable: str | None = None, auto: bool = False) -> tuple[pd.Series, dict]:
+    """Returns (daily series, attrs) for one source spec. auto=True skips buoys flagged in VARIABLE_TRUST."""
     kind, start, end = spec["kind"], _ts(start), _ts(end)
     notes = [spec["note"]] if spec.get("note") else []
     datasets, dist, extra = [], None, {}
@@ -570,11 +602,15 @@ def _fetch_one(spec: dict, lat, lon, start, end) -> tuple[pd.Series, dict]:
         notes.append("saturation = O2 / O2sat(T, S), Garcia & Gordon (1992); checked against buoy OSAT, r 0.98")
     elif kind in ("buoy", "buoy_untrusted"):
         trust = "good" if kind == "buoy" else "untrusted"
-        cands = nearest_platforms(lat, lon, trust, None if kind == "buoy" else NEAR_KM)
+        if kind == "buoy" and auto:
+            cands = _auto_buoys(lat, lon, variable)
+        else:
+            cands = nearest_platforms(lat, lon, trust, None if kind == "buoy" else NEAR_KM)
         if kind == "buoy_untrusted":
             cands = [x for x in cands if PLATFORMS[x[0]]["kind"] == "coastal buoy"]
         if not cands:
-            raise DataUnavailable(f"no {trust} platform near the point")
+            raise DataUnavailable(f"no {trust} platform near the point"
+                                  + (f" for {variable} (others flagged in VARIABLE_TRUST)" if auto else ""))
         errs = []
         for pid, d in cands[:3]:
             try:
@@ -583,6 +619,9 @@ def _fetch_one(spec: dict, lat, lon, start, end) -> tuple[pd.Series, dict]:
                 extra["platform"] = pid
                 if PLATFORMS[pid].get("note"):
                     notes.append(PLATFORMS[pid]["note"])
+                if variable is not None and (pid, variable) in VARIABLE_TRUST:
+                    extra["trust"], why = VARIABLE_TRUST[(pid, variable)]
+                    notes.append(f"{pid} {variable}: {extra['trust']}: {why}")
                 break
             except Exception as ex:  # noqa: BLE001
                 errs.append(f"{pid}: {ex}")
@@ -636,8 +675,10 @@ def _series_cached(variable, lat, lon, start, end, source, bucket) -> pd.DataFra
             if sp["trust"] in ("untrusted", "not_usable_absolute") or sp.get("auto") is False:
                 continue
             if sp.get("auto_only_near"):
-                if not nearest_platforms(lat, lon, "good", BUOY_AUTO_KM):
+                if not _auto_buoys(lat, lon, variable, BUOY_AUTO_KM):
                     continue
+            if sp["kind"] == "buoy" and not _auto_buoys(lat, lon, variable):
+                continue                     # every buoy is flagged for this variable (VARIABLE_TRUST)
             cands.append(sp)
     else:
         cands = [sp for sp in specs if sp["id"] == source]
@@ -646,7 +687,7 @@ def _series_cached(variable, lat, lon, start, end, source, bucket) -> pd.DataFra
     errs = []
     for sp in cands:
         try:
-            s, attrs = _fetch_one(sp, lat, lon, start, end)
+            s, attrs = _fetch_one(sp, lat, lon, start, end, variable=variable, auto=(source == "auto"))
             s = s[(s.index >= _ts(start).normalize()) & (s.index <= _ts(end))]
             df = s.rename(variable).to_frame()
             df.index.name = "time"
@@ -969,7 +1010,11 @@ def obs_vs_model(variable: str, lat: float, lon: float, start, end, obs: str = "
            "obs_label": o.attrs.get("label"), "model_label": m.attrs.get("label"),
            "obs_platform": o.attrs.get("platform"), "lat": olat, "lon": olon, "n": int(len(j)),
            "bias": None, "rmse": None, "r": None, "obs_mean": None, "model_mean": None,
-           "start": str(_ts(start).date()), "end": str(_ts(end).date()), "note": note}
+           "start": str(_ts(start).date()), "end": str(_ts(end).date()), "note": note,
+           "obs_trust": o.attrs.get("trust")}
+    if out["obs_trust"] in AUTO_EXCLUDED_TRUST:
+        out["note"] = (note + "; " if note else "") + (f"observation trust is {out['obs_trust']} for {v} "
+                                                        "(VARIABLE_TRUST): read the statistics as a sensor check")
     if len(j) >= 3:
         d = j["mod"] - j["obs"]
         out.update(bias=round(float(d.mean()), 3), rmse=round(float(np.sqrt((d ** 2).mean())), 3),

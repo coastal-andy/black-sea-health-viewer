@@ -1,0 +1,5 @@
+station,variable,source,n_years,years,meaningful,slope_per_decade,ci_lo,ci_hi,p_value,r2,note,trust,record,label
+EUXRo03,sst,satellite,44,1982-2025,True,0.5597,0.4576,0.6619,5.095e-14,0.7444,,good,1982-01-01 to 2025-12-31,"Satellite SST L4 (CMEMS REP + NRT, NRT offset removed)"
+EUXRoOB01,sst,satellite,44,1982-2025,True,0.5659,0.4533,0.6784,7.305e-13,0.7102,,good,1982-01-01 to 2025-12-31,"Satellite SST L4 (CMEMS REP + NRT, NRT offset removed)"
+EUXRoOB02,sst,satellite,44,1982-2025,True,0.5713,0.4659,0.6767,7.142e-14,0.7403,,good,1982-01-01 to 2025-12-31,"Satellite SST L4 (CMEMS REP + NRT, NRT offset removed)"
+EUXRoOB03,sst,satellite,44,1982-2025,True,0.5597,0.4576,0.6619,5.095e-14,0.7444,,good,1982-01-01 to 2025-12-31,"Satellite SST L4 (CMEMS REP + NRT, NRT offset removed)"

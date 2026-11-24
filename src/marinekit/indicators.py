@@ -883,7 +883,7 @@ def _card_clarity(c, lat, lon, d, sector):
         c["investigate"].append(INVESTIGATE["hotspot"])
     c["why"] = (f"Estimated Secchi depth {secchi:.1f} m on {vd.date()} (normal for the date {nsecchi:.1f} m); Kd490 "
                 f"{v:.3f} 1/m, {ratio:.1f} times normal.")
-    c["text"]["public"] = (f"You could see about {secchi:.0f} m down here, "
+    c["text"]["public"] = (f"You could see about {_r(secchi, 1):.1f} m down here, "
                            + ("much murkier than usual." if status == "alert" else "murkier than usual." if murky else
                               "clearer than usual." if secchi > nsecchi * 1.2 else "about normal for the season."))
     c["text"]["student"] = ("Kd490 says how fast blue light fades with depth. Secchi depth is estimated as 1.1 / Kd(PAR), "
@@ -1271,6 +1271,34 @@ def card(card_id: str, lat: float, lon: float, date=None, profile: str = "public
 
 def all_cards(lat: float, lon: float, date=None, profile: str = "public") -> list[dict]:
     return [card(cid, lat, lon, date, profile) for cid in CARDS]
+
+
+def sst_display(lat: float, lon: float, date=None) -> dict:
+    """The sea surface temperature the temperature card shows, for summaries outside the card (additive helper).
+    Same series, same 3-day look-back and same rounding as card("temperature", ...)["value"], without the
+    climatology, model and driver work. Keys: value (°C, 2 decimals, or None), unit, label, dataset, date
+    (ISO day of the value used), origin, note. NRT days are lowered by datahub.SST_NRT_MINUS_REP so they line up
+    with the REP record; a raw NRT field pixel is therefore about that much warmer."""
+    d = _ts(date if date is not None else dh.today())
+    lat, lon = round(float(lat), 4), round(float(lon), 4)
+    out = {"value": None, "unit": "°C", "label": "Sea surface temperature (satellite L4, as in the temperature card)",
+           "dataset": None, "date": None, "origin": "satellite", "note": ""}
+    try:
+        s = _series("sst", lat, lon, d)
+    except Exception as e:  # noqa: BLE001
+        out["note"] = f"No satellite SST: {type(e).__name__}: {str(e)[:200]}"
+        return out
+    v, vd = dh.value_on(s["sst"].asfreq("D").interpolate(limit=2), d, 3)
+    ds = s.attrs.get("datasets") or [{}]
+    out["dataset"] = ", ".join(str(x.get("dataset")) for x in ds if x.get("dataset")) or s.attrs.get("label")
+    roles = [x.get("role") for x in ds if x.get("role")]
+    out["note"] = (f"{'/'.join(roles) + '; ' if roles else ''}NRT values lowered by {dh.SST_NRT_MINUS_REP} °C "
+                   "(NRT minus REP offset)" if "NRT" in roles else "/".join(roles))
+    if v is None:
+        out["note"] = "No satellite SST in the 3 days up to this date."
+        return out
+    out.update(value=_r(v, 2), date=str(vd.date()))
+    return out
 
 
 def _as_geom(z):
