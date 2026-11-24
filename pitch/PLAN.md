@@ -14,9 +14,9 @@ Innovation in one sentence (said at the start and at the end): *A map-first view
 
 | Time | Step (organisers' sheet) | Speaker | Key message | Scoring criteria hit |
 |---|---|---|---|---|
-| 0:00-0:15 | Title | Andrei | The innovation sentence above. | Presentation (5) |
-| 0:15-1:00 | 1. Problem definition | Andrei | The five sectors interact and all depend on the same water (Kumu diagram). Their pressures and natural change (upwelling, the Danube, storms) move the same parameters. The problem: telling natural change from pressure, at a place and a date, from scattered data of uneven trust. | Impact (20) |
-| 1:00-1:45 | 2. Relevance for the five sectors | Andrei | Where the sectors overlap: a plain count (0-5), tourism only in summer. What each sector gets from the tool, in one line each. | Integration across sectors (15) |
+| 0:00-0:15 | Title | Teammate (third member) | The innovation sentence above. | Presentation (5) |
+| 0:15-1:00 | 1. Problem definition | Teammate | The five sectors interact and all depend on the same water (Kumu diagram). Their pressures and natural change (upwelling, the Danube, storms) move the same parameters. The problem: telling natural change from pressure, at a place and a date, from scattered data of uneven trust. | Impact (20) |
+| 1:00-1:45 | 2. Relevance for the five sectors | Teammate | Where the sectors overlap: a plain count (0-5), tourism only in summer. What each sector gets from the tool, in one line each. | Integration across sectors (15) |
 | 1:45-2:30 | 3. Monitoring architecture | Joseph | Observation technologies, parameters and data flows: buoys, bottles, satellite, Copernicus models and sector layers feed one QC'd, cached data hub. | Technical monitoring logic (20) |
 | 2:30-3:15 | 4. Data processing methodology | Joseph | Integration, QC, indicators against reference conditions, then the natural-or-pressure rule chain, ending in an "investigate" action and who acts. | Technical logic (20), Data to decisions (15) |
 | 3:15-5:15 | 5. Prototype (live demo) | Andrei | One tool, four users: the same coast reads differently for the public, a sector manager and a researcher. | Ease of use (10), Feasibility (15) |
@@ -24,7 +24,7 @@ Innovation in one sentence (said at the start and at the end): *A map-first view
 | 6:00-6:50 | 7. Impact and implementation roadmap | Andrei (users, benefits), Joseph (pilot requirements) | Users and environmental benefits; a 3-month pilot with NIMRD; the ranked list of what to measure next, most of it low cost. | Impact (20), Feasibility (15) |
 | 6:50-7:00 | Close | Andrei | The innovation sentence again, and thank you. | Presentation (5) |
 
-Speaker order: Andrei (1-2), Joseph (3-4), Andrei (5), Joseph (6), Andrei and Joseph (7). Each names the other at the hand-over, which shows the teamwork.
+Speaker order: teammate (title, 1-2), Joseph (3-4), Andrei (5), Joseph (6), Andrei and Joseph (7), Andrei (close). Three voices, each on the part they built; each names the next speaker at the hand-over, which shows the teamwork. The teammate prepared the sector work and is styling the PowerPoint, so her deck is the master file: slides 4-9 are built in her template.
 
 **5-minute cut:** step 1 to 30 s (Kumu diagram and one sentence), steps 3 and 4 merged into one 1:00 slide, demo 1:30, step 6 to 30 s, step 7 to 40 s.
 
@@ -106,7 +106,7 @@ Hard questions to expect: "Is the +0.56 °C per decade significant?" Yes for the
 | Time | Task | Owner | Matters for the pitch? |
 |---|---|---|---|
 | 09:45 | Approve this plan; decide slide tool, speaker split, live or recorded demo | Andrei | yes |
-| 09:45 | Export the Kumu diagram from the existing PowerPoint as a PNG (full slide, high resolution) and put it in `pitch/assets/kumu_sectors.png` | Andrei or Joseph (whoever has the file) | yes |
+| 09:50 | Get the teammate's current .pptx (unfinished is fine) into `pitch/`, so slides 4-9 use her template; agree that she owns slides 1-3 and the rest are added after them. Also ask her whether her sector slide already has a map, or should use the QGIS overlap map | Andrei asks the teammate | yes |
 | 09:45 | Ask the organisers: pitch length, Q&A length, own laptop or theirs, HDMI or USB-C | Joseph | yes |
 | 09:50-10:25 | Build the slides (9 + backup) from this outline | Claude session, Andrei reviews | yes |
 | 09:50 | Export the QGIS summer/winter map (or reuse `docs/pressure_zones_map.png`) | coordinator (QGIS MCP) | yes |
@@ -118,8 +118,8 @@ Hard questions to expect: "Is the +0.56 °C per decade significant?" Yes for the
 | 10:25 | Record the 2:00 demo screen recording (QuickTime, no sound), save to the desktop and to a USB stick or Joseph's laptop | Andrei | yes |
 | 10:30 | Laptop setup: projector test, mirror display, browser zoom so the panel fits, Do Not Disturb on, close other apps, power cable in | Andrei | yes |
 | 10:30 | Default demo state: dark, Overview, Constanța, Public profile; one tab per page pre-opened | Andrei | yes |
-| 10:35 | Rehearse once with a timer; cut if over 7:00 | both | yes |
-| 10:50 | Second rehearsal of hand-overs and the first 30 s only | both | yes |
+| 10:35 | Rehearse once with a timer, all three speakers; cut if over 7:00 | all three | yes |
+| 10:50 | Second rehearsal of the two hand-overs (teammate to Joseph, Joseph to Andrei) and the first 30 s | all three | yes |
 | 10:55 | Slides open in presenter view; viewer tab one click away; recording ready | Andrei | yes |
 
 Open items from HANDOVER and whether they matter today:
@@ -154,6 +154,6 @@ What Joseph must bring: his laptop with the repo and cache as a second demo mach
 ## Decisions for Andrei
 
 1. Slide tool: since the Kumu diagram already lives in a PowerPoint, (a) build the deck as a .pptx and paste the Kumu slide in as slide 2 (recommended, one file, presenter view, works offline), or (b) a slide-deck artifact in the browser with the Kumu diagram as an image and a PDF export as backup. Either way, send the .pptx (or a PNG of the Kumu slide) so it can go in `pitch/assets/`.
-2. Speaker split as above: Andrei steps 1, 2, 5 and the close; Joseph steps 3, 4, 6 and the pilot requirements in step 7.
+2. Speaker split as above: teammate title and steps 1-2; Joseph steps 3, 4, 6 and the pilot requirements in step 7; Andrei step 5 (demo), users and benefits in step 7, and the close.
 3. Demo: live with the recording as fallback (recommended), or the recording only.
 4. Include the EN/RO switch in the demo only if it is merged and tested by 10:15?
