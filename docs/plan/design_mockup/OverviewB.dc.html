@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Overview, direction B</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#06131D}
+a{color:#4CC3E6}a:hover{color:#8ADBF2}
+</style>
+</helmet>
+<div style="height: 900px; display: flex; font-family: 'Barlow', system-ui, sans-serif; color: #E6EEF3; background: #06131D; font-variant-numeric: tabular-nums; overflow: hidden">
+
+  <nav aria-label="Pages" style="width: 72px; flex: 0 0 72px; background: #0A1B27; border-right: 1px solid #1E3646; display: flex; flex-direction: column; align-items: stretch; padding-top: 10px; gap: 2px">
+    <div style="height: 52px; display: flex; align-items: center; justify-content: center">
+      <svg width="30" height="30" viewBox="0 0 28 28" role="img" aria-label="Black Sea Health"><circle cx="14" cy="14" r="12.5" fill="none" stroke="#4CC3E6" stroke-width="1.5"></circle><path d="M4 16 C8 12 11 20 15 16 S22 12 24 15" fill="none" stroke="#4CC3E6" stroke-width="2"></path></svg>
+    </div>
+    <a href="OverviewB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #E6EEF3; background: #13293A; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 5 L8 3 L14 5 L20 3 V17 L14 19 L8 17 L2 19 Z M8 3 V17 M14 5 V19" fill="none" stroke="#4CC3E6" stroke-width="1.6"></path></svg>Overview</a>
+    <a href="WaterB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M11 2 C11 2 4 10 4 14 A7 7 0 0 0 18 14 C18 10 11 2 11 2 Z" fill="none" stroke="#8FA7B6" stroke-width="1.6"></path></svg>Water</a>
+    <a href="SeabedB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M2 8 C5 5 8 11 11 8 S17 5 20 8 M2 13 C5 10 8 16 11 13 S17 10 20 13 M2 19 L8 16 L14 18 L20 15" fill="none" stroke="#8FA7B6" stroke-width="1.6"></path></svg>Seabed</a>
+    <a href="PressuresB.dc.html" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="3" width="10" height="10" fill="none" stroke="#8FA7B6" stroke-width="1.6"></rect><rect x="9" y="9" width="10" height="10" fill="none" stroke="#8FA7B6" stroke-width="1.6"></rect></svg>Pressures</a>
+    <a href="#" style="height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; text-decoration: none; color: #8FA7B6; font-size: 10.5px; letter-spacing: 0.4px">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4 H18 M4 9 H18 M4 14 H13 M4 19 H10" fill="none" stroke="#8FA7B6" stroke-width="1.6"></path></svg>Methods</a>
+  </nav>
+
+  <main style="position: relative; flex: 1 1 auto; min-width: 0; background: #0E3045">
+    <svg role="img" aria-label="Dark map of the Romanian Black Sea coast with sea temperature and hatched pressure overlap" width="100%" height="100%" viewBox="-120 150 1000 860" preserveAspectRatio="xMidYMid slice" style="position: absolute; inset: 0; display: block">
+      <defs>
+        <linearGradient id="bsst" x1="0" y1="0" x2="1" y2="0.2">
+          <stop offset="0" stop-color="#3B528B"></stop>
+          <stop offset="0.35" stop-color="#21918C"></stop>
+          <stop offset="0.7" stop-color="#5EC962"></stop>
+          <stop offset="1" stop-color="#FDE725"></stop>
+        </linearGradient>
+        <pattern id="bh3" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#F07B3F" stroke-width="2.4"></line></pattern>
+        <pattern id="bh2" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#F2B134" stroke-width="1.6"></line></pattern>
+      </defs>
+      <path d="M760,40 L800,250 L700,400 L560,520 L420,640 L360,800 L330,1026 L1200,1026 L1200,0 Z" fill="#0A2536"></path>
+      <path d="M980,0 L1000,300 L900,560 L760,800 L700,1026 L1200,1026 L1200,0 Z" fill="#071C2A"></path>
+      <rect x="-300" y="0" width="1500" height="1100" fill="url(#bsst)" opacity="0.38"></rect>
+      <g stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="1">
+        <line x1="-300" y1="275" x2="1200" y2="275"></line><line x1="-300" y1="545" x2="1200" y2="545"></line><line x1="-300" y1="815" x2="1200" y2="815"></line>
+        <line x1="308" y1="0" x2="308" y2="1100"></line><line x1="500" y1="0" x2="500" y2="1100"></line><line x1="693" y1="0" x2="693" y2="1100"></line>
+      </g>
+      <g font-family="Barlow Condensed" font-size="12" fill="#8FA7B6" fill-opacity="0.8">
+        <text x="840" y="270" text-anchor="end">45.0° N</text><text x="840" y="540" text-anchor="end">44.5° N</text><text x="840" y="810" text-anchor="end">44.0° N</text>
+        <text x="314" y="1000">29.0° E</text><text x="506" y="1000">29.5° E</text><text x="699" y="1000">30.0° E</text>
+      </g>
+      <path d="M600,60 L640,180 L600,330 L470,420 L330,520 L230,640 L215,760 L205,900 L190,1026" fill="none" stroke="#9FD3E8" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 5"></path>
+      <path d="M-300,0 L560,0 L577,27 L608,135 L589,184 L570,243 L547,329 L423,378 L308,437 L250,529 L185,626 L166,675 L180,712 L192,722 L177,730 L173,778 L166,837 L150,913 L146,945 L146,1026 L-300,1026 Z" fill="#16242D" stroke="#4A6676" stroke-width="1.2"></path>
+      <path d="M290,440 L330,360 L400,310 L470,315 L430,360 L340,415 Z" fill="#0E3045" stroke="#4A6676" stroke-width="0.8"></path>
+      <path d="M-300,150 C0,120 200,175 380,152 S520,170 589,184" fill="none" stroke="#2F6A86" stroke-width="2"></path>
+      <path d="M190,610 L238,598 L248,650 L200,662 Z" fill="url(#bh2)" stroke="#F2B134" stroke-width="1.4"></path>
+      <path d="M186,688 L242,678 L254,742 L204,762 L188,738 Z" fill="url(#bh3)" stroke="#F07B3F" stroke-width="2.2"></path>
+      <path d="M154,893 L198,888 L203,936 L157,942 Z" fill="url(#bh2)" stroke="#F2B134" stroke-width="1.4"></path>
+      <circle cx="330" cy="610" r="4.5" fill="#4CC3E6"></circle>
+      <circle cx="232" cy="705" r="4.5" fill="#4CC3E6"></circle>
+      <circle cx="205" cy="860" r="4.5" fill="#6E8392"></circle>
+      <circle cx="222" cy="718" r="12" fill="none" stroke="#FFFFFF" stroke-width="2"></circle>
+      <circle cx="222" cy="718" r="3" fill="#FFFFFF"></circle>
+      <g font-family="Barlow" font-size="13" fill="#C9D7E0">
+        <text x="120" y="722" text-anchor="end" font-weight="600" fill="#FFFFFF">Constanța</text>
+        <text x="120" y="640" text-anchor="end">Midia</text>
+        <text x="125" y="920" text-anchor="end">Mangalia</text>
+        <text x="500" y="320" text-anchor="end">Danube Delta</text>
+      </g>
+    </svg>
+
+    <div style="position: absolute; left: 16px; top: 16px; display: flex; flex-direction: column; gap: 8px; width: min(360px, calc(100% - 32px))">
+      <label for="b-search" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search a place</label>
+      <input id="b-search" type="search" placeholder="Search a beach, port or station" style="font: inherit; font-size: 14px; height: 44px; padding: 0 14px; background: rgba(10,27,39,0.88); color: #E6EEF3; border: 1px solid #2A4558; border-radius: 4px">
+      <div role="group" aria-label="Map layer" style="display: flex; background: rgba(10,27,39,0.88); border: 1px solid #2A4558; border-radius: 4px">
+        <button type="button" aria-pressed="true" style="font: inherit; font-size: 13px; flex: 1 1 auto; height: 40px; border: 0; border-right: 1px solid #2A4558; background: #13293A; color: #FFFFFF; cursor: pointer">Temperature</button>
+        <button type="button" aria-pressed="false" style="font: inherit; font-size: 13px; flex: 1 1 auto; height: 40px; border: 0; border-right: 1px solid #2A4558; background: transparent; color: #8FA7B6; cursor: pointer">Algae</button>
+        <button type="button" aria-pressed="false" style="font: inherit; font-size: 13px; flex: 1 1 auto; height: 40px; border: 0; border-right: 1px solid #2A4558; background: transparent; color: #8FA7B6; cursor: pointer">Oxygen</button>
+        <button type="button" aria-pressed="true" style="font: inherit; font-size: 13px; flex: 1 1 auto; height: 40px; border: 0; background: transparent; color: #F2B134; cursor: pointer">Overlap</button>
+      </div>
+    </div>
+
+    <div style="position: absolute; right: 16px; top: 16px; display: flex; flex-direction: column; gap: 6px">
+      <button type="button" onClick="{{toggleFull}}" aria-label="{{fullLabel}}" style="width: 44px; height: 44px; border: 1px solid #2A4558; border-radius: 4px; background: rgba(10,27,39,0.88); display: flex; align-items: center; justify-content: center; cursor: pointer">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 7 V2 H7 M11 2 H16 V7 M16 11 V16 H11 M7 16 H2 V11" fill="none" stroke="#E6EEF3" stroke-width="1.6"></path></svg>
+      </button>
+      <button type="button" aria-label="Zoom in" style="width: 44px; height: 44px; border: 1px solid #2A4558; border-radius: 4px; background: rgba(10,27,39,0.88); color: #E6EEF3; font-size: 20px; cursor: pointer">+</button>
+      <button type="button" aria-label="Zoom out" style="width: 44px; height: 44px; border: 1px solid #2A4558; border-radius: 4px; background: rgba(10,27,39,0.88); color: #E6EEF3; font-size: 20px; cursor: pointer">−</button>
+    </div>
+
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 0 16px 10px; gap: 12px; flex-wrap: wrap">
+        <div style="display: flex; flex-direction: column; gap: 3px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: #8FA7B6">
+          <span style="width: 96px; height: 4px; border: 1px solid #8FA7B6; border-top: 0"></span>
+          <span>20 km</span>
+        </div>
+        <sc-if value="{{legendOpen}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; gap: 20px; align-items: flex-end; background: rgba(10,27,39,0.88); border: 1px solid #2A4558; border-radius: 4px; padding: 8px 12px">
+            <div style="display: flex; flex-direction: column; gap: 4px; width: 200px">
+              <span style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #8FA7B6">Sea temperature °C · satellite</span>
+              <span style="height: 6px; background: linear-gradient(90deg, #3B528B, #21918C, #5EC962, #FDE725)"></span>
+              <span style="display: flex; justify-content: space-between; font-family: 'Barlow Condensed', sans-serif; font-size: 13px"><span>12.7</span><span>13.4</span><span>14.1</span></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <span style="font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #8FA7B6">Sectors overlapping, of 5</span>
+              <div style="display: flex; gap: 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; align-items: center">
+                <span style="width: 22px; height: 12px; border: 1px solid #C9A227"></span><span style="margin-right: 4px">1</span>
+                <span style="width: 22px; height: 12px; border: 1.5px solid #F2B134; background: repeating-linear-gradient(-45deg, #F2B134 0 1.5px, transparent 1.5px 6px)"></span><span style="margin-right: 4px">2</span>
+                <span style="width: 22px; height: 12px; border: 2px solid #F07B3F; background: repeating-linear-gradient(-45deg, #F07B3F 0 2px, transparent 2px 5px)"></span><span>3+</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="height: 64px; background: rgba(6,19,29,0.94); border-top: 1px solid #1E3646; display: flex; align-items: center; gap: 14px; padding: 0 16px">
+        <button type="button" aria-label="Play the last 7 days" style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; border: 1px solid #4CC3E6; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2 L12 7 L3 12 Z" fill="#4CC3E6"></path></svg>
+        </button>
+        <div style="flex: 1 1 auto; min-width: 0; position: relative; height: 40px">
+          <div style="position: absolute; left: 0; right: 0; top: 18px; height: 2px; background: #1E3646"></div>
+          <div style="position: absolute; left: 58%; right: 0; top: 14px; height: 10px; background: repeating-linear-gradient(-45deg, #2A4558 0 1px, transparent 1px 5px)"></div>
+          <div style="position: absolute; left: 58%; top: 6px; width: 2px; height: 26px; background: #4CC3E6"></div>
+          <div style="display: flex; justify-content: space-between; position: absolute; left: 0; right: 0; top: 26px; font-family: 'Barlow Condensed', sans-serif; font-size: 12.5px; color: #8FA7B6">
+            <span>17 Nov</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span style="color: #FFFFFF; font-weight: 600">23 Nov today</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28 forecast</span>
+          </div>
+        </div>
+        <button type="button" onClick="{{toggleLegend}}" aria-expanded="{{legendOpenStr}}" style="font: inherit; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; height: 40px; padding: 0 12px; border: 1px solid #2A4558; border-radius: 4px; background: transparent; color: #C9D7E0; cursor: pointer">{{legendLabel}}</button>
+      </div>
+    </div>
+  </main>
+
+  <sc-if value="{{showPanel}}" hint-placeholder-val="{{ true }}">
+    <aside aria-label="Selected place" style="width: 400px; flex: 0 0 400px; background: #0C1F2C; border-left: 1px solid #1E3646; display: flex; flex-direction: column; overflow-y: auto">
+      <div role="tablist" aria-label="Viewing as" style="display: flex; border-bottom: 1px solid #1E3646; padding: 0 8px">
+        <sc-for list="{{profiles}}" as="p" hint-placeholder-count="4">
+          <button type="button" role="tab" onClick="{{p.pick}}" style="{{p.style}}">{{p.label}}</button>
+        </sc-for>
+      </div>
+      <div style="padding: 20px 22px 16px; border-bottom: 1px solid #1E3646; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: #8FA7B6">44.170 N · 28.720 E · {{overlapLine}}</span>
+        <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 500; line-height: 1; letter-spacing: 0.2px">Constanța offshore</h1>
+        <p style="margin: 4px 0 0; font-size: 16px; line-height: 1.4; color: #E6EEF3">{{verdict}}</p>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.45; color: #A9BDCA">{{verdictSub}}</p>
+        <div style="display: flex; gap: 18px; margin-top: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; letter-spacing: 0.6px; text-transform: uppercase">
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; background: #2BB38A"></span>7 normal</span>
+          <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; background: #F2B134"></span>2 watch</span>
+          <span style="display: flex; align-items: center; gap: 6px; color: #8FA7B6"><span style="width: 8px; height: 8px; background: #F07B3F"></span>0 alert</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <sc-for list="{{tiles}}" as="t" hint-placeholder-count="9">
+          <div style="border-bottom: 1px solid #16303F; background: {{t.rowBg}}">
+            <button type="button" onClick="{{t.toggle}}" aria-expanded="{{t.expanded}}" style="font: inherit; color: inherit; text-align: left; width: 100%; border: 0; background: transparent; cursor: pointer; display: grid; grid-template-columns: 8px minmax(0, 1fr) auto 12px; column-gap: 12px; row-gap: 2px; align-items: baseline; padding: 12px 18px 12px 22px">
+              <span style="width: 8px; height: 8px; background: {{t.color}}"></span>
+              <span style="font-size: 14.5px; font-weight: 500">{{t.title}}</span>
+              <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 500; white-space: nowrap">{{t.value}}</span>
+              <span style="font-size: 12px; color: #8FA7B6">{{t.chev}}</span>
+              <span></span>
+              <span style="font-size: 12.5px; color: #A9BDCA; line-height: 1.35">{{t.line}}</span>
+              <span style="font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: #8FA7B6; text-align: right">{{t.origin}}</span>
+              <span></span>
+            </button>
+            <sc-if value="{{t.open}}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 0 22px 14px 42px; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; line-height: 1.45">
+                <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 10px; color: #C9D7E0">
+                  <span style="font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: #8FA7B6; padding-top: 2px">Means</span><span>{{t.meaning}}</span>
+                  <span style="font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; color: #8FA7B6; padding-top: 2px">Source</span><span>{{t.source}}</span>
+                </div>
+                <a href="WaterB.dc.html" style="font-size: 12.5px; text-decoration: none">Open the 60-day chart →</a>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="padding: 16px 22px 22px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center">
+        <a href="WaterB.dc.html" style="font-size: 14px; font-weight: 600; text-decoration: none">Water quality analysis →</a>
+        <span style="font-size: 11.5px; color: #8FA7B6">vs. usual for late November</span>
+      </div>
+    </aside>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { profile: 'public', legendOpen: true, full: false, open: 1 };
+  }
+  renderVals() {
+    const S = { normal: '#2BB38A', watch: '#F2B134', alert: '#F07B3F', none: '#6E8392' };
+    const P = this.state.profile;
+    const rows = [
+      ['Water temperature', '13.4 °C', 'satellite', 'normal', '1.8 °C warmer than usual, still normal', 'Anomaly +1.8 °C vs 1991-2020, inside the usual 9.7-13.5 °C', 'No effect on port operations', 'z +1.1 · CMEMS SST L4 · 1.1 km'],
+      ['Oxygen near the seabed', '3.59 mg/L', 'model', 'watch', 'Low near the seabed. Estimate from a model', 'Below the 5 mg/L stress level for sea life; model only', 'Dredging stirs mud and can lower it further: check first', 'BS-BGC bottom O2 · low confidence · 0.7 km'],
+      ['Algae and blooms', '1.61 mg/m³', 'satellite', 'normal', 'Less algae than usual this week', 'Chlorophyll-a 1.61, usual 2.46 mg/m³ (1998-2020)', 'No bloom near the port approaches', 'OC L4 gap-free 1 km · log-space climatology'],
+      ['Water clarity', '2.5 m', 'satellite', 'normal', 'You can see about 2.5 m down', 'Light depth from Kd490; usual 2.3 m', 'Normal; dredging plumes would show here', 'Kd490 · usual 1.0-4.6 m · 0.0 km'],
+      ['Nutrients (past samples)', '9.8 µmol/L', 'measured', 'normal', 'Below the official limit in past samples', 'Dissolved nitrogen 9.8 vs 10.5 µmol/L, 2020 window', 'Within limits; discharges add to this', 'EMODnet DIVAnd 6-yr window · OFFICIAL-RO'],
+      ['Bathing water', 'Excellent', 'measured', 'normal', 'Nearest beach rated Excellent (2024)', 'EU Bathing Water Directive class, 2024 season', 'Constanța II Modern, 5 km away', 'RO2230009006580002 · 2024'],
+      ['Sea life records', '6 species', 'measured', 'normal', 'Introduced species such as the rapa whelk seen here', '6 species recorded since 2015 in this box', 'Ballast water brings new species: worth reporting', 'EMODnet Biology · box ±0.15° lat'],
+      ['Danube flow', '57 %', 'model', 'watch', 'The Danube carries less water than usual', 'Low river flow: saltier and clearer water here', 'Low flow: natural, not a pressure from the port', 'GloFAS v4 at the delta apex · rule chain: natural'],
+      ['Acidity (pH)', '8.20', 'model', 'normal', 'Normal. Estimate from a model', 'pH 8.20, usual 8.18-8.45', 'Normal', 'BS-BGC surface pH · watch only']
+    ];
+    const col = { public: 4, student: 5, stakeholder: 6, researcher: 7 }[P];
+    const tiles = rows.map((r, i) => {
+      const open = this.state.open === i;
+      return {
+        title: r[0], value: r[1], origin: r[2], color: S[r[3]], line: r[col],
+        meaning: P === 'student' ? r[6] : r[5], source: r[7],
+        open, expanded: open ? 'true' : 'false', chev: open ? '▾' : '▸',
+        rowBg: open ? '#102838' : 'transparent',
+        toggle: () => this.setState({ open: open ? -1 : i })
+      };
+    });
+    const V = {
+      public: ['Mostly normal today. Two things to keep an eye on.', 'Low oxygen near the seabed and a weak Danube flow. Neither is an alarm.'],
+      student: ['7 of 9 health signs are normal for late November.', 'Amber means outside the usual seasonal range or close to a limit. Each line says how the value is measured.'],
+      stakeholder: ['3 of 5 sectors share this water: ports, shipyards, fishing.', 'Two signs to watch before dredging or discharges.'],
+      researcher: ['9 cards: 7 normal, 2 watch.', 'Natural-vs-pressure rule chain applied. Coastal buoys EUXRoCB0x excluded (no QC). Model nitrate and phosphate not used.']
+    }[P];
+    const labels = { public: 'Public', student: 'Student', stakeholder: 'Sector', researcher: 'Research' };
+    const profiles = Object.keys(labels).map(k => ({
+      label: labels[k],
+      pick: () => this.setState({ profile: k }),
+      style: 'font: inherit; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; flex: 1 1 0; height: 48px; border: 0; background: transparent; cursor: pointer; ' +
+        (k === P ? 'color: #FFFFFF; font-weight: 600; box-shadow: inset 0 -2px 0 #4CC3E6' : 'color: #8FA7B6')
+    }));
+    return {
+      profiles, tiles,
+      verdict: V[0], verdictSub: V[1],
+      overlapLine: P === 'stakeholder' ? '3 of 5 sectors' : '1 of 5 sectors',
+      showPanel: !this.state.full,
+      legendOpen: this.state.legendOpen,
+      legendOpenStr: this.state.legendOpen ? 'true' : 'false',
+      legendLabel: this.state.legendOpen ? 'Hide legend' : 'Legend',
+      toggleLegend: () => this.setState({ legendOpen: !this.state.legendOpen }),
+      toggleFull: () => this.setState({ full: !this.state.full }),
+      fullLabel: this.state.full ? 'Show the side panel' : 'Full-screen map'
+    };
+  }
+}
+</script>
+</body>
+</html>
