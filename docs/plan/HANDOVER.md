@@ -4,6 +4,14 @@ For a fresh Claude session taking over as coordinator. Read this, then `CLAUDE.m
 
 Last update: 23 Nov 2026, late evening (Day 1 of the hackathon), second coordinator. Pitch: Day 2 (24 Nov), 11:00, in Constanța.
 
+## Update 24 Nov, 10:15 (third coordinator): read this first
+- **Viewer frozen for the pitch** at 925b32e (local tag `pitch-demo`); the server on 8502 runs that code. Don't edit `src/viewer/` or restart 8502 until after the pitch.
+- Done since the sections below: direction B rebuild merged into `main` (pull request 1). On `design` since then: aligned rows, resizable and foldable panels, Copernicus tiles clamped to the latest published day, soft-edged pressure map (Edges: Soft / Sharp, default Sharp, `?edges=soft`), and EN / RO (`?lang=ro`).
+- Joseph's data work (validation, spectra, seasonal gate, trust flags, Methods content) is merged into `main` (pull request 3, 17ee449). By Andrei's decision it is used **in the pitch slides only** for now; it is not wired into the viewer.
+- Pitch: `pitch/PLAN.md` and the 11-slide `pitch/efxinnos_pitch.pptx` (third teammate's deck is the master file). Speakers: teammate (title, problem, sectors), Joseph (architecture, methods, validation), Andrei (demo, impact, close).
+- **First task after the pitch: wiring.** Merge `main` into `design`, then: Overview summary SST from `indicators.sst_display`; shipping-lane hover from `buffer_label`; Water page Sources from `marinekit.validation.source_summary`, usual range and trend from `marinekit.seasonal` (show the result only when `show` is true, otherwise `gate_reason`); untrusted sensors greyed via `datahub.variable_trust`; Methods page from `marinekit.methods`. Details in the pull request 3 description.
+- Romanian for data-side texts: the list and a proposed `lang="en"` argument for `card()` / `zone_cards()` are in the coordinator's notes folder (`ro_data_side_strings.md`); pass it to Joseph.
+
 ## The user and how they work
 - Andrei: GIS background, owns the **design** of the app (`design` branch). Colleague **Joseph (josephfournier0212)** owns data analysis (`data` branch). He has accepted the repo invite and cloned it, but has **pushed nothing yet** (as of 23 Nov late evening `data` = `main` = 10d31db, no pull requests). Check `git log main..origin/data` before touching anything near his area.
 - Wants Claude as **coordinator**: plan, delegate self-contained work to sub-sessions, verify results yourself, report briefly.
