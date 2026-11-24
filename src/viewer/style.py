@@ -356,7 +356,7 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{background:{t['panel']};
 .bsv-det1 {{display:flex; flex-direction:column; gap:6px; font-size:12.5px; line-height:1.45; color:{t['soft']};}}
 .bsv-det1 .bsv-lbl {{font-size:10.5px; margin-right:4px;}}
 /* bottom timeline */
-.st-key-timeline {{height:64px; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
+.st-key-timeline {{height:64px !important; min-height:64px; flex:0 0 64px !important; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
   flex-wrap:nowrap !important;}}
 .st-key-tl_track {{flex:1 1 auto; min-width:0; gap:0 !important; position:relative;}}
 .st-key-tl_track [data-testid="stSlider"] {{padding:0 6px; margin-top:-6px;}}
