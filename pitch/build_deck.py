@@ -125,9 +125,9 @@ def slide_pressure(prs):
     s = prs.slides.add_slide(blank_layout(prs))
     title(s, "PRESSURE MAP", "WHERE THE FIVE SECTORS MEET",
           "Step 2  |  Number of sectors present in each 250 m cell (0-5)")
-    picture_fit(s, A / "pressure_zones_map.png", 0.3, 1.45, 9.0, 5.6)
-    text(s, 0.3, 7.0, 9.0, 0.35, "a) summer (tourism on, 1 Jun - 15 Sep)   b) winter   c) Constanța to Vama Veche, "
-         "with point features. Hollow points are assumed locations.", size=11, color=MUTED)
+    picture_fit(s, A / "pressure_soft_map.png", 0.3, 1.45, 9.2, 5.5)
+    text(s, 0.3, 7.0, 9.0, 0.35, "Soft edges: zone limits are approximate, so they fade over 1-3 km. Inside the zones the "
+         "colour is the exact count. Lines mark 1, 2 and 3 sectors.", size=11, color=MUTED)
     x = 9.75
     stats = [("330", "features mapped in 5 sectors, each with a confidence: official, mapped or assumed"),
              ("76  to  2", "cells with 4 sectors, summer to winter: tourism drives the summer overlap"),
