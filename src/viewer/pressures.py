@@ -123,8 +123,10 @@ def page():
                                      required=True, label_visibility="collapsed")
             pts = [(s["lat"], s["lon"]) for s in sites] + [(44.34, 28.68), (43.79, 28.58)]
             view = SC.fit_view(pts, width_px=900, height_px=760)
+            notes = (["Tourism zones are switched off outside the bathing season (1 June - 15 September)."]
+                     if sector == "tourism" and season == "winter" else [])
             m, _, msgs = M.build(view, {"overlap", "zones", "features"}, day_s, season, None, detail,
-                                 only_sector=sector, theme=theme_name())
+                                 only_sector=sector, theme=theme_name(), notes=notes)
             t = tokens()
             for i, s in enumerate(sites):
                 folium.CircleMarker([s["lat"], s["lon"]], radius=8, color=t["text"], weight=2, fill=True,
@@ -135,13 +137,9 @@ def page():
                          f"{i + 1}</div>")).add_to(m)
             st_folium(m, height=720, use_container_width=True, returned_objects=[],
                       key=f"pmap_{sector}_{season}_{theme_name()}")
-            notes = list(msgs)
-            if sector == "tourism" and season == "winter":
-                notes.insert(0, "Tourism zones are switched off outside the bathing season (1 June - 15 September).")
-            if notes:
-                with st.container(key="map_msgs"):
-                    for n in notes:
-                        st.caption(n)
+            if msgs:  # only when the map has no legend to hold them
+                with st.container(key="map_tools_note"):
+                    M.notes_slot(st.empty(), msgs)
     with right:
         with st.container(key="bsv_panel"):
             sname = "summer, tourism on (1 Jun - 15 Sep)" if season == "summer" else "winter, tourism off"

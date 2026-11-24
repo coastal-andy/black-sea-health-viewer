@@ -71,6 +71,7 @@ def overview():
                 with st.popover("Map layers and season", width="stretch"):
                     _layer_controls(profile)
                     SH.season_control()
+                note_slot = st.empty()  # map notes without a legend to go in (rare): a short line here
             only = profile.get("sector") if (profile.get("sector") and ss.get("w_mysector", True)) else None
             m, fd, msgs = M.build(ss.view, layers, day_s, season, None, detail, tiles_mode=ss.get("w_tiles", False),
                                   only_sector=only, theme=theme_name())
@@ -82,10 +83,7 @@ def overview():
                            ss.get("w_tiles", False), only, ss.view)
             out = st_folium(m, height=700, use_container_width=True, key=mkey,
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
-            if msgs:
-                with st.container(key="map_msgs"):
-                    for msg in msgs:
-                        st.caption(msg)
+            M.notes_slot(note_slot, msgs)
             OV.timeline()
             click = (out or {}).get("last_clicked")
             if click and click != ss.get("last_click"):

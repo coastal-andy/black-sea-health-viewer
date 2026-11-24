@@ -261,6 +261,7 @@ def page():
                 SH.place_picker()
                 st.segmented_control("Field", list(FIELDS), key="w_field", format_func=FIELDS.get, required=True,
                                      label_visibility="collapsed", width="stretch")
+                note_slot = st.empty()
             T = map_time(field, day_s)
             ss["_sea_time"] = str(T)  # the panel reads the same time step
             extra = {"depth": _depth_legend, "wind": lambda mm: _wind_labels(mm, T, msgs_extra, sel)}.get(field)
@@ -273,10 +274,7 @@ def page():
             out = st_folium(m, height=640, use_container_width=True,
                             key=f"seamap_{field}_{T:%Y%m%d%H}_{ss.get('map_nonce', 0)}_{theme_name()}",
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
-            if msgs:
-                with st.container(key="map_msgs"):
-                    for msg in msgs:
-                        st.caption(msg)
+            M.notes_slot(note_slot, msgs)
             depth_panel(sel)
             click = (out or {}).get("last_clicked")
             if click and click != ss.get("last_click"):

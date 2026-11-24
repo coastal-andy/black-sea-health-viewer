@@ -621,6 +621,42 @@ def tile_url(layer: str, day: str) -> str | None:
     return None
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def tile_day(layer: str, day: str) -> str | None:
+    """The day the Copernicus WMTS can draw for `day`: the day itself if published, else the nearest published day
+    (the latest one for today and forecast days). The tile server answers HTTP 400 with no image for a TIME it does
+    not have, so the map stays empty if the request asks for an unpublished day. None if the service is unreachable."""
+    from marinekit.sources import copernicus as cp
+    L = LAYERS[layer]
+    want = pd.Timestamp(day)
+    for key in [L["key"], L.get("fallback_key")]:
+        if not key:
+            continue
+        try:
+            lay = next((l for l in cp.wmts_layers(key) if l["variable"] == L["var"]), None)
+        except Exception as ex:
+            log.info("wmts layers %s: %s", key, ex)
+            continue
+        if lay is None:
+            continue
+        spans = []
+        for v in lay.get("time_values") or []:
+            parts = str(v).split("/")
+            if len(parts) >= 2:
+                spans.append((pd.Timestamp(parts[0]).tz_localize(None).normalize(),
+                              pd.Timestamp(parts[1]).tz_localize(None).normalize()))
+            else:
+                for x in str(v).split(","):
+                    t = pd.Timestamp(x).tz_localize(None).normalize()
+                    spans.append((t, t))
+        if not spans:
+            d = lay.get("time_default")
+            return str(pd.Timestamp(d).tz_localize(None).date()) if d else day
+        best = min((min(max(want, a), b) for a, b in spans), key=lambda t: abs((t - want).days))
+        return str(best.date())
+    return None
+
+
 def tile_url_styled(layer: str, day: str, vmin: float, vmax: float) -> str | None:
     """Copernicus WMTS tiles drawn with the viewer's ramp and range (STYLE=cmap:<name>,range:a/b in the
     product's own units, e.g. kelvin for satellite SST). None if the layer has no WMTS tiles."""

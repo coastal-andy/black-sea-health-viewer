@@ -136,6 +136,11 @@ header[data-testid="stHeader"] {{display:none !important;}}
 .block-container, [data-testid="stMainBlockContainer"] {{padding:0 !important; max-width:none !important;}}
 [data-testid="stElementContainer"]:has(> div > div > style), [data-testid="stElementContainer"]:has(style) {{display:none !important;}}
 [data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"]:has(> [data-testid="stHorizontalBlock"] [class*="st-key-bsv_map"]) {{gap:0;}}
+/* Streamlit pulls every markdown block up by 1rem (to cancel the last paragraph's margin). Our own row and section
+   blocks have no paragraph margin, so without this each row reserves 16 px less than it draws and the highlight of
+   one row spills onto the next. */
+[data-testid="stMarkdownContainer"]:has(> .bsv-vrow, > .bsv-row, > .bsv-site, > .bsv-sec, > .bsv-lbl, > .bsv-sites-head,
+  > .bsv-stats, > .bsv-det, > .bsv-det1, > .bsv-chain, > .bsv-mapnote) {{margin-bottom:0 !important;}}
 
 /* left icon rail (72 px) */
 section[data-testid="stSidebar"] {{width:72px !important; min-width:72px !important; max-width:72px !important;
@@ -194,8 +199,11 @@ div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}
 [class*="st-key-bsv_map"] [data-testid="stElementContainer"] {{margin:0;}}
 .st-key-map_tools {{position:absolute; left:16px; top:16px; z-index:20; width:min(380px, calc(100% - 96px)); gap:8px;
   background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:10px;}}
-.st-key-map_msgs {{position:absolute; left:16px; bottom:16px; z-index:20; max-width:60%;}}
-.st-key-map_msgs p {{background:{t['overlay']}; padding:4px 8px; border:1px solid {t['ctrl']}; border-radius:4px; font-size:12px; color:{t['sub']} !important;}}
+/* map notes without a legend: short lines inside the map-tools box (most notes sit in the map legend) */
+.bsv-mapnote {{font-size:11.5px; line-height:1.35; color:{t['sub']};}}
+.bsv-mapnote > div + div {{margin-top:3px;}}
+.st-key-map_tools_note {{position:absolute; left:16px; top:66px; z-index:20; max-width:min(420px, calc(100% - 96px));
+  background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:6px 10px;}}
 .st-key-page_body {{padding:24px 28px 40px 28px;}}
 /* Overview panel (B1) */
 .st-key-ptabs {{border-bottom:1px solid {t['line']}; padding:0 8px;}}
@@ -315,7 +323,6 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .st-key-map_tools [data-testid="stButtonGroup"] button {{flex:1 1 0; height:38px; padding:0 8px !important;}}
 .st-key-map_tools [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
 .st-key-depthpanel {{background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px 6px 16px; gap:0 !important;}}
-.st-key-bsv_map_po .st-key-map_msgs, .st-key-bsv_map_pc .st-key-map_msgs {{bottom:auto; top:120px;}}
 .st-key-dp_head {{height:56px; gap:16px !important; flex-wrap:nowrap !important;}}
 .st-key-dp_head [data-testid="stMarkdownContainer"] {{display:flex; gap:16px; align-items:baseline;}}
 .bsv-dp-t {{font-size:14px; font-weight:500; color:{t['text']}; white-space:nowrap;}}

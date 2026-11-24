@@ -13,6 +13,8 @@ from viewer import adapters as A
 from viewer.style import FONT_NUM, FONT_UI, OVERLAP, SECTOR, OI, esc, overlap_levels, theme_name, tokens
 
 log = logging.getLogger("viewer")
+# the font stacks without quotes: they go inside style='...' attributes, where a quote would end the attribute
+FONT_UI, FONT_NUM = FONT_UI.replace("'", ""), FONT_NUM.replace("'", "")
 
 ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/{}/MapServer/tile/{{z}}/{{y}}/{{x}}"
 
@@ -56,6 +58,8 @@ def base_map(lat, lon, zoom, theme: str | None = None) -> folium.Map:
     folium.TileLayer(ESRI.format("World_Imagery"), attr="Esri World Imagery", name="Satellite image",
                      max_zoom=16, show=False).add_to(m)
     # fill the iframe height (the viewer sets the iframe to the page height) and theme the Leaflet controls
+    from viewer.style import FONTS_URL
+    m.get_root().header.add_child(folium.Element(f"<link href='{FONTS_URL}' rel='stylesheet'>"))
     m.get_root().header.add_child(folium.Element(
         f"<style>html,body{{background:{t['bg']};}} .folium-map,#map_div{{height:100vh !important;}}"
         f".leaflet-container{{background:{t['bg']};font-family:{FONT_UI};}}"
@@ -109,20 +113,42 @@ FIELD_ALPHA = 0.82  # alpha of the gridded image (adapters.field); the legend ba
 
 def _tiles(m, lay, day, opacity, msgs):
     """Copernicus WMTS tiles. If the grid is in the cache, the tiles get the viewer's ramp and range (and the legend
-    matches); otherwise they keep the service's own colours and the legend says so. Returns a legend dict or None."""
+    matches); otherwise they keep the service's own colours and the legend says so. The tile TIME is the nearest day
+    the service has published (it returns no image for an unpublished day, e.g. today for satellite SST).
+    Returns a legend dict, or None when the service cannot be reached (the caller then draws the local layer)."""
     L = A.LAYERS[lay]
     try:
-        fd = A.timed(A.field, lay, day, timeout=4)
+        tday = A.tile_day(lay, day)
+    except Exception:
+        tday = None
+    if not tday:
+        return None
+    try:
+        fd = A.timed(A.field, lay, day, timeout=1.5)  # never block long: unstyled tiles are fine meanwhile
     except Exception:
         fd = None
-    url = A.tile_url_styled(lay, day, fd["vmin"], fd["vmax"]) if fd else A.tile_url(lay, day)
+    if fd and fd["time"] != tday:  # tiles and legend must show the same day: use the cached grid's day if published
+        tday2 = A.tile_day(lay, fd["time"])
+        tday = tday2 if tday2 == fd["time"] else tday
+        if tday != fd["time"]:
+            fd = None
+    url = A.tile_url_styled(lay, tday, fd["vmin"], fd["vmax"]) if fd else A.tile_url(lay, tday)
     if not url:
-        msgs.append(f"{L['title']}: no map tiles available.")
         return None
-    add_tiles(m, url, L["title"], opacity=opacity)
+    add_tiles(m, url, f"{L['title']} ({tday})", opacity=opacity)
+    if tday != day:
+        msgs.append(day_note(L["title"], day, tday))
     if fd:
         return dict(fd, origin=f"{fd['origin']}, Copernicus map tiles")
-    return dict(title=L["title"], unit=L["unit"], origin=L["origin"], service_colours=True, time=day)
+    return dict(title=L["title"], unit=L["unit"], origin=L["origin"], service_colours=True, time=tday)
+
+
+def day_note(title: str, asked: str, got: str) -> str:
+    """'Sea surface temperature: 24 Nov not published yet, showing 23 Nov.' (or 'nearest day' for the past)."""
+    a, g = pd.Timestamp(asked), pd.Timestamp(got)
+    if g < a:
+        return f"{title}: {a:%d %b} not published yet, showing {g:%d %b}, the latest day."
+    return f"{title}: no data for {a:%d %b}, showing the nearest day, {g:%d %b}."
 
 
 DEPTH_STOPS = [0, 10, 20, 50, 100, 200, 500, 1000, 2000]  # m; the shelf gets most of the ramp, deeper = last colour
@@ -334,9 +360,34 @@ def _fmt(x):
     return f"{x:.2f}" if abs(x) < 1 else (f"{x:.1f}" if abs(x) < 20 else f"{x:.0f}")
 
 
+def _summary(n_notes: int) -> str:
+    """Fold control label; when folded it says how many notes the legend holds, so they are not missed."""
+    extra = f" &middot; {n_notes} note{'s' if n_notes > 1 else ''}" if n_notes else ""
+    return f"<span class='lg-open'>Hide legend</span><span class='lg-closed'>Legend{extra}</span>"
+
+
+def notes_html(notes: list[str] | None) -> str:
+    """Map notes (nearest available day, layer caveats) as small lines at the bottom of the legend."""
+    if not notes:
+        return ""
+    t = tokens()
+    rows = "".join(f"<div style='margin:3px 0 0 0'>{esc(n)}</div>" for n in dict.fromkeys(notes))
+    return (f"<div style='margin-top:8px;padding-top:6px;border-top:1px solid {t['ctrl']};font-size:11px;"
+            f"line-height:1.35;color:{t['sub']}'>{rows}</div>")
+
+
+def notes_slot(slot, msgs: list[str] | None):
+    """Map notes that found no legend: short muted lines in the page's map-tools box (never over the timeline)."""
+    if msgs:
+        slot.markdown("<div class='bsv-mapnote'>" + "".join(f"<div>{esc(x)}</div>" for x in dict.fromkeys(msgs)) +
+                      "</div>", unsafe_allow_html=True)
+
+
 def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels: list | None = None,
-                hatched: bool = False, bar_opacity: float = 1.0) -> str:
-    """Compact themed legend (flat panel, hairline border, 4 px corners), collapsible and height-capped."""
+                hatched: bool = False, bar_opacity: float = 1.0, notes: list[str] | None = None,
+                edges: str = "sharp") -> str:
+    """Compact themed legend (flat panel, hairline border, 4 px corners), collapsible and height-capped.
+    notes: short map notes shown at the bottom (they used to float over the map and the timeline)."""
     t = tokens()
     lab = (f"font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:{t['muted']};"
            "display:block;margin:8px 0 4px 0")
@@ -402,19 +453,25 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
                      "border:1.5px dashed #1B7F3B'></span>Natura 2000 site</div>")
     if not parts:
         return ""
+    notes = list(dict.fromkeys(notes or []))
     return (f"<details open class='bsv-legend' style='position:absolute;bottom:26px;right:10px;z-index:9999;"
             f"background:{t['overlay']};color:{t['text']};padding:6px 12px 8px 12px;border-radius:4px;"
             f"border:1px solid {t['ctrl']};font:12px/1.35 {FONT_UI};max-width:250px'>"
             f"<summary style='cursor:pointer;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;"
-            f"color:{t['muted']}'>{LEGEND_SUMMARY}</summary>"
-            "<div style='max-height:min(46vh,330px);overflow-y:auto'>" + "".join(parts) + "</div></details>")
+            f"color:{t['muted']}'>{_summary(len(notes))}</summary>"
+            "<div style='max-height:min(46vh,330px);overflow-y:auto'>" + "".join(parts) + notes_html(notes) +
+            "</div></details>")
 
 
 def build(view: dict, layers: set, day: str, season: str, sel: dict | None, detail: bool, tiles_mode: bool = False,
           only_sector: str | None = None, theme: str | None = None,
-          legend: bool = True, extra=None, vec_time=None) -> tuple[folium.Map, dict | None, list[str]]:
-    """Return (map, field dict or None, messages). extra(m), if given, adds page-specific layers. vec_time: the time
-    step for the waves / currents / wind layers (default: the day at 00:00)."""
+          legend: bool = True, extra=None, vec_time=None, notes: list[str] | None = None,
+          edges: str = "sharp") -> tuple[folium.Map, dict | None, list[str]]:
+    """Return (map, field dict or None, messages not shown on the map). extra(m), if given, adds page-specific
+    layers. vec_time: the time step for the waves / currents / wind layers (default: the day at 00:00).
+    Map notes (nearest available day, layer caveats, and `notes` from the page) go to the bottom of the legend;
+    the returned messages are the ones that had no legend to go in, for the page to show in its own place.
+    edges: 'sharp' (500 m cells and polygon outlines) or 'soft' (blurred zones, see viewer.softzones)."""
     msgs = []
     m = base_map(view["lat"], view["lon"], view["zoom"], theme)
     stamp = A._zones_stamp()
@@ -426,7 +483,11 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
         grid_op = 0.45 if "overlap" in layers else 0.85
         if tiles_mode:
             lfd = _tiles(m, lay, day, grid_op, msgs)
-        else:
+            if lfd is None:
+                msgs.append("Copernicus map tiles could not be reached; showing the local layer instead.")
+            elif A.LAYERS[lay].get("note"):
+                msgs.append(A.LAYERS[lay]["note"])
+        if not tiles_mode or lfd is None:
             try:
                 fd = A.field(lay, day)
             except A.SlowSource:
@@ -437,8 +498,8 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
             if fd:
                 add_field(m, fd, opacity=grid_op)
                 if fd["time"] != day:
-                    msgs.append(f"{fd['title']}: nearest available day is {fd['time']}.")
-            else:
+                    msgs.append(day_note(fd["title"], day, fd["time"]))
+            elif not tiles_mode:
                 lfd = _tiles(m, lay, day, grid_op, msgs)
                 if lfd is not None:
                     msgs.append(f"{A.LAYERS[lay]['title']}: the grid could not be downloaded, showing Copernicus map tiles "
@@ -478,9 +539,13 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
     add_selection(m, sel)
     if extra is not None:  # page-specific layers go in before the layer control, or folium never adds them
         extra(m)
+    all_notes = list(notes or []) + msgs
     lg = legend_html(fd or lfd, layers, season, detail, levels, hatched=bool(grid),
-                     bar_opacity=FIELD_ALPHA * grid_op) if legend else ""
+                     bar_opacity=FIELD_ALPHA * grid_op, notes=all_notes, edges=edges) if legend else ""
     if lg:
         m.get_root().html.add_child(folium.Element(lg))
+        msgs = []
+    else:
+        msgs = all_notes
     folium.LayerControl(collapsed=True, position="topright").add_to(m)
     return m, fd, msgs
