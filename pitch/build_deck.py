@@ -328,14 +328,16 @@ def slide_validation(prs):
     text(s, 0.35, 5.25, 6.2, 0.4, "Not trusted, shown greyed out", size=15, bold=True)
     text(s, 0.35, 5.65, 6.2, 1.6, [
         "Buoy chlorophyll reads 2-3 times too high",
-        "Offshore buoy salinity: fouled sensor",
+        "Buoy salinity at EUXRoOB01-03: fouled sensor",
         "New coastal buoys EUXRoCB0x: not quality-controlled",
         "Station 15480: on shore, not sea temperature"], size=13)
     text(s, 6.9, 5.25, 6.2, 0.4, "Ecological interpretation", size=15, bold=True)
     text(s, 6.9, 5.65, 6.2, 1.6, [
         "An anomaly is not damage.",
         "Pressure only when the rule chain finds no natural driver.",
-        "Seabed oxygen is model-only: low confidence, said in the app."], size=13)
+        "Seabed oxygen is model-only: low confidence, said in the app.",
+        "Long-term trend: sea temperature +0.56 to +0.57 °C per decade at the 4 buoy sites, 1982-2025 (satellite, 95 % CI 0.45-0.68). "
+        "Shorter records: no trend shown."], size=13)
     notes(s, "Joseph. We checked every source against buoys and bottle samples before trusting it. Satellite sea "
              "temperature is within about half a degree. Salinity from the model is within about 1 PSU at the "
              "coast. Model nitrate and phosphate do not match the bottles, so we never show them as values. "
