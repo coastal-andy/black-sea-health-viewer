@@ -180,7 +180,7 @@ section[data-testid="stSidebar"] div[style*="cursor: col-resize"], section[data-
 /* docked panel on the right */
 [data-testid="stHorizontalBlock"]:has(> div > .st-key-bsv_panel), [data-testid="stHorizontalBlock"]:has([class*="st-key-bsv_map"]) {{flex-wrap:nowrap !important;}}
 div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{min-width:0 !important;}}
-div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{min-width:280px; background:{t['panel']}; border-left:1px solid {t['line']};
+div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{background:{t['panel']}; border-left:1px solid {t['line']};
   height:100vh; overflow-y:auto; position:sticky; top:0;}}
 .st-key-bsv_panel {{padding:0 0 24px 0;}}
 .st-key-bsv_panel > div {{gap:0;}}
@@ -261,7 +261,7 @@ div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}
 .st-key-panel_foot .bsv-note {{font-size:11.5px;}}
 /* Water quality (B2) */
 [data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) {{flex-wrap:nowrap !important;}}
-div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:300px; background:{t['panel']};
+div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{background:{t['panel']};
   border-right:1px solid {t['line']}; height:100vh; overflow-y:auto; position:sticky; top:0;}}
 .st-key-bsv_aside {{gap:0 !important; padding-bottom:24px;}}
 [class*="st-key-vrow_"] {{position:relative; gap:0 !important;}}
@@ -478,12 +478,46 @@ button p {{color:inherit;}}
 .bsv-card .src {{color:{t['muted']}; font-size:11.5px; margin-top:6px; border-top:1px solid {t['line2']}; padding-top:4px;}}
 .bsv-card summary {{cursor:pointer;}}
 .stApp table {{color:{t['text']};}}
+/* resizable panel and list (handles and script in shell.RESIZE_JS). The script sets --bsv-pw / --bsv-aw on <html>
+   while dragging and keeps them for the browser session; the clamp keeps 280 px to half the width. */
+:root {{--bsv-pw0:max(300px, calc((100vw - 72px) * 0.30)); --bsv-aw0:260px;
+  --bsv-pwe:clamp(280px, var(--bsv-pw, var(--bsv-pw0)), calc((100vw - 72px) * 0.5));
+  --bsv-awe:clamp(200px, var(--bsv-aw, var(--bsv-aw0)), calc((100vw - 72px) * 0.4));}}
+#bsv-ph, #bsv-ah, #bsv-pt, #bsv-shield {{display:none;}}
+@media (min-width: 900px) {{
+  div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{flex:0 0 var(--bsv-pwe) !important; width:var(--bsv-pwe) !important;
+    min-width:0 !important; max-width:none !important;}}
+  div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{flex:1 1 0 !important; width:auto !important; min-width:0 !important;}}
+  div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{flex:0 0 var(--bsv-awe) !important; width:var(--bsv-awe) !important;
+    min-width:0 !important; max-width:none !important;}}
+  [data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) > div[data-testid="stColumn"]:not(:has(.st-key-bsv_aside)) {{
+    flex:1 1 0 !important; width:auto !important; min-width:0 !important;}}
+  html.bsv-pc div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{display:none !important;}}
+  body:has(.st-key-bsv_panel) > #bsv-ph {{display:block; right:calc(var(--bsv-pwe) - 4px);}}
+  body:has(.st-key-bsv_aside) > #bsv-ah {{display:block; left:calc(72px + var(--bsv-awe) - 4px);}}
+  body:has(.st-key-bsv_panel) > #bsv-pt {{display:flex; right:calc(var(--bsv-pwe) - 1px);}}
+  html.bsv-pc body > #bsv-ph {{display:none;}}
+  html.bsv-pc body:has(.st-key-bsv_panel) > #bsv-pt {{right:0;}}
+}}
+#bsv-ph, #bsv-ah {{position:fixed; top:0; bottom:0; width:8px; z-index:999990; cursor:col-resize; touch-action:none;
+  background:transparent;}}
+#bsv-ph::after, #bsv-ah::after {{content:""; position:absolute; left:3px; top:0; bottom:0; width:2px; background:transparent;
+  transition:background 0.12s;}}
+#bsv-ph:hover::after, #bsv-ah:hover::after, #bsv-ph:focus-visible::after, #bsv-ah:focus-visible::after,
+html.bsv-drag #bsv-ph::after, html.bsv-drag #bsv-ah::after {{background:{t['accent']};}}
+#bsv-ph:focus, #bsv-ah:focus {{outline:none;}}
+#bsv-pt {{position:fixed; top:calc(50% - 28px); width:18px; height:56px; z-index:999991; padding:0; margin:0;
+  align-items:center; justify-content:center; cursor:pointer; background:{t['panel']}; color:{t['muted']};
+  border:1px solid {t['line']}; border-right:0; border-radius:4px 0 0 4px;}}
+#bsv-pt:hover, #bsv-pt:focus-visible {{color:{t['text']}; border-color:{t['accent']}; outline:none;}}
+#bsv-pt .op {{display:none;}} html.bsv-pc #bsv-pt .op {{display:block;}} html.bsv-pc #bsv-pt .cl {{display:none;}}
+html.bsv-drag #bsv-shield {{display:block; position:fixed; inset:0; z-index:999989; cursor:col-resize;}}
+html.bsv-drag, html.bsv-drag * {{user-select:none !important;}}
+html.bsv-drag iframe {{pointer-events:none !important;}}
+.st-key-bsv_js {{display:none !important;}}
 /* responsive: 900-1199 px a narrower docked panel; below 900 px the map on top, the panel below, full width */
 @media (max-width: 1199px) {{
-  div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{flex:0 0 330px !important; width:330px !important;
-    min-width:330px !important; max-width:330px !important;}}
-  div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{flex:1 1 auto !important; width:auto !important;}}
-  div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{flex:0 0 240px !important; width:240px !important; min-width:240px !important;}}
+  :root {{--bsv-pw0:330px; --bsv-aw0:240px;}}
   .st-key-page_body:has(.bsv-whead) {{padding:20px 24px 40px 24px;}}
   .bsv-stat .v {{font-size:28px;}}
   .bsv-sites-head .cols, .bsv-site .cols {{grid-template-columns:repeat(4, 36px);}}

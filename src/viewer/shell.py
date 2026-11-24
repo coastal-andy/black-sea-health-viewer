@@ -38,6 +38,90 @@ def keep_widget_state():
             ss[k] = ss[k]
 
 
+# ------------------------------------------------------------------------------------------ resizable panels
+# Drag handles for the docked right panel and the Water page's variable list, plus a tab that folds the panel away.
+# They are plain elements on <body> (outside Streamlit's React tree, so reruns never remove them); their position
+# and the column widths come from the CSS variables --bsv-pw / --bsv-aw (style.css). Widths are kept for the browser
+# session (sessionStorage). Below 900 px the CSS hides the handles and the page stacks as before. The map iframes
+# resize with their column, and Leaflet redraws on the iframe's own resize event (invalidateSize); a resize event
+# is also sent after each drag for anything that listens on the page. No '<' followed by a letter inside the script:
+# Streamlit's HTML sanitiser drops a script whose text looks like markup, so the SVG tags are written as \x3c.
+RESIZE_JS = """<script>
+(function () {
+  var d = document, root = d.documentElement;
+  if (d.getElementById('bsv-ph')) return;
+  var RAIL = 72, KP = 'bsv-panel-w', KA = 'bsv-aside-w', KC = 'bsv-panel-closed';
+  function get(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function put(k, v) { try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} }
+  if (get(KP)) root.style.setProperty('--bsv-pw', get(KP) + 'px');
+  if (get(KA)) root.style.setProperty('--bsv-aw', get(KA) + 'px');
+  if (get(KC) === '1') root.classList.add('bsv-pc');
+  function el(tag, id, attrs) {
+    var e = d.createElement(tag); e.id = id;
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    d.body.appendChild(e); return e;
+  }
+  var ph = el('div', 'bsv-ph', {role: 'separator', 'aria-orientation': 'vertical', tabindex: '0',
+    'aria-label': 'Resize the panel', title: 'Drag to resize the panel. Double-click to reset.'});
+  var ah = el('div', 'bsv-ah', {role: 'separator', 'aria-orientation': 'vertical', tabindex: '0',
+    'aria-label': 'Resize the list', title: 'Drag to resize the list. Double-click to reset.'});
+  var pt = el('button', 'bsv-pt', {type: 'button', title: 'Hide the panel', 'aria-label': 'Hide the panel'});
+  pt.innerHTML = "\\x3csvg class='cl' width='10' height='10' viewBox='0 0 10 10' aria-hidden='true'>\\x3cpath d='M3 1.5 L7 5 L3 8.5' " +
+    "fill='none' stroke='currentColor' stroke-width='1.5'/>\\x3c/svg>\\x3csvg class='op' width='10' height='10' viewBox='0 0 10 10' " +
+    "aria-hidden='true'>\\x3cpath d='M7 1.5 L3 5 L7 8.5' fill='none' stroke='currentColor' stroke-width='1.5'/>\\x3c/svg>";
+  el('div', 'bsv-shield', {});
+  function nudge() { setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 30); }
+  function width(v, fromRight, x) {
+    var main = window.innerWidth - RAIL;
+    var w = fromRight ? window.innerWidth - x : x - RAIL;
+    return Math.round(Math.max(fromRight ? 280 : 200, Math.min(main * (fromRight ? 0.5 : 0.4), w)));
+  }
+  function current(h, fromRight) {
+    var r = h.getBoundingClientRect();
+    return fromRight ? window.innerWidth - r.left - 4 : r.left + 4 - RAIL;
+  }
+  function wire(h, v, key, fromRight) {
+    h.addEventListener('pointerdown', function (ev) {
+      if (ev.button !== 0) return;
+      ev.preventDefault();
+      try { h.setPointerCapture(ev.pointerId); } catch (e) {}
+      root.classList.add('bsv-drag');
+      function move(e) { root.style.setProperty(v, width(v, fromRight, e.clientX) + 'px'); }
+      function up() {
+        h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up);
+        h.removeEventListener('pointercancel', up); root.classList.remove('bsv-drag');
+        var w = parseInt(root.style.getPropertyValue(v), 10);
+        if (w) put(key, String(w));
+        nudge();
+      }
+      h.addEventListener('pointermove', move); h.addEventListener('pointerup', up); h.addEventListener('pointercancel', up);
+    });
+    h.addEventListener('dblclick', function () { root.style.removeProperty(v); put(key, null); nudge(); });
+    h.addEventListener('keydown', function (e) {
+      var step = e.shiftKey ? 64 : 16, dir = 0;
+      if (e.key === 'ArrowLeft') dir = fromRight ? 1 : -1;
+      if (e.key === 'ArrowRight') dir = fromRight ? -1 : 1;
+      if (!dir) return;
+      e.preventDefault();
+      var w = current(h, fromRight) + dir * step;
+      w = width(v, fromRight, fromRight ? window.innerWidth - w : w + RAIL);
+      root.style.setProperty(v, w + 'px'); put(key, String(w)); nudge();
+    });
+  }
+  wire(ph, '--bsv-pw', KP, true);
+  wire(ah, '--bsv-aw', KA, false);
+  pt.addEventListener('click', function () {
+    var closed = root.classList.toggle('bsv-pc');
+    put(KC, closed ? '1' : null);
+    pt.title = closed ? 'Show the panel' : 'Hide the panel';
+    pt.setAttribute('aria-label', pt.title);
+    nudge();
+  });
+  if (root.classList.contains('bsv-pc')) { pt.title = 'Show the panel'; pt.setAttribute('aria-label', pt.title); }
+})();
+</script>"""
+
+
 # ------------------------------------------------------------------------------------------ rail
 def rail(pages: dict):
     """Logo, one link per page (icons come from CSS), and the Dark/Light switch at the bottom."""
@@ -49,6 +133,8 @@ def rail(pages: dict):
             with st.container(key=f"rail_{k}"):
                 st.page_link(pages[k], label=label)
         dark = st.session_state.get("theme", "dark") == "dark"
+        with st.container(key="bsv_js"):
+            st.html(RESIZE_JS, unsafe_allow_javascript=True)
         with st.container(key="theme_switch"):
             st.button("Light" if dark else "Dark", key="theme_btn", on_click=_toggle_theme,
                       help="Switch to the light theme" if dark else "Switch to the dark theme")
