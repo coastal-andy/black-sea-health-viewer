@@ -4,49 +4,51 @@ Pitch today, 24 Nov 2026. Presentations run 11:00-13:00 for up to 5 teams (agend
 
 Status: plan only. No slides are built until Andrei approves this plan.
 
-One-sentence pitch: *A map-first viewer for the Romanian coast that says, for each place and day, whether the water is normal, whether a change is natural or a likely pressure, how much to trust each number, and what to check next, for five blue-economy sectors.*
+The pitch follows the **7 steps on the organisers' deliverables sheet** (step 8, "final presentation", is the pitch itself), one slide per step, and opens with the team's Kumu diagram of how the five sectors interact.
+
+Innovation in one sentence (said at the start and at the end): *A map-first viewer for the Romanian coast that says, for each place and day, whether the water is normal, whether a change is natural or a likely pressure, how much to trust each number, and what to check next, for five blue-economy sectors.*
 
 ---
 
-## 1. Pitch structure (7:00)
+## 1. Pitch structure: 7 steps in 7:00
 
-| Time | Part | Sprint | Speaker | Key message | Scoring criteria hit |
-|---|---|---|---|---|---|
-| 0:00-0:40 | Problem | 1 | Andrei | Change is not damage. Upwelling, the Danube and storms move every parameter; managers need to know when a change is natural and when it is us. | Impact (20) |
-| 0:40-1:40 | Pressure map | 1 | Andrei | Five sectors share one coast. A plain count of overlapping sectors (0-5), with tourism only in summer, shows where monitoring matters most. | Integration across sectors (15) |
-| 1:40-2:40 | Architecture and trust | 2 | Joseph | Every value comes from a named source with a known error. We checked satellite and model against buoys and bottles before trusting them. | Technical monitoring logic (20) |
-| 2:40-3:30 | Data-to-decision canvas | 3 | Joseph | Indicator, reference, natural-or-pressure rule chain, status with confidence, then a concrete "investigate" action and who acts. | Data to decisions (15) |
-| 3:30-6:00 | Live demo | 4 | Andrei | One tool, four users. The same coast reads differently for the public, a student, a sector manager and a researcher. | Ease of use (10), Feasibility (15) |
-| 6:00-6:40 | Impact and measurement needs | 5 | Joseph | The tool also says what to measure next: a ranked list of 7 needs, most of them low cost. | Impact (20), Feasibility (15) |
-| 6:40-7:00 | Roadmap and close | 5 | Andrei | Built on free open data, runs offline today; a 3-month pilot with NIMRD makes it operational. | Feasibility (15), Presentation (5) |
+| Time | Step (organisers' sheet) | Speaker | Key message | Scoring criteria hit |
+|---|---|---|---|---|
+| 0:00-0:15 | Title | Andrei | The innovation sentence above. | Presentation (5) |
+| 0:15-1:00 | 1. Problem definition | Andrei | The five sectors interact and all depend on the same water (Kumu diagram). Their pressures and natural change (upwelling, the Danube, storms) move the same parameters. The problem: telling natural change from pressure, at a place and a date, from scattered data of uneven trust. | Impact (20) |
+| 1:00-1:45 | 2. Relevance for the five sectors | Andrei | Where the sectors overlap: a plain count (0-5), tourism only in summer. What each sector gets from the tool, in one line each. | Integration across sectors (15) |
+| 1:45-2:30 | 3. Monitoring architecture | Joseph | Observation technologies, parameters and data flows: buoys, bottles, satellite, Copernicus models and sector layers feed one QC'd, cached data hub. | Technical monitoring logic (20) |
+| 2:30-3:15 | 4. Data processing methodology | Joseph | Integration, QC, indicators against reference conditions, then the natural-or-pressure rule chain, ending in an "investigate" action and who acts. | Technical logic (20), Data to decisions (15) |
+| 3:15-5:15 | 5. Prototype (live demo) | Andrei | One tool, four users: the same coast reads differently for the public, a sector manager and a researcher. | Ease of use (10), Feasibility (15) |
+| 5:15-6:00 | 6. Validation approach | Joseph | Reliability: each source checked against buoys and bottles. Uncertainty: a number per variable. Ecological interpretation: an anomaly is not damage until the rule chain has ruled out natural drivers. | Technical logic (20) |
+| 6:00-6:50 | 7. Impact and implementation roadmap | Andrei (users, benefits), Joseph (pilot requirements) | Users and environmental benefits; a 3-month pilot with NIMRD; the ranked list of what to measure next, most of it low cost. | Impact (20), Feasibility (15) |
+| 6:50-7:00 | Close | Andrei | The innovation sentence again, and thank you. | Presentation (5) |
 
-**5-minute cut:** drop the problem slide to 20 s, merge architecture and canvas into one 1:20 slide (Joseph), demo 2:00, impact and close 0:40.
+Speaker order: Andrei (1-2), Joseph (3-4), Andrei (5), Joseph (6), Andrei and Joseph (7). Each names the other at the hand-over, which shows the teamwork.
 
-Teamwork (5 points) is shown by the hand-overs: Andrei opens, Joseph takes the science, Andrei demos, Joseph gives the measurement needs, Andrei closes. Each names the other at the hand-over.
+**5-minute cut:** step 1 to 30 s (Kumu diagram and one sentence), steps 3 and 4 merged into one 1:00 slide, demo 1:30, step 6 to 30 s, step 7 to 40 s.
 
 ---
 
-## 2. Slide outline (11 slides plus backup)
+## 2. Slide outline (9 slides plus backup)
 
-Style: dark background matching the viewer (#06131D, text #E6EEF3, accent #4CC3E6), Barlow, one idea per slide, no emoji, no icons for decoration, status colours only as small squares with a word. Okabe-Ito for sectors; the overlap ramp from `data/zones/overlap_style.json`.
+One slide per step, no more. Style: dark background matching the viewer (#06131D, text #E6EEF3, accent #4CC3E6), Barlow, no emoji, no decorative icons, status colours only as small squares with a word. Okabe-Ito for sectors; the overlap ramp from `data/zones/overlap_style.json`. The Kumu slide keeps the team's diagram as it is.
 
-| # | Title | Content | Visual |
-|---|---|---|---|
-| 1 | Black Sea Health Viewer | One-sentence pitch; team names and roles; EfxINNOs Challenge 04. | Full-screen viewer screenshot, Overview, dark. |
-| 2 | Change is not damage | Temperature swings 17-18 °C every year (annual cycle 8.7-9.1 °C, warmest mid-August). Upwelling, the Danube plume and storms move oxygen, salinity and clarity. Data sit in 5+ portals with different trust. Question: is this change natural, or a pressure? | Joseph's seasonal fit, SST at EUXRo03 (`seasonal/figures/fit_EUXRo03_sst_satellite_monthly.png`). |
-| 3 | Five sectors, one coast (Sprint 1) | 330 features in 5 sectors, each with a confidence (official / mapped / assumed; assumed drawn dashed). One buffer per activity, from law, literature or a stated rule. Plain count, no weights. Summer: 76 cells of 250 m with 4 sectors (Olimp, Mangalia, Eforie Nord, 2 Mai). Winter: 2 cells (the Agigea lease). No cell has all 5. Monitoring need per sector in one line each. | QGIS export from `gis/black_sea_pressures.qgz`: summer and winter side by side (or `docs/pressure_zones_map.png`). |
-| 4 | Monitoring architecture (Sprint 2) | Parameters: T, S, O2, chl-a, clarity, nutrients, pH, waves, currents, wind, depth. Platforms: offshore buoys, bottle samples, satellite, Copernicus models, EMODnet layers. QC and trust flags per platform and variable, cached store, indicators, viewer. Space: 250 m (zones) to 1-5 km (satellite). Time: daily, 10-day forecast, climatology 1991-2020. | Architecture diagram redrawn from `docs/plan/team_plan.html` (Sources > Data hub (QC, cache) > Indicators > Screening < Pressure zones > Viewer > Users). |
-| 5 | Which source to trust | SST: satellite within about 0.45 °C of the buoys (4 buoys, about 5400 days). Salinity: model at the coast, about 1 PSU; offshore buoy salinity fouled. Surface O2: model about 1 mg/L offshore, 2 mg/L at the coast. Chl-a: satellite as reference; buoy fluorescence reads 2-3x high. Nutrients: bottles and climatology only; model nitrate and phosphate not used as values. | Taylor diagram for SST (`validation/figures/taylor_sst.png`) beside a 5-row "reference per variable" table. |
-| 6 | From data to decision (Sprint 3) | Canvas: harmonise and QC > indicator vs reference (climatology anomaly, z-score) > threshold labelled OFFICIAL-RO / OFFICIAL-EU / OURS > natural-or-pressure rule chain (8 rules, first match wins) > status and confidence > investigate action > who acts. | Canvas diagram (new, simple boxes and arrows, drawn from SHORTLIST sections 3 and 5). |
-| 7 | Natural or pressure? One example | Every bottom-oxygen episode below 4 mg/L in the forecast since Dec 2024 is in the cold season, with bottom salinity 19.1-19.9: rule 3, cold saline intrusion, natural. "Pressure" is used only when no natural driver explains a change. | Viewer screenshot: an open card showing its rule chain. |
-| 8 | Live demo (Sprint 4) | Title only, plus the local URL. | 4 small fallback screenshots in a row (Overview, Water, Seabed, Pressures). |
-| 9 | One tool, four users | Public: is it fine to swim. Student: how the sea works. Sector manager: my sites, what to check. Researcher: sources, errors, data download. Every value shows unit and origin (measured / satellite / model). | 4 cropped viewer screenshots, one per profile. |
-| 10 | What to measure next (Sprint 5) | Joseph's ranked list, top 5 with cost and who: 1 chl-a bottles at the buoys (low, GeoEcoMar and NIMRD); 2 checked coastal O2 sensor (low); 3 post-2021 nutrient bottles (medium, NIMRD); 4 bottom O2 at the mussel farms May-Sep (high); 5 clean the buoy conductivity cells (low). Long satellite SST 1982-2025: +0.56 °C per decade at the buoys (95 % CI 0.46-0.66). | Table from `docs/indicators/methods/MEASUREMENT_NEEDS.md` (origin/data). |
-| 11 | Roadmap and limits | Now: working prototype, free open data, offline cache. Next 3 months: pilot with NIMRD (confirm thresholds, add post-2021 monitoring data, QC the coastal buoys), host on a server. Then: Bulgarian and Ukrainian coasts (same Copernicus and EMODnet products), EfxINNOs final in Varna. Limits said openly (see below). | Simple three-step timeline. |
+| # | Step | Title | Content | Visual |
+|---|---|---|---|---|
+| 1 | Title | Black Sea Health Viewer | Innovation sentence; team names and roles; EfxINNOs Challenge 04. | Full-screen viewer screenshot, Overview, dark. |
+| 2 | 1 | Five sectors, one sea | Positive and negative links between ports, shipyards, tourism, fishing and aquaculture (from the diagram). All of them change, and depend on, the same water. Natural change is large too: temperature swings 17-18 °C a year; upwelling, the Danube plume and storms move oxygen, salinity and clarity. Question: is this change natural, or a pressure? | **The team's Kumu diagram** (screenshot from the existing PowerPoint), with one line of text under it. |
+| 3 | 2 | Where the sectors meet | 330 features with a confidence (official / mapped / assumed; assumed drawn dashed). One buffer per activity. Plain count, no weights. Summer: 76 cells of 250 m with 4 sectors (Olimp, Mangalia, Eforie Nord, 2 Mai); winter: 2. No cell has all 5. Per sector, one line: what it gets (ports: dredging plumes and clarity; shipyards: works footprint; tourism: bathing water, blooms, jellyfish; fishing: oxygen and heat at the grounds; aquaculture: bottom oxygen and toxins at the leases). | QGIS export from `gis/black_sea_pressures.qgz`, summer and winter side by side (or `docs/pressure_zones_map.png`). |
+| 4 | 3 | Monitoring architecture | Parameters: T, S, O2, chl-a, clarity, nutrients, pH, waves, currents, wind, depth. Technologies: offshore buoys, bottle samples, satellite, Copernicus models and reanalysis, EMODnet and OSM sector layers. Flow: sources > data hub (harmonise, QC, trust flags, cache) > indicators > screening (with pressure zones) > viewer > users. Space 250 m to 5 km; daily, 10-day forecast, climatology 1991-2020. | Architecture diagram redrawn from `docs/plan/team_plan.html`. |
+| 5 | 4 | From data to decision | Indicator vs reference (day-of-year climatology anomaly, z-score) > threshold labelled OFFICIAL-RO / OFFICIAL-EU / OURS > rule chain (8 rules, first match wins: model artefact, upwelling, cold saline intrusion, Danube plume, storm, bloom decay, outfall, unexplained) > status and confidence > investigate action > who acts. Example: every bottom-oxygen episode below 4 mg/L in the forecast since Dec 2024 is cold-season, bottom salinity 19.1-19.9: rule 3, natural. | Canvas diagram (simple boxes and arrows, from SHORTLIST sections 3 and 5). |
+| 6 | 5 | Prototype | Title and local URL only; the demo does the talking. | 4 small fallback screenshots (Overview, Water, Seabed, Pressures). |
+| 7 | 6 | How much to trust each number | SST: satellite within about 0.45 °C of 4 buoys. Salinity: model about 1 PSU at the coast; offshore buoy salinity fouled. Surface O2: model about 1 mg/L offshore, 2 mg/L coast. Chl-a: satellite as reference; buoy fluorescence reads 2-3x high. Nutrients: bottles and climatology only; model nitrate and phosphate never shown as values. Untrusted sensors stay visible, greyed out. | Taylor diagram for SST (`validation/figures/taylor_sst.png`) beside a 5-row "reference per variable" table. |
+| 8 | 7 | Impact and pilot | Users: port and dredging managers, mussel farmers, beach managers, fishers, NIMRD, the environment agency, the public. Benefits: one shared screen, earlier and targeted sampling, fewer false alarms. Pilot (3 months, with NIMRD): confirm thresholds, add post-2021 monitoring data, QC the coastal buoys, host on a server. Measure next (top 3): chl-a bottles at buoy visits (low cost), checked coastal O2 sensor (low), bottom O2 at the mussel farms May-Sep (high). Then: Bulgarian and Ukrainian coasts, EfxINNOs final in Varna. | Left: three-step timeline. Right: top-5 measurement needs from `docs/indicators/methods/MEASUREMENT_NEEDS.md` (origin/data). |
+| 9 | Close | What we do not claim | The known limits below in 4 short lines, then the innovation sentence. | Text only. |
 
-Backup slides (for Q&A only): data sources table; buffer table (`data/zones/buffers.yaml`); salinity and O2 scatter plots; trend figure for SST; the full 8-rule chain; the "to confirm with NIMRD" list.
+Backup slides (for Q&A only): data sources table; buffer table (`data/zones/buffers.yaml`); salinity and O2 scatter plots; SST seasonal fit and long-term trend (+0.56 °C per decade, 1982-2025); the full 8-rule chain; the "to confirm with NIMRD" list; the 4 profiles side by side.
 
-**Known limits (exact wording for slide 11 and Q&A):**
+**Known limits (exact wording for slide 9 and Q&A):**
 - Copernicus model nitrate and phosphate are unreliable, so nutrients come from historical samples and climatology.
 - Seabed oxygen is model-only (there is no seabed sensor), so its confidence is low.
 - The new coastal buoys EUXRoCB0x are not quality-controlled. Station 15480 is on shore.
@@ -55,26 +57,24 @@ Backup slides (for Q&A only): data sources table; buffer table (`data/zones/buff
 
 ---
 
-## 3. Live demo script (2:30)
+## 3. Live demo script (2:00)
 
 Start state: viewer at `http://localhost:8502`, dark theme, Overview, place Constanța, profile Public, browser full screen, zoom set so the panel and the map both fit the projector (check at 10:30).
 
 | # | Click | Say (one or two sentences) | Time |
 |---|---|---|---|
-| 1 | Overview, profile Public | "A beach manager opens it and gets one sentence: how the water at Constanța is today compared with a normal day in late November." | 0:15 |
-| 2 | Point at the verdict and counts, then the timeline | "Nine indicators, each a square with a word, normal, watch or alert, plus its origin: measured, satellite or model. The timeline covers the last week and the forecast." | 0:20 |
-| 3 | Open the Oxygen card (or the card on watch today) | "Open one: the value, the usual range for this date, and the rule chain, which says whether a natural driver explains the change before anything is called a pressure." (Check at 10:20 which card is on watch today and adjust the sentence to what it shows.) | 0:25 |
-| 4 | Switch profile to Sector, choose aquaculture | "A mussel farmer sees the same coast through their sites, and what to check: for example a drop-camera transect if bottom oxygen falls to class D." | 0:20 |
-| 5 | Water quality, temperature, then chlorophyll | "The 60-day chart against the usual range. Under Sources: which product we trust for this variable, and why the buoy chlorophyll is greyed out." | 0:25 |
-| 6 | Coast and seabed, waves | "Colour is wave height, arrows are direction, arrow length is wave period. The depth profile shows the shelf." | 0:15 |
-| 7 | Pressures, summer, then winter | "In summer four sectors overlap along the resort coast. Switch to winter: tourism goes off, and the pressure sits at the port approaches." | 0:20 |
-| 8 | EN/RO switch (only if merged and tested by 10:15) | "And for local users, in Romanian." | 0:05 |
-| 9 | Back to slides | "That is the prototype. What it tells us to measure next: Joseph." | 0:05 |
+| 1 | Overview, profile Public | "A beach manager opens it and gets one sentence: how the water at Constanța is today compared with a normal day in late November. Nine indicators, each with a status word and its origin: measured, satellite or model." | 0:20 |
+| 2 | Open the card on watch today (or Oxygen) | "Open one: the value, the usual range for this date, and the rule chain, which says whether a natural driver explains the change before anything is called a pressure." (Check at 10:20 which card is on watch and adjust.) | 0:25 |
+| 3 | Switch profile to Sector, choose aquaculture | "A mussel farmer sees the same coast through their sites, and what to check: for example a drop-camera transect if bottom oxygen falls to class D." | 0:20 |
+| 4 | Water quality, chlorophyll, open Sources | "The 60-day chart against the usual range, and which source we trust for this variable: the buoy chlorophyll is greyed out." | 0:20 |
+| 5 | Coast and seabed, waves | "Colour is wave height, arrows are direction, arrow length is wave period." | 0:10 |
+| 6 | Pressures, summer, then winter | "In summer four sectors overlap along the resort coast. In winter tourism goes off, and the pressure sits at the port approaches." | 0:20 |
+| 7 | EN/RO switch (only if merged and tested by 10:15), then back to slides | "And in Romanian for local users. How far can you trust these numbers? Joseph." | 0:05 |
 
 Fallback, in order:
 1. App slow or a page fails: switch to the browser tab with the same page pre-opened (keep one tab per page open before starting).
-2. App down or no projector link to the laptop: play the screen recording (2:30, no sound, Andrei narrates) from the desktop, or from Joseph's laptop.
-3. No laptop at all: slide 8 screenshots plus slide 9, narrated with the same script.
+2. App down or no projector link to the laptop: play the screen recording (2:00, no sound, Andrei narrates) from the desktop, or from Joseph's laptop.
+3. No laptop at all: slide 6 screenshots, narrated with the same script.
 
 Basemap tiles are the only online part. With Wi-Fi off the map shows the data layers on a blank background, which still works for the demo.
 
@@ -106,15 +106,16 @@ Hard questions to expect: "Is the +0.56 °C per decade significant?" Yes for the
 | Time | Task | Owner | Matters for the pitch? |
 |---|---|---|---|
 | 09:45 | Approve this plan; decide slide tool, speaker split, live or recorded demo | Andrei | yes |
+| 09:45 | Export the Kumu diagram from the existing PowerPoint as a PNG (full slide, high resolution) and put it in `pitch/assets/kumu_sectors.png` | Andrei or Joseph (whoever has the file) | yes |
 | 09:45 | Ask the organisers: pitch length, Q&A length, own laptop or theirs, HDMI or USB-C | Joseph | yes |
-| 09:50-10:25 | Build the slides (11 + backup) from this outline | Claude session, Andrei reviews | yes |
+| 09:50-10:25 | Build the slides (9 + backup) from this outline | Claude session, Andrei reviews | yes |
 | 09:50 | Export the QGIS summer/winter map (or reuse `docs/pressure_zones_map.png`) | coordinator (QGIS MCP) | yes |
-| 09:50 | Copy Joseph's figures for slides 2, 5, 10 into `pitch/assets/` (from `origin/data`, no merge needed) | slides session | yes |
+| 09:50 | Copy Joseph's figures for slides 7 and 8 (and backup) into `pitch/assets/` (from `origin/data`, no merge needed) | slides session | yes |
 | 10:00 | Viewer feature freeze: viewer-c finishes or stops; restart the server once; no edits after 10:15 | coordinator | yes |
 | 10:00 | Decide on PR #3 (Joseph's data branch): merge into `main` only if the viewer runs with it by 10:15; otherwise after the pitch. The slides do not need the merge. | Andrei and Joseph | low |
 | 10:15 | Warm cache check: `scripts/preload_cache.py` (0 failures expected), then one offline run with `MARINEKIT_OFFLINE=1` | coordinator | yes |
 | 10:20 | Take the 9 viewer screenshots (Overview, open card, 4 profiles, Water, Seabed, Pressures summer and winter) | coordinator | yes |
-| 10:25 | Record the 2:30 demo screen recording (QuickTime, no sound), save to the desktop and to a USB stick or Joseph's laptop | Andrei | yes |
+| 10:25 | Record the 2:00 demo screen recording (QuickTime, no sound), save to the desktop and to a USB stick or Joseph's laptop | Andrei | yes |
 | 10:30 | Laptop setup: projector test, mirror display, browser zoom so the panel fits, Do Not Disturb on, close other apps, power cable in | Andrei | yes |
 | 10:30 | Default demo state: dark, Overview, Constanța, Public profile; one tab per page pre-opened | Andrei | yes |
 | 10:35 | Rehearse once with a timer; cut if over 7:00 | both | yes |
@@ -125,13 +126,13 @@ Open items from HANDOVER and whether they matter today:
 
 | Item | Status | Matters for the pitch? |
 |---|---|---|
-| NIMRD questions (SHORTLIST section 6, pressure_zones to-confirm list) | not asked | Only as a slide 11 line and Q&A 10. If a NIMRD person is free before 10:30, ask questions 2 and 4 (thresholds, coastal buoy QC). Drop question 6 (weights), it is retired. |
+| NIMRD questions (SHORTLIST section 6, pressure_zones to-confirm list) | not asked | Only as a slide 8 line and Q&A 10. If a NIMRD person is free before 10:30, ask questions 2 and 4 (thresholds, coastal buoy QC). Drop question 6 (weights), it is retired. |
 | SST in the summary box differs from the temperature card | fixed on `data` (`indicators.sst_display`); viewer not wired yet | Low. Avoid pointing at both numbers in the demo, or label the summary value "map pixel". |
 | Clarity card 2.5 m vs text "about 3 m" | fixed on `data` (PR #3) | Low. Do not open the clarity card in the demo unless PR #3 is merged. |
 | Shipping-lane hover "buffer 0 m (rule)" | `buffer_label` added on `data`; viewer not wired yet | Low. Do not hover the shipping lane in the demo. |
-| Fishing under-counted near shore; ANAR PDFs not read | documented in PR #3 | Yes, as a stated limit (slide 11, Q&A). |
+| Fishing under-counted near shore; ANAR PDFs not read | documented in PR #3 | Yes, as a stated limit (slide 9, Q&A). |
 
-What Joseph must bring: his laptop with the repo and cache as a second demo machine, the validation and seasonal numbers in his head (Q&A 4-6), and the measurement-needs table for slide 10.
+What Joseph must bring: his laptop with the repo and cache as a second demo machine, the validation and seasonal numbers in his head (Q&A 4-6), and the measurement-needs table for slide 8.
 
 ---
 
@@ -152,7 +153,7 @@ What Joseph must bring: his laptop with the repo and cache as a second demo mach
 
 ## Decisions for Andrei
 
-1. Slide tool and format: (a) Claude-made slide deck artifact (opens in a browser, exports to PDF/PPTX), (b) PowerPoint file, (c) Google Slides. Recommended: (a) with a PDF export as backup.
-2. Speaker split as above (Andrei: problem, pressure map, demo, close; Joseph: architecture, trust, canvas, measurement needs)?
+1. Slide tool: since the Kumu diagram already lives in a PowerPoint, (a) build the deck as a .pptx and paste the Kumu slide in as slide 2 (recommended, one file, presenter view, works offline), or (b) a slide-deck artifact in the browser with the Kumu diagram as an image and a PDF export as backup. Either way, send the .pptx (or a PNG of the Kumu slide) so it can go in `pitch/assets/`.
+2. Speaker split as above: Andrei steps 1, 2, 5 and the close; Joseph steps 3, 4, 6 and the pilot requirements in step 7.
 3. Demo: live with the recording as fallback (recommended), or the recording only.
 4. Include the EN/RO switch in the demo only if it is merged and tested by 10:15?
