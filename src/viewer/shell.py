@@ -221,7 +221,7 @@ def date_controls():
 
 EDGES = {"soft": "Soft edges", "sharp": "Sharp edges"}
 EDGES_SHORT = {"soft": "Soft", "sharp": "Sharp"}
-EDGES_DEFAULT = "sharp"  # switch to "soft" once the soft map has been checked
+EDGES_DEFAULT = "soft"  # checked by the coordinator on 24 Nov; "?edges=sharp" shows the grid cells
 
 
 def edges() -> str:
