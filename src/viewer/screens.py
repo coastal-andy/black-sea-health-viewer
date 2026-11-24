@@ -14,6 +14,7 @@ from viewer import adapters as A
 from viewer import maps as M
 from viewer import panels as PN
 from viewer import profiles as P
+from viewer.i18n import lang, t
 from viewer.style import table_html, OVERLAP, SECTOR, esc, pill
 
 PRESSURES = {
@@ -174,77 +175,80 @@ def fit_view(points: list[tuple[float, float]], width_px=650, height_px=470, pad
 
 def methods_screen(profile):
     detail = P.show_detail(profile)
-    st.markdown("### Data and methods")
-    st.markdown("Every value in this viewer shows where it comes from: **measured** (buoys, samples), **satellite** "
-                "(a measured proxy for the surface), or **model** (computed, fills gaps, gives forecasts).")
+    st.markdown("### " + t("Data and methods"))
+    st.markdown(t("Every value in this viewer shows where it comes from: **measured** (buoys, samples), **satellite** "
+                  "(a measured proxy for the surface), or **model** (computed, fills gaps, gives forecasts)."))
     mods = A.status_of_modules()
-    st.markdown("<div class='bsv-box'><b>Connected modules</b><br>" + "<br>".join(
-        f"{esc(k)}: {'connected' if v else 'not yet (placeholder in use)'}" for k, v in mods.items())
-        + f"<br>Pressure zones files: {esc(A.zones_version())}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='bsv-box'><b>{esc(t('Connected modules'))}</b><br>" + "<br>".join(
+        f"{esc(k)}: {esc(t('connected') if v else t('not yet (placeholder in use)'))}" for k, v in mods.items())
+        + f"<br>{esc(t('Pressure zones files'))}: {esc(A.zones_version())}</div>", unsafe_allow_html=True)
+    if lang() == "ro":
+        st.caption(t("The tables below come from the project documentation and are in English."))
 
-    tabs = st.tabs(["Sources", "Reference periods and thresholds", "Quality control", "Natural or pressure?",
-                    "What to investigate", "Limitations"])
+    tabs = st.tabs([t("Sources"), t("Reference periods and thresholds"), t("Quality control"), t("Natural or pressure?"),
+                    t("What to investigate"), t("Limitations")])
     sl = A.md_tables(A.DOCS / "indicators" / "SHORTLIST.md")
     with tabs[0]:
-        st.markdown("**Copernicus Marine Service** (model, reanalysis, satellite, in-situ; free account)")
+        st.markdown(t("**Copernicus Marine Service** (model, reanalysis, satellite, in-situ; free account)"))
         cat = A.catalog_table()
         cols = ["key", "origin", "product", "dataset_id", "variables", "resolution_deg", "frequency", "reference_years"]
         if not detail:
             cols = ["origin", "product", "variables", "reference_years"]
         st.markdown(table_html(cat[cols], height=320), unsafe_allow_html=True)
-        st.markdown("**Other sources**")
-        st.markdown(
-            "- EMODnet Physics: buoys, coastal stations, tide gauges near Romania (ERDDAP, no login); QC flags 1 and 2 kept.\n"
-            "- EMODnet Chemistry: 14,746 water samples 1963-2021 and DIVAnd seasonal climatologies (oxygen, nutrients).\n"
-            "- EMODnet Human Activities, Bathymetry, Seabed Habitats; Natura 2000 (EEA); OpenStreetMap for ports, beaches, shipyards.\n"
-            "- NOAA, ESA Ocean Colour CCI, Open-Meteo (waves, wind), GloFAS Danube discharge: no-login backups and drivers.")
+        st.markdown("**" + t("Other sources") + "**")
+        st.markdown("\n".join("- " + t(x) for x in (
+            "EMODnet Physics: buoys, coastal stations, tide gauges near Romania (ERDDAP, no login); QC flags 1 and 2 kept.",
+            "EMODnet Chemistry: 14,746 water samples 1963-2021 and DIVAnd seasonal climatologies (oxygen, nutrients).",
+            "EMODnet Human Activities, Bathymetry, Seabed Habitats; Natura 2000 (EEA); OpenStreetMap for ports, beaches, shipyards.",
+            "NOAA, ESA Ocean Colour CCI, Open-Meteo (waves, wind), GloFAS Danube discharge: no-login backups and drivers.")))
         if detail:
-            st.caption("Dataset IDs come from marinekit.sources.copernicus.CATALOG. Details: docs/data_sources/*.md.")
+            st.caption(t("Dataset IDs come from marinekit.sources.copernicus.CATALOG. Details: docs/data_sources/*.md."))
     with tabs[1]:
-        st.markdown("Anomalies are always measured against the **same day of the year** (not the yearly mean). "
-                    "OFFICIAL = Romanian MSFD 2024 (NIMRD) or an EU directive; OURS = a climatology band or a value we "
-                    "propose. Draft thresholds are to be confirmed with NIMRD.")
-        t = (sl.get("2. Indicator table") or [None])[0]
-        if t is not None:
-            t = t.map(A.strip_md)
+        st.markdown(t("Anomalies are always measured against the **same day of the year** (not the yearly mean). "
+                      "OFFICIAL = Romanian MSFD 2024 (NIMRD) or an EU directive; OURS = a climatology band or a value we "
+                      "propose. Draft thresholds are to be confirmed with NIMRD."))
+        tb = (sl.get("2. Indicator table") or [None])[0]
+        if tb is not None:
+            tb = tb.map(A.strip_md)
             if not detail:
-                t = t[["Indicator", "Reference / threshold", "Evidence", "Confidence"]]
-            st.markdown(table_html(t, height=420), unsafe_allow_html=True)
-        st.markdown("**Reference periods**: satellite SST 1991-2020 (WMO standard); satellite chlorophyll and Kd490 "
-                    "1998-2022; model reanalysis 1993-2022; Danube discharge 1997-2025.")
+                tb = tb[["Indicator", "Reference / threshold", "Evidence", "Confidence"]]
+            st.markdown(table_html(tb, height=420), unsafe_allow_html=True)
+        st.markdown(t("**Reference periods**: satellite SST 1991-2020 (WMO standard); satellite chlorophyll and Kd490 "
+                      "1998-2022; model reanalysis 1993-2022; Danube discharge 1997-2025."))
     with tabs[2]:
-        st.markdown("**In-situ QC rules**\n"
-                    "- Only OceanSITES QC flags 1 (good) and 2 (probably good) are kept.\n"
-                    "- Physical bounds per variable (e.g. temperature -2 to 35 °C, salinity 0 to 40) remove sensor spikes.\n"
-                    "- New coastal buoys are shown greyed out ('under QC') until their units are confirmed.\n"
-                    "- Shore stations are not used as sea temperature.")
-        t = (sl.get("4. Data quality register (what to trust)") or [None])[0]
-        if t is not None:
-            st.markdown("**Data quality register**")
-            st.markdown(table_html(t.map(A.strip_md)), unsafe_allow_html=True)
+        st.markdown("**" + t("In-situ QC rules") + "**\n" + "\n".join("- " + t(x) for x in (
+            "Only OceanSITES QC flags 1 (good) and 2 (probably good) are kept.",
+            "Physical bounds per variable (e.g. temperature -2 to 35 °C, salinity 0 to 40) remove sensor spikes.",
+            "New coastal buoys are shown greyed out ('under QC') until their units are confirmed.",
+            "Shore stations are not used as sea temperature.")))
+        tb = (sl.get("4. Data quality register (what to trust)") or [None])[0]
+        if tb is not None:
+            st.markdown("**" + t("Data quality register") + "**")
+            st.markdown(table_html(tb.map(A.strip_md)), unsafe_allow_html=True)
         p = A.platforms()
         if len(p):
-            st.markdown("**In-situ platforms and their status**")
+            st.markdown("**" + t("In-situ platforms and their status") + "**")
             show = p[["id", "name", "type", "lat", "lon", "time_end", "trust", "trust_note"]].rename(
                 columns={"time_end": "last data", "trust": "status", "trust_note": "note"})
             st.markdown(table_html(show, height=300), unsafe_allow_html=True)
     with tabs[3]:
-        st.markdown("One rule chain for all cards, applied in order. 'Pressure' is used only when no natural driver explains the event.")
+        st.markdown(t("One rule chain for all cards, applied in order. 'Pressure' is used only when no natural driver "
+                      "explains the event."))
         path = A.DOCS / "indicators" / "SHORTLIST.md"
         txt = path.read_text() if path.exists() else ""
         sec = txt.split("## 3.")[1].split("## 4.")[0] if "## 3." in txt else ""
         st.markdown("\n".join(l for l in sec.splitlines()[1:]))
     with tabs[4]:
-        t = (sl.get('5. "Investigate" recommendations (the decision output)') or [None])[0]
-        if t is not None:
-            st.markdown(table_html(t.map(A.strip_md)), unsafe_allow_html=True)
+        tb = (sl.get('5. "Investigate" recommendations (the decision output)') or [None])[0]
+        if tb is not None:
+            st.markdown(table_html(tb.map(A.strip_md)), unsafe_allow_html=True)
     with tabs[5]:
-        st.markdown(
-            "- The model's chlorophyll, bottom oxygen and nutrients disagree with its own reanalysis: we use satellite and "
-            "in-situ data for those, and keep the model for temperature, salinity and currents.\n"
-            "- No bottom-oxygen sensor exists near the coast: the oxygen card has low confidence.\n"
-            "- Nutrient observations end around 2020-2021: that card is historical only.\n"
-            "- Satellite chlorophyll near the coast is affected by river sediment (medium confidence within about 20 km of shore).\n"
-            "- Aquaculture sites, fishing landing points and some coastal works are located from place names: marked 'assumed'.\n"
-            "- Basemap tiles and Copernicus map tiles need the internet; data layers and charts work offline from the cache.\n"
-            "- Trends use annual means without correcting for autocorrelation, so the uncertainty is a lower bound.")
+        st.markdown("\n".join("- " + t(x) for x in (
+            "The model's chlorophyll, bottom oxygen and nutrients disagree with its own reanalysis: we use satellite and "
+            "in-situ data for those, and keep the model for temperature, salinity and currents.",
+            "No bottom-oxygen sensor exists near the coast: the oxygen card has low confidence.",
+            "Nutrient observations end around 2020-2021: that card is historical only.",
+            "Satellite chlorophyll near the coast is affected by river sediment (medium confidence within about 20 km of shore).",
+            "Aquaculture sites, fishing landing points and some coastal works are located from place names: marked 'assumed'.",
+            "Basemap tiles and Copernicus map tiles need the internet; data layers and charts work offline from the cache.",
+            "Trends use annual means without correcting for autocorrelation, so the uncertainty is a lower bound.")))

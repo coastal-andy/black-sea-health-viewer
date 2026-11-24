@@ -288,6 +288,23 @@ def _arrow_svg(length: float, angle_to: float = 90.0, h: int = 18, core: str = "
             f'stroke-linejoin="round"/></svg>')
 
 
+def _tr(s: str, **kw) -> str:
+    """Legend text in the viewer's language (viewer.i18n); plain English when used on its own."""
+    try:
+        from viewer.i18n import t
+        return t(s, **kw)
+    except Exception:
+        return s.format(**kw) if kw else s
+
+
+def _when(ts, fmt: str) -> str:
+    try:
+        from viewer.i18n import dt
+        return dt(ts, fmt)
+    except Exception:
+        return pd.Timestamp(ts).strftime(fmt)
+
+
 def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | None = None) -> str:
     """HTML legend: colorbar with units, arrow meaning and, for waves, period examples (3, 6, 10 s).
 
@@ -310,8 +327,8 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
         f'<span style="position:absolute;left:{i * 25}%;transform:translateX(-{0 if i == 0 else (100 if i == 4 else 50)}%)">'
         f'{fmt(v)}{"+" if i == 4 else ""}</span>' for i, v in enumerate(ticks))
     parts = [
-        f'<div style="font-weight:600;margin-bottom:2px">{sp["label"]}</div>',
-        f'<div style="font-size:11px;color:{c_sub};margin-bottom:3px">{sp["mag_label"]} ({sp["unit"]})'
+        f'<div style="font-weight:600;margin-bottom:2px">{_tr(sp["label"])}</div>',
+        f'<div style="font-size:11px;color:{c_sub};margin-bottom:3px">{_tr(sp["mag_label"])} ({sp["unit"]})'
         f'{" - " + when if when else ""}</div>',
         f'<div style="height:10px;width:190px;border-radius:2px;background:linear-gradient(to right, {stops})"></div>',
         f'<div style="position:relative;height:14px;width:190px;font-size:11px;color:{c_tick}">{tick_html}</div>',
@@ -320,17 +337,18 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
         ex = "".join(f'<div style="display:flex;align-items:center;gap:6px;height:18px">'
                      f'<span style="width:30px;text-align:right">{p} s</span>{_arrow_svg(float(_wave_len_px(p)), **arw)}</div>'
                      for p in (3, 6, 10))
-        parts.append('<div style="margin-top:4px;font-size:11px">Arrow length = peak period</div>'
+        parts.append(f'<div style="margin-top:4px;font-size:11px">{_tr("Arrow length = peak period")}</div>'
                      f'<div style="font-size:11px">{ex}</div>'
-                     f'<div style="font-size:11px;color:{c_sub}">short = wind sea, long = swell</div>')
+                     f'<div style="font-size:11px;color:{c_sub}">{_tr("short = wind sea, long = swell")}</div>')
     elif kind == "currents":
-        parts.append('<div style="margin-top:4px;font-size:11px">Dot = slower than 0.02 m/s (no clear direction)</div>')
+        parts.append(f'<div style="margin-top:4px;font-size:11px">'
+                     f'{_tr("Dot = slower than 0.02 m/s (no clear direction)")}</div>')
     elif kind == "wind":
-        parts.append('<div style="margin-top:4px;font-size:11px">Disc colour = wind speed at reference points '
-                     '(no gridded wind source)</div>')
+        parts.append(f'<div style="margin-top:4px;font-size:11px">'
+                     f'{_tr("Disc colour = wind speed at reference points (no gridded wind source)")}</div>')
     parts.append(f'<div style="margin-top:4px;font-size:11px;max-width:200px">{_arrow_svg(22, **arw)} '
-                 f'{sp["convention"].split(".")[0]}.</div>')
-    parts.append(f'<div style="font-size:10px;color:{c_note};max-width:200px">Click the sea for values.</div>')
+                 f'{_tr(sp["convention"].split(".")[0] + ".")}</div>')
+    parts.append(f'<div style="font-size:10px;color:{c_note};max-width:200px">{_tr("Click the sea for values.")}</div>')
     if theme:
         return (f'<div style="background:{th.get("overlay", base)};color:{th.get("text", "#1a1a1a")};padding:8px 12px;'
                 f'border-radius:4px;border:1px solid {th.get("ctrl", "#999")};font:12px/1.35 {th.get("font", "system-ui")}">'
@@ -513,12 +531,14 @@ def field_layer(m, ds: xr.Dataset, kind: str | None = None, time=None, name: str
     if "time" in ds.dims:
         ds = ds.sel(time=_ts(time), method="nearest") if time is not None else ds.isel(time=0)
     when = ds.attrs.get("time", "")
-    when_txt = pd.Timestamp(when).strftime("%d %b %Y %H:%M UTC") if when else ""
+    when_txt = _when(when, "%d %b %Y %H:%M UTC") if when else ""
     if kind == "currents" and when:
-        when_txt = pd.Timestamp(when).strftime("%d %b %Y") + " daily mean"
-    fg = folium.FeatureGroup(name=name or (f"{sp['label']} ({when_txt})" if when_txt else sp["label"]), show=show)
+        when_txt = _when(when, "%d %b %Y") + _tr(" daily mean")
+    label = _tr(sp["label"])
+    fg = folium.FeatureGroup(name=name or (f"{label} ({when_txt})" if when_txt else label), show=show)
     cm = _cmap(sp["cmap"])
-    opts = dict(label=sp["label"], magLabel=sp["mag_label"], unit=sp["unit"], perLabel=sp.get("period_label", ""))
+    opts = dict(label=label, magLabel=_tr(sp["mag_label"]), unit=sp["unit"],
+                perLabel=_tr(sp.get("period_label", "")) if sp.get("period_label") else "")
 
     if "station" in ds.dims:  # wind at points
         mag = ds[sp["mag"]].values

@@ -53,7 +53,8 @@ class _ThemedStatus(dict):
     """STATUS[k] -> (colour for the current theme, label). Same shape as the old constant."""
 
     def __getitem__(self, k):
-        return tokens()[k], STATUS_LABEL[k]
+        from viewer.i18n import t
+        return tokens()[k], t(STATUS_LABEL[k])
 
     def get(self, k, default=None):
         return self[k] if k in STATUS_LABEL else default
@@ -174,7 +175,11 @@ section[data-testid="stSidebar"] div[style*="cursor: col-resize"], section[data-
 .st-key-theme_switch {{position:fixed; left:0; bottom:12px; width:72px; z-index:1000; display:flex; align-items:center;}}
 .st-key-theme_switch button {{width:56px; min-height:28px; height:28px; margin:0 8px; padding:0; border-radius:4px;
   border:1px solid {t['ctrl']} !important; background:transparent !important;}}
-.st-key-theme_switch button p {{font-size:10.5px !important; letter-spacing:1px; text-transform:uppercase; color:{t['sub']} !important;}}
+.st-key-theme_switch button p {{font-size:10.5px !important; letter-spacing:0.6px; white-space:nowrap; text-transform:uppercase; color:{t['sub']} !important;}}
+.st-key-lang_switch {{position:fixed; left:0; bottom:48px; width:72px; z-index:1000; display:flex; align-items:center;}}
+.st-key-lang_switch button {{width:56px; min-height:28px; height:28px; margin:0 8px; padding:0; border-radius:4px;
+  border:1px solid {t['ctrl']} !important; background:transparent !important;}}
+.st-key-lang_switch button p {{font-size:10.5px !important; letter-spacing:1px; text-transform:uppercase; color:{t['sub']} !important;}}
 .st-key-theme_switch .bsv-lbl {{display:block; text-align:center; width:72px; margin-bottom:4px;}}
 
 /* docked panel on the right */
@@ -511,7 +516,7 @@ button p {{color:inherit;}}
 #bsv-ph:hover::after, #bsv-ah:hover::after, #bsv-ph:focus-visible::after, #bsv-ah:focus-visible::after,
 html.bsv-drag #bsv-ph::after, html.bsv-drag #bsv-ah::after {{background:{t['accent']};}}
 #bsv-ph:focus, #bsv-ah:focus {{outline:none;}}
-#bsv-pt {{position:fixed; top:calc(50% - 28px); width:18px; height:56px; z-index:999991; padding:0; margin:0;
+#bsv-pt {{position:fixed; top:188px; width:18px; height:56px; z-index:999991; padding:0; margin:0;
   align-items:center; justify-content:center; cursor:pointer; background:{t['panel']}; color:{t['muted']};
   border:1px solid {t['line']}; border-right:0; border-radius:4px 0 0 4px;}}
 #bsv-pt:hover, #bsv-pt:focus-visible {{color:{t['text']}; border-color:{t['accent']}; outline:none;}}
@@ -597,17 +602,46 @@ ORIGIN = _ThemedOrigin({
     "model": OI["orange"], "reanalysis": OI["vermillion"],
     "climatology": OI["grey"], "derived": OI["purple"],
 })
-ORIGIN_LABEL = {"in-situ": "measured", "measured": "measured", "satellite": "satellite", "model": "model",
-                "reanalysis": "model (reanalysis)", "derived": "derived", "climatology": "reference"}
+class _Translated(dict):
+    """A label dict whose values come back in the viewer language (viewer.i18n.t)."""
+
+    def __getitem__(self, k):
+        from viewer.i18n import t
+        return t(dict.__getitem__(self, k))
+
+    def get(self, k, default=None):
+        return self[k] if k in self else default
+
+
+ORIGIN_LABEL = _Translated({"in-situ": "measured", "measured": "measured", "satellite": "satellite", "model": "model",
+                            "reanalysis": "model (reanalysis)", "derived": "derived", "climatology": "reference"})
 
 # the sector colours already used in data/zones (pressure_zones.py), kept identical
-SECTOR = {
+class _SectorDict(dict):
+    """SECTOR[k] -> (label in the viewer language, colour)."""
+
+    def __getitem__(self, k):
+        from viewer.i18n import t
+        lab, col = dict.__getitem__(self, k)
+        return t(lab), col
+
+    def get(self, k, default=None):
+        return self[k] if k in self else default
+
+    def items(self):
+        return [(k, self[k]) for k in self.keys()]
+
+    def values(self):
+        return [self[k] for k in self.keys()]
+
+
+SECTOR = _SectorDict({
     "ports": ("Ports and logistics", "#0072B2"),
     "shipyards": ("Shipyards and marine engineering", "#D55E00"),
     "tourism": ("Coastal and marine tourism", "#E69F00"),
     "fishing": ("Fishing", "#009E73"),
     "aquaculture": ("Aquaculture", "#CC79A7"),
-}
+})
 
 # overlap count 1..5: read from data/zones/overlap_style.json (shared with the QGIS project), with this fallback
 _OVERLAP_FALLBACK = [(1, "#FDE0B2", 0.45), (2, "#F4A259", 0.70), (3, "#D55E00", 0.85), (4, "#8C2D04", 0.90),

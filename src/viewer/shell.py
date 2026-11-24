@@ -8,6 +8,8 @@ import streamlit as st
 from viewer import adapters as A
 from viewer import onboarding as OB
 from viewer import profiles as P
+from viewer import i18n as I
+from viewer.i18n import dt, t
 from viewer.style import LOGO_SVG, SECTOR, THEMES, esc, tokens
 
 # rail key -> label; the order is the rail order
@@ -125,44 +127,48 @@ RESIZE_JS = """<script>
 # ------------------------------------------------------------------------------------------ rail
 def rail(pages: dict):
     """Logo, one link per page (icons come from CSS), and the Dark/Light switch at the bottom."""
-    t = tokens()
+    tk = tokens()
     with st.sidebar:
         with st.container(key="logo_block"):
-            st.markdown(f"<div class='bsv-logo'>{LOGO_SVG.format(c=t['accent'])}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='bsv-logo'>{LOGO_SVG.format(c=tk['accent'])}</div>", unsafe_allow_html=True)
         for k, label in PAGES.items():
             with st.container(key=f"rail_{k}"):
-                st.page_link(pages[k], label=label)
+                st.page_link(pages[k], label=t(label))
         dark = st.session_state.get("theme", "dark") == "dark"
         with st.container(key="bsv_js"):
             st.html(RESIZE_JS, unsafe_allow_javascript=True)
+        ro = I.lang() == "ro"
+        with st.container(key="lang_switch"):  # shows the language you switch to
+            st.button("EN" if ro else "RO", key="lang_btn", on_click=I.toggle_lang,
+                      help="Switch to English" if ro else "Comută pe limba română")
         with st.container(key="theme_switch"):
-            st.button("Light" if dark else "Dark", key="theme_btn", on_click=_toggle_theme,
-                      help="Switch to the light theme" if dark else "Switch to the dark theme")
+            st.button(t("Light") if dark else t("Dark"), key="theme_btn", on_click=_toggle_theme,
+                      help=t("Switch to the light theme") if dark else t("Switch to the dark theme"))
 
 
 # ------------------------------------------------------------------------------------------ place, date, season
 def place_options() -> dict:
     opts = {}
     for name, (la, lo) in A.stations().items():
-        opts[f"Station: {name}"] = dict(name=name, lat=la, lon=lo, kind="station", wkt=None)
+        opts[t("Station: {name}", name=name)] = dict(name=name, lat=la, lon=lo, kind="station", wkt=None)
     p = A.platforms()
     for _, r in p[p.recent & p.type.isin(["Mooring", "Gliders"])].iterrows():
-        tag = {"under_qc": " (under QC)", "context": " (shore station)"}.get(r.trust, "")
-        opts[f"Buoy: {r['name']}{tag}"] = dict(name=f"Buoy {r['name']}", lat=float(r.lat), lon=float(r.lon),
+        tag = {"under_qc": t(" (under QC)"), "context": t(" (shore station)")}.get(r.trust, "")
+        opts[t("Buoy: {name}", name=r['name']) + tag] = dict(name=t("Buoy {name}", name=r['name']), lat=float(r.lat), lon=float(r.lon),
                                                kind="platform", wkt=None, platform=r.id)
     for _, r in p[p.id.isin(["EUXRoOB02", "EUXRoOB03"])].iterrows():
-        opts[f"Buoy: {r['name']} (offshore, data to {r.time_end:%b %Y})"] = dict(
-            name=f"Buoy {r['name']}", lat=float(r.lat), lon=float(r.lon), kind="platform", wkt=None, platform=r.id)
+        opts[t("Buoy: {name} (offshore, data to {when})", name=r['name'], when=dt(r.time_end, "%b %Y"))] = dict(
+            name=t("Buoy {name}", name=r['name']), lat=float(r.lat), lon=float(r.lon), kind="platform", wkt=None, platform=r.id)
     stamp = A._zones_stamp()
     for k, (lab, _) in SECTOR.items():
         g = A.sector_zone_geom(k, stamp)
         if g is not None and not g.is_empty:
             rp = g.representative_point()
-            opts[f"Zone: {lab}"] = dict(name=f"{lab} zones", lat=rp.y, lon=rp.x, kind="zone",
+            opts[t("Zone: {name}", name=lab)] = dict(name=t("{name} zones", name=lab), lat=rp.y, lon=rp.x, kind="zone",
                                         wkt=g.simplify(0.002).wkt)
     hs = A.hotspots(stamp)
     for _, r in hs.head(12).iterrows():
-        opts[f"Overlap area: {r['name']}"] = dict(name=str(r["name"]), lat=float(r.lat), lon=float(r.lon),
+        opts[t("Overlap area: {name}", name=r['name'])] = dict(name=str(r["name"]), lat=float(r.lat), lon=float(r.lon),
                                                   kind="zone", wkt=r.wkt)
     return opts
 
@@ -179,8 +185,8 @@ def place_picker(placeholder: str = "Search a beach, port, station or zone"):
     ss._place_opts = place_options()
     if ss.get("w_place") not in ss._place_opts:
         ss["w_place"] = None
-    st.selectbox("Place", list(ss._place_opts), index=None, key="w_place", on_change=_on_place,
-                 placeholder=placeholder, label_visibility="collapsed")
+    st.selectbox(t("Place"), list(ss._place_opts), index=None, key="w_place", on_change=_on_place,
+                 placeholder=t(placeholder), label_visibility="collapsed")
 
 
 def day_season() -> tuple[str, str]:
@@ -196,9 +202,9 @@ def day_season() -> tuple[str, str]:
 def season_control():
     day, _ = day_season()
     auto = A.season_for_date(pd.Timestamp(day).date())
-    st.radio("Season for pressure zones", ["auto", "summer", "winter"], horizontal=True, key="w_season",
-             format_func=lambda s: f"From date ({auto})" if s == "auto" else s.capitalize(),
-             help="Summer = bathing season, 1 June to 15 September: tourism zones are on.")
+    st.radio(t("Season for pressure zones"), ["auto", "summer", "winter"], horizontal=True, key="w_season",
+             format_func=lambda s: t("From date ({season})", season=t(auto)) if s == "auto" else t(s.capitalize()),
+             help=t("Summer = bathing season, 1 June to 15 September: tourism zones are on."))
 
 
 def date_controls():
@@ -214,6 +220,7 @@ def date_controls():
 
 
 EDGES = {"soft": "Soft edges", "sharp": "Sharp edges"}
+EDGES_SHORT = {"soft": "Soft", "sharp": "Sharp"}
 EDGES_DEFAULT = "sharp"  # switch to "soft" once the soft map has been checked
 
 
@@ -229,32 +236,43 @@ def edges() -> str:
 def edges_control(compact: bool = False):
     """Edges: Soft / Sharp. Soft fades the zone limits (they are approximate); the colour is still the count."""
     edges()
-    st.segmented_control("Edges", list(EDGES), key="w_edges", format_func=(str.capitalize if compact else EDGES.get),
+    st.segmented_control(t("Edges"), list(EDGES), key="w_edges",
+                         format_func=lambda k: t(EDGES_SHORT[k] if compact else EDGES[k]),
                          required=True, label_visibility="collapsed" if compact else "visible",
-                         help="Soft: zone limits fade out, because they are approximate. Sharp: the 500 m grid "
-                              "cells and the zone outlines. Both show the same count of overlapping sectors.")
+                         help=t("Soft: zone limits fade out, because they are approximate. Sharp: the 500 m grid "
+                                "cells and the zone outlines. Both show the same count of overlapping sectors."))
 
 
 # ------------------------------------------------------------------------------------------ profile
+def describe(p: dict) -> str:
+    """profiles.describe in the viewer language."""
+    s = t(P.ROLES.get(p.get("role"), "Visitor"))
+    if p.get("role") == "stakeholder" and p.get("sector"):
+        s += f" - {t(P.SECTORS[p['sector']])}"
+    if p.get("role") == "researcher" and p.get("focus"):
+        s += f" - {t(p['focus'])}"
+    return s
+
+
 def profile_menu():
     ss = st.session_state
     profile = ss.profile
-    with st.popover(f"Viewing as: {P.describe(profile)}", width="stretch"):
-        role = st.radio("Who are you?", list(P.ROLES), index=list(P.ROLES).index(profile["role"]),
-                        format_func=P.ROLES.get, key="pf_role")
+    with st.popover(t("Viewing as: {who}", who=describe(profile)), width="stretch"):
+        role = st.radio(t("Who are you?"), list(P.ROLES), index=list(P.ROLES).index(profile["role"]),
+                        format_func=lambda k: t(P.ROLES[k]), key="pf_role")
         sector = focus = None
         if role == "stakeholder":
-            sector = st.selectbox("Sector", list(P.SECTORS), format_func=P.SECTORS.get, key="pf_sector",
+            sector = st.selectbox(t("Sector"), list(P.SECTORS), format_func=lambda k: t(P.SECTORS[k]), key="pf_sector",
                                   index=list(P.SECTORS).index(profile["sector"]) if profile.get("sector") else 0)
         if role == "researcher":
-            focus = st.selectbox("Focus", list(P.FOCUS), format_func=P.FOCUS.get, key="pf_focus",
+            focus = st.selectbox(t("Focus"), list(P.FOCUS), format_func=lambda k: t(P.FOCUS[k]), key="pf_focus",
                                  index=list(P.FOCUS).index(profile["focus"]) if profile.get("focus") else 0)
-        goal = st.selectbox("What do you want to do?", list(P.GOALS), format_func=P.GOALS.get, key="pf_goal",
-                            index=list(P.GOALS).index(profile["goal"]))
-        if st.button("Apply", type="primary", width="stretch"):
+        goal = st.selectbox(t("What do you want to do?"), list(P.GOALS), format_func=lambda k: t(P.GOALS[k]),
+                            key="pf_goal", index=list(P.GOALS).index(profile["goal"]))
+        if st.button(t("Apply"), type="primary", width="stretch"):
             OB.finish(dict(role=role, sector=sector, focus=focus, goal=goal))
             st.rerun()
-        if st.button("Start the questionnaire again", width="stretch"):
+        if st.button(t("Start the questionnaire again"), width="stretch"):
             ss.onboarding = True
             st.rerun()
 
@@ -264,15 +282,22 @@ def selection_header(sel: dict, season: str) -> str:
     """Small uppercase coordinates line, the place name, and the overlap / Natura lines."""
     inside = A.zones_containing(sel["lat"], sel["lon"], A._zones_stamp())
     n, secs = A.overlap_at(sel["lat"], sel["lon"], season)
-    ov = f"{n} of 5 sectors" if n else "outside the sector zones"
-    out = [f"<div class='bsv-lbl'>{sel['lat']:.3f} N &middot; {sel['lon']:.3f} E &middot; {esc(ov)} ({esc(season)})</div>",
-           f"<div class='bsv-place'>{esc(sel['name'])}</div>"]
+    ov = t("{n} of 5 sectors", n=n) if n else t("outside the sector zones")
+    out = [f"<div class='bsv-lbl'>{sel['lat']:.3f} N &middot; {sel['lon']:.3f} E &middot; {esc(ov)} ({esc(t(season))})</div>",
+           f"<div class='bsv-place'>{esc(place_name(sel['name']))}</div>"]
     if secs:
-        out.append(f"<div class='bsv-note'>Sectors here: {esc(secs.replace(',', ', '))}</div>")
+        names = ", ".join(t(x.strip()) for x in secs.split(","))
+        out.append(f"<div class='bsv-note'>{esc(t('Sectors here: {names}', names=names))}</div>")
     nat = [z["sector"] for z in inside if z["kind"] == "Natura 2000"]
     if nat:
-        out.append(f"<div class='bsv-note'>Inside Natura 2000: {esc('; '.join(nat[:2]))}</div>")
+        out.append(f"<div class='bsv-note'>{esc(t('Inside Natura 2000: {names}', names='; '.join(nat[:2])))}</div>")
     return "".join(out)
+
+
+def place_name(name: str) -> str:
+    """Names the viewer gives to places (start points, 'Clicked point') in the viewer language; real place names
+    such as Constanța or Mangalia stay as they are."""
+    return t(name) if isinstance(name, str) else name
 
 
 def page_head(title: str, sub: str = ""):

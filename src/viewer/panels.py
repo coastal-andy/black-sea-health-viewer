@@ -9,6 +9,7 @@ import streamlit as st
 
 from viewer import adapters as A
 from viewer import profiles as P
+from viewer.i18n import data, dt, t as tr_
 from viewer.style import table_html, ORIGIN, ORIGIN_LABEL, OI, STATUS, esc, origin_tag, pill, plotly_layout, theme_name, tokens
 
 FONT = dict(family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif", size=12, color="#1C2430")
@@ -29,29 +30,29 @@ def _layout(fig, title="", ytitle="", height=360, log=False):
 def _src_line(meta: dict, detail: bool) -> str:
     bits = []
     if meta.get("platform"):
-        bits.append(f"platform {meta['platform']}")
+        bits.append(tr_("platform {p}", p=meta['platform']))
     if meta.get("distance_km") is not None:
-        bits.append(f"{meta['distance_km']} km from the point")
+        bits.append(tr_("{d} km from the point", d=meta['distance_km']))
     if meta.get("grid_lat") is not None and detail:
-        bits.append(f"grid cell {meta['grid_lat']:.3f} N {meta['grid_lon']:.3f} E")
+        bits.append(tr_("grid cell {la} N {lo} E", la=f"{meta['grid_lat']:.3f}", lo=f"{meta['grid_lon']:.3f}"))
     if detail and meta.get("dataset"):
         bits.append(str(meta["dataset"]))
     if detail and meta.get("depth_m") not in (None, "", {}):
-        bits.append(f"depth {meta['depth_m']}")
+        bits.append(tr_("depth {d}", d=meta['depth_m']))
     return ", ".join(bits)
 
 
 def _ready(items):
     pending = [i for i in items if i.get("series") is None]
     for i in pending:
-        st.caption(f"{i['label']}: {i.get('note', 'still downloading')}")
+        st.caption(f"{i['label']}: {data(i.get('note')) or tr_('still downloading')}")
     return [i for i in items if i.get("series") is not None]
 
 
 def var_label(var: str, profile: dict) -> str:
     v = A.VARIABLES[var]
     t = P.VAR_TEXT.get(var, {}).get(P.level(profile))
-    return f"{t or v['label']} ({v['unit']})"
+    return f"{tr_(t or v['label'])} ({v['unit']})"
 
 
 # ------------------------------------------------------------------------------------------ compare
@@ -146,37 +147,39 @@ def anomaly_view(sel, var, profile):
 # ------------------------------------------------------------------------------------------ trend
 def trend_view(sel, var, profile):
     detail = P.show_detail(profile)
-    with st.spinner("Loading the multi-year series (first time can take 10-20 s)..."):
+    with st.spinner(tr_("Loading the multi-year series (first time can take 10-20 s)...")):
         s = A.soft(A.long_series, var, sel["lat"], sel["lon"])
     if s is None or s.empty:
-        st.info("No multi-year series for this variable at this point.")
+        st.info(tr_("No multi-year series for this variable at this point."))
         return
     tr = A.annual_trend(s)
     v = A.VARIABLES[var]
     if tr is None:
-        st.info("Not enough complete years for a trend.")
+        st.info(tr_("Not enough complete years for a trend."))
         return
     ann = tr["annual"]
     x = ann.index.to_numpy(float)
     fig = go.Figure()
     o = s.attrs.get("origin", "satellite")
-    fig.add_trace(go.Scatter(x=ann.index, y=ann.values, mode="markers+lines", name="annual mean",
+    fig.add_trace(go.Scatter(x=ann.index, y=ann.values, mode="markers+lines", name=tr_("annual mean"),
                              line=dict(color=ORIGIN.get(o, OI["blue"]), width=1), marker=dict(size=7)))
-    fig.add_trace(go.Scatter(x=ann.index, y=tr["intercept"] + tr["slope"] * x, mode="lines", name="trend",
+    fig.add_trace(go.Scatter(x=ann.index, y=tr["intercept"] + tr["slope"] * x, mode="lines", name=tr_("trend"),
                              line=dict(color=OI["vermillion"], width=2.4)))
     _layout(fig, ytitle=var_label(var, profile), log=False)
     fig.update_layout(hovermode="closest")
     st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     c = st.columns(3)
-    c[0].metric("Change per decade", f"{tr['slope_decade']:+.2f} {v['unit']}",
-                help="Slope of the straight line through the annual means, times ten years.")
-    c[1].metric("Uncertainty (95 %)", f"± {tr['ci_decade']:.2f} {v['unit']}")
-    c[2].metric("Years used", f"{tr['years'][0]}-{tr['years'][1]} ({tr['n']})")
+    c[0].metric(tr_("Change per decade"), f"{tr['slope_decade']:+.2f} {v['unit']}",
+                help=tr_("Slope of the straight line through the annual means, times ten years."))
+    c[1].metric(tr_("Uncertainty (95 %)"), f"± {tr['ci_decade']:.2f} {v['unit']}")
+    c[2].metric(tr_("Years used"), f"{tr['years'][0]}-{tr['years'][1]} ({tr['n']})")
     sig = tr["ci_decade"] < abs(tr["slope_decade"])
-    direction = "rising" if tr["slope_decade"] > 0 else "falling"
-    st.markdown(f"**{'Clear' if sig else 'No clear'} long-term change**: {direction} by {abs(tr['slope_decade']):.2f} "
-                f"{v['unit']} per decade" + ("" if sig else " (the uncertainty is larger than the change)") + ".")
-    st.caption(P.text(P.EXPLAIN, "trend", profile) + f" Source: {ORIGIN_LABEL.get(o, o)}"
+    rising = tr["slope_decade"] > 0
+    head = tr_("Clear long-term change") if sig else tr_("No clear long-term change")
+    body = (tr_("rising by {x} {u} per decade", x=f"{abs(tr['slope_decade']):.2f}", u=v['unit']) if rising else
+            tr_("falling by {x} {u} per decade", x=f"{abs(tr['slope_decade']):.2f}", u=v['unit']))
+    st.markdown(f"**{head}**: {body}" + ("" if sig else tr_(" (the uncertainty is larger than the change)")) + ".")
+    st.caption(tr_(P.text(P.EXPLAIN, "trend", profile)) + tr_(" Source: {src}", src=tr_(ORIGIN_LABEL.get(o, o)))
                + (f", {s.attrs.get('dataset', '')}, p = {tr['p']:.3g}" if detail else "") + ".")
 
 
@@ -184,17 +187,17 @@ def trend_view(sel, var, profile):
 def obs_model_view(sel, var, profile):
     detail = P.show_detail(profile)
     if A.has_module("marinekit.datahub"):
-        with st.spinner("Pairing measurements and model..."):
+        with st.spinner(tr_("Pairing measurements and model...")):
             r = A.soft(A.hub_obs_model, var, round(sel["lat"], 4), round(sel["lon"], 4), str(A.today().date()))
         if r is not None:
             return _obs_model_hub(r, var, profile, detail)
-    with st.spinner("Pairing measurements and model..."):
+    with st.spinner(tr_("Pairing measurements and model...")):
         items = _ready(A.series_for(var, sel["lat"], sel["lon"]))
     obs = [i for i in items if i["origin"] in ("in-situ", "satellite")]
     mods = [i for i in items if i["origin"] in ("model", "reanalysis")]
     if not obs or not mods:
-        st.info("Needs both an observation (buoy or satellite) and a model series at this point. "
-                "Try sea temperature or salinity near a buoy, or pick a buoy from the list.")
+        st.info(tr_("Needs both an observation (buoy or satellite) and a model series at this point. "
+                    "Try sea temperature or salinity near a buoy, or pick a buoy from the list."))
         return
     mod = mods[0]
     rows = []
@@ -203,13 +206,14 @@ def obs_model_view(sel, var, profile):
         mt = A.obs_vs_model(ob["series"], mod["series"])
         if mt is None:
             continue
-        rows.append({"Observation": ob["label"], "Model": mod["label"], "Days paired": mt["n"],
-                     "Bias (model - obs)": round(mt["bias"], 3), "RMSE": round(mt["rmse"], 3), "Correlation r": round(mt["r"], 3),
-                     "Period": f"{mt['start']:%d %b %Y} - {mt['end']:%d %b %Y}",
-                     "Trust": "under QC" if ob.get("untrusted") else "ok"})
+        rows.append({tr_("Observation"): ob["label"], tr_("Model"): mod["label"], tr_("Days paired"): mt["n"],
+                     tr_("Bias (model - obs)"): round(mt["bias"], 3), "RMSE": round(mt["rmse"], 3),
+                     tr_("Correlation r"): round(mt["r"], 3),
+                     tr_("Period"): f"{dt(mt['start'], '%d %b %Y')} - {dt(mt['end'], '%d %b %Y')}",
+                     tr_("Trust"): tr_("under QC") if ob.get("untrusted") else "ok"})
         figs.append((ob, mt))
     if not rows:
-        st.info("The observation and the model do not overlap in time at this point.")
+        st.info(tr_("The observation and the model do not overlap in time at this point."))
         return
     v = A.VARIABLES[var]
     st.markdown(table_html(pd.DataFrame(rows)), unsafe_allow_html=True)
@@ -217,83 +221,90 @@ def obs_model_view(sel, var, profile):
     j = mt["joined"]
     lo, hi = float(np.nanmin(j.values)), float(np.nanmax(j.values))
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[lo, hi], y=[lo, hi], mode="lines", line=dict(color="#999", dash="dash"), name="perfect agreement"))
-    fig.add_trace(go.Scatter(x=j["obs"], y=j["mod"], mode="markers", name="one day",
+    fig.add_trace(go.Scatter(x=[lo, hi], y=[lo, hi], mode="lines", line=dict(color="#999", dash="dash"), name=tr_("perfect agreement")))
+    fig.add_trace(go.Scatter(x=j["obs"], y=j["mod"], mode="markers", name=tr_("one day"),
                              marker=dict(color=ORIGIN.get(ob["origin"], OI["black"]), size=6, opacity=0.65),
-                             text=[f"{t:%d %b %Y}" for t in j.index], hovertemplate="%{text}<br>obs %{x:.2f}<br>model %{y:.2f}"))
-    _layout(fig, ytitle=f"Model ({v['unit']})", height=340)
-    fig.update_xaxes(title=f"{ORIGIN_LABEL.get(ob['origin'])} ({v['unit']})")
+                             text=[dt(t, "%d %b %Y") for t in j.index],
+                             hovertemplate="%{text}<br>" + tr_("observed") + " %{x:.2f}<br>" + tr_("model") + " %{y:.2f}"))
+    _layout(fig, ytitle=tr_("Model ({u})", u=v['unit']), height=340)
+    fig.update_xaxes(title=f"{tr_(ORIGIN_LABEL.get(ob['origin']) or '')} ({v['unit']})")
     fig.update_layout(hovermode="closest")
     st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
-    st.caption("Bias above zero means the model is too high. RMSE is the typical size of the error. "
-               "r close to 1 means the model follows the ups and downs."
-               + (f" Model: {mod['dataset']} ({_src_line(mod['meta'], True)})." if detail else ""))
+    st.caption(tr_(BIAS_NOTE)
+               + (f" {tr_('Model')}: {mod['dataset']} ({_src_line(mod['meta'], True)})." if detail else ""))
 
 
 def _obs_model_hub(r, var, profile, detail):
     v = A.VARIABLES[var]
     unit = r.get("unit") or v["unit"]
     if not r.get("n"):
-        st.info("The observation and the model do not overlap in time here. " + (r.get("note") or ""))
+        st.info(tr_("The observation and the model do not overlap in time here.") + " " + (data(r.get("note")) or ""))
         return
     c = st.columns(4)
-    c[0].metric("Days compared", r["n"])
-    c[1].metric("Bias (model - obs)", f"{r['bias']:+.2f} {unit}" if r.get("bias") is not None else "-")
+    c[0].metric(tr_("Days compared"), r["n"])
+    c[1].metric(tr_("Bias (model - obs)"), f"{r['bias']:+.2f} {unit}" if r.get("bias") is not None else "-")
     c[2].metric("RMSE", f"{r['rmse']:.2f} {unit}" if r.get("rmse") is not None else "-")
-    c[3].metric("Correlation r", f"{r['r']:.2f}" if r.get("r") is not None else "-")
-    st.markdown(f"Observation: **{esc(r.get('obs_label'))}**" + (f" (platform {esc(r['obs_platform'])})" if r.get("obs_platform") else "")
-                + f"  \nModel: **{esc(r.get('model_label'))}**", unsafe_allow_html=True)
+    c[3].metric(tr_("Correlation r"), f"{r['r']:.2f}" if r.get("r") is not None else "-")
+    st.markdown(f"{tr_('Observation')}: **{esc(r.get('obs_label'))}**"
+                + (f" ({tr_('platform {p}', p=esc(r['obs_platform']))})" if r.get("obs_platform") else "")
+                + f"  \n{tr_('Model')}: **{esc(r.get('model_label'))}**", unsafe_allow_html=True)
     j = r.get("joined")
     if j is not None and len(j):
         lo, hi = float(np.nanmin(j.values)), float(np.nanmax(j.values))
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=[lo, hi], y=[lo, hi], mode="lines", line=dict(color="#999", dash="dash"),
-                                 name="perfect agreement"))
-        fig.add_trace(go.Scatter(x=j["obs"], y=j["mod"], mode="markers", name="one day",
+                                 name=tr_("perfect agreement")))
+        fig.add_trace(go.Scatter(x=j["obs"], y=j["mod"], mode="markers", name=tr_("one day"),
                                  marker=dict(color=OI["blue"], size=6, opacity=0.6),
-                                 text=[f"{t:%d %b %Y}" for t in j.index],
-                                 hovertemplate="%{text}<br>observed %{x:.2f}<br>model %{y:.2f}<extra></extra>"))
+                                 text=[dt(t, "%d %b %Y") for t in j.index],
+                                 hovertemplate="%{text}<br>" + tr_("observed") + " %{x:.2f}<br>" + tr_("model")
+                                               + " %{y:.2f}<extra></extra>"))
         lg = bool(v.get("log"))
-        _layout(fig, ytitle=f"Model ({unit})", height=340, log=lg)
-        fig.update_xaxes(title=f"Observed ({unit})", type="log" if lg else "linear")
+        _layout(fig, ytitle=tr_("Model ({u})", u=unit), height=340, log=lg)
+        fig.update_xaxes(title=tr_("Observed ({u})", u=unit), type="log" if lg else "linear")
         fig.update_layout(hovermode="closest")
         st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
-    st.caption("Bias above zero means the model is too high. RMSE is the typical size of the error. "
-               "r close to 1 means the model follows the ups and downs."
-               + (f" {r['note']}." if r.get("note") else "")
-               + (f" Period {r.get('start')} to {r.get('end')}, sampled at {r['lat']:.3f} N {r['lon']:.3f} E." if detail else ""))
+    st.caption(tr_(BIAS_NOTE)
+               + (f" {data(r['note'])}." if r.get("note") else "")
+               + (tr_(" Period {a} to {b}, sampled at {la} N {lo} E.", a=r.get('start'), b=r.get('end'),
+                      la=f"{r['lat']:.3f}", lo=f"{r['lon']:.3f}") if detail else ""))
+
+
+BIAS_NOTE = ("Bias above zero means the model is too high. RMSE is the typical size of the error. "
+             "r close to 1 means the model follows the ups and downs.")
+VEC_KINDS = {"all three": "All three", "waves": "Waves", "currents": "Currents", "wind": "Wind"}
 
 
 # ------------------------------------------------------------------------------------------ vectors
 def vector_view(sel, profile):
     vv = A.vectorviz()
     if vv is None or not (hasattr(vv, "point_chart") and hasattr(vv, "load_point")):
-        st.info("The combined waves / currents / wind chart comes from the vector visualisation module, which is not ready yet.")
+        st.info(tr_("The combined waves / currents / wind chart comes from the vector visualisation module, which is not ready yet."))
         return
     st.session_state.setdefault("vec_kind", "all three")
-    kind = st.segmented_control("Show", ["all three", "waves", "currents", "wind"], key="vec_kind",
-                                format_func=str.capitalize) or "all three"
+    kind = st.segmented_control(tr_("Show"), ["all three", "waves", "currents", "wind"], key="vec_kind",
+                                format_func=lambda k: tr_(VEC_KINDS[k])) or "all three"
     t = A.today()
     start, end = t - pd.Timedelta(days=10), t + pd.Timedelta(days=4)
     kinds = ["waves", "currents", "wind"] if kind == "all three" else [kind]
     dfs = {}
-    with st.spinner("Loading waves, currents and wind..."):
+    with st.spinner(tr_("Loading waves, currents and wind...")):
         for k in kinds:
             try:
                 dfs[k] = A.timed(_vec_point, k, round(sel["lat"], 3), round(sel["lon"], 3), str(start.date()),
                                  str(end.date()), timeout=45)
             except Exception as ex:
-                st.caption(f"{k.capitalize()}: {str(ex)[:160]}")
+                st.caption(f"{tr_(VEC_KINDS[k])}: {str(ex)[:160]}")
     if not dfs:
         return
     try:
         fig = _vec_fig(tuple(dfs), round(sel["lat"], 3), round(sel["lon"], 3), str(start.date()), str(end.date()),
                        theme_name())
         st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
-        st.caption("Arrows point where the water or air is going (up = north). For waves, a longer arrow means a "
-                   "longer wave period (swell). The dashed line marks today; later values are forecast.")
+        st.caption(tr_("Arrows point where the water or air is going (up = north). For waves, a longer arrow means a "
+                       "longer wave period (swell). The dashed line marks today; later values are forecast."))
     except Exception as ex:
-        st.warning(f"Could not draw the chart: {str(ex)[:200]}")
+        st.warning(tr_("Could not draw the chart: {e}", e=str(ex)[:200]))
 
 
 @st.cache_data(ttl=3 * 3600, show_spinner=False, max_entries=64)
