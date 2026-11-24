@@ -213,6 +213,28 @@ def date_controls():
              help="Summer = bathing season, 1 June to 15 September: tourism zones are on.")
 
 
+EDGES = {"soft": "Soft edges", "sharp": "Sharp edges"}
+EDGES_DEFAULT = "sharp"  # switch to "soft" once the soft map has been checked
+
+
+def edges() -> str:
+    """'soft' or 'sharp': how the pressure overlap and sector zones are drawn (one setting for every map)."""
+    ss = st.session_state
+    if ss.get("w_edges") not in EDGES:  # ?edges=soft in the URL starts with soft edges (handy for checks and demos)
+        q = st.query_params.get("edges")
+        ss["w_edges"] = q if q in EDGES else EDGES_DEFAULT
+    return ss["w_edges"]
+
+
+def edges_control(compact: bool = False):
+    """Edges: Soft / Sharp. Soft fades the zone limits (they are approximate); the colour is still the count."""
+    edges()
+    st.segmented_control("Edges", list(EDGES), key="w_edges", format_func=(str.capitalize if compact else EDGES.get),
+                         required=True, label_visibility="collapsed" if compact else "visible",
+                         help="Soft: zone limits fade out, because they are approximate. Sharp: the 500 m grid "
+                              "cells and the zone outlines. Both show the same count of overlapping sectors.")
+
+
 # ------------------------------------------------------------------------------------------ profile
 def profile_menu():
     ss = st.session_state

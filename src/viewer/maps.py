@@ -253,6 +253,61 @@ def add_overlap(m, gj: dict, season: str, hatched: bool = False):
                    tooltip=folium.GeoJsonTooltip(["label"], labels=False)).add_to(m)
 
 
+def add_overlap_soft(m, gj: dict, season: str, stamp: tuple, hatched: bool = False):
+    """Soft overlap (viewer.softzones): a smooth 0-5 image in the overlap ramp, thin lines where the count reaches
+    1, 2 and 3, and the original overlap polygons kept invisible on top, so hover still gives the exact count of
+    the 500 m grid."""
+    from viewer import softzones as SZ
+    t = tokens()
+    img = SZ.overlap_image(season, stamp)
+    folium.map.CustomPane("softoverlap", z_index=390, pointer_events=False).add_to(m)
+    folium.raster_layers.ImageOverlay(image=img["url"], bounds=img["bounds"], opacity=0.6 if hatched else 0.95,
+                                      name=f"Pressure overlap, soft edges ({season})", interactive=False,
+                                      pane="softoverlap").add_to(m)
+    weight, alpha = {1: 0.6, 2: 1.0, 3: 1.5}, {1: 0.3, 2: 0.55, 3: 0.8}
+    folium.GeoJson(SZ.contours(season, stamp), name="Overlap lines (1, 2, 3 sectors)", zoom_on_click=False,
+                   style_function=lambda f: {"color": t["text"], "weight": weight.get(f["properties"]["k"], 1.0),
+                                             "opacity": alpha.get(f["properties"]["k"], 0.5)},
+                   tooltip=folium.GeoJsonTooltip(["label"], labels=False)).add_to(m)
+    for f in gj["features"]:
+        n = int(f["properties"]["n"])
+        f["properties"]["label"] = f"{n} of 5 sectors overlap here ({season}, 500 m grid)"
+    folium.GeoJson(gj, name="Exact count on hover", control=False, zoom_on_click=False,
+                   style_function=lambda f: {"fillColor": "#000000", "fillOpacity": 0.0, "weight": 0, "opacity": 0},
+                   tooltip=folium.GeoJsonTooltip(["label"], labels=False)).add_to(m)
+
+
+def add_zones_soft(m, gj: dict, season: str, stamp: tuple, only_sector: str | None = None):
+    """Soft sector zones: each sector's zones as a fading image in its colour (wider fade for assumed locations),
+    with the invisible polygons on top for the tooltips and a dashed outline for assumed zones."""
+    from viewer import softzones as SZ
+    folium.map.CustomPane("softzones", z_index=395, pointer_events=False).add_to(m)  # tint on top of the overlap
+    for k in SECTOR:
+        if only_sector and k != only_sector:
+            continue
+        img = SZ.zone_image(k, season, stamp)
+        if img:
+            folium.raster_layers.ImageOverlay(image=img["url"], bounds=img["bounds"], opacity=1.0, interactive=False,
+                                              name=f"{SECTOR[k][0]} zones, soft", pane="softzones").add_to(m)
+    fg = folium.FeatureGroup(name="Sector zones (outlines of assumed ones)").add_to(m)
+    for f in gj["features"]:
+        p = f["properties"]
+        if only_sector and p["sector"] != only_sector:
+            continue
+        if season == "winter" and str(p.get("season")) == "summer":
+            continue
+        lab, col = SECTOR.get(p["sector"], (p["sector"], "#555"))
+        dashed = str(p.get("confidence")) == "assumed"
+        buf = p.get("buffer_m")
+        tip = (f"<b>{esc(lab)}</b><br>{esc(p.get('activity') or '')}<br>"
+               f"buffer {buf:.0f} m ({esc(p.get('buffer_basis'))})<br>confidence: {esc(p.get('confidence'))}"
+               if buf == buf and buf is not None else f"<b>{esc(lab)}</b>")
+        folium.GeoJson(f, style_function=lambda _f, col=col, dashed=dashed: {
+            "color": col, "weight": 1.2 if dashed else 0, "opacity": 0.85 if dashed else 0, "fillColor": col,
+            "fillOpacity": 0.0, "dashArray": "6 5" if dashed else None},
+            tooltip=folium.Tooltip(tip), zoom_on_click=False).add_to(fg)
+
+
 def add_zones(m, gj: dict, season: str, only_sector: str | None = None):
     fg = folium.FeatureGroup(name="Sector zones").add_to(m)
     for f in gj["features"]:
@@ -272,7 +327,10 @@ def add_zones(m, gj: dict, season: str, only_sector: str | None = None):
             tooltip=folium.Tooltip(tip), zoom_on_click=False).add_to(fg)
 
 
-def add_features(m, gj: dict, season: str, only_sector: str | None = None):
+def add_features(m, gj: dict, season: str, only_sector: str | None = None, soft: bool = False):
+    """Activities: points, lines and areas. With soft edges the areas are shown by the soft zones already, so their
+    polygons stay invisible (hover and click still work), except the dashed outline of assumed ones; several are
+    built from 1 km grid cells (shipping lanes, fishing grounds) and would bring the hard squares back."""
     fg = folium.FeatureGroup(name="Sector activities").add_to(m)
     for f in gj["features"]:
         p = f["properties"]
@@ -294,9 +352,13 @@ def add_features(m, gj: dict, season: str, only_sector: str | None = None):
                                 fill=conf != "assumed", fill_opacity=0.9, dash_array="2 2" if conf == "assumed" else None,
                                 tooltip=folium.Tooltip(tip), popup=pop).add_to(fg)
         else:
-            folium.GeoJson(f, style_function=lambda _f, col=col, conf=conf: {
-                "color": col, "weight": 2, "fillColor": col,
-                "dashArray": "4 4" if conf == "assumed" else None, "fillOpacity": 0.0 if conf == "assumed" else 0.25},
+            area = g.get("type") in ("Polygon", "MultiPolygon")
+            hide = soft and area
+            folium.GeoJson(f, style_function=lambda _f, col=col, conf=conf, hide=hide: {
+                "color": col, "weight": (1.2 if conf == "assumed" else 0) if hide else 2, "fillColor": col,
+                "opacity": (0.85 if conf == "assumed" else 0) if hide else 1,
+                "dashArray": "4 4" if conf == "assumed" else None,
+                "fillOpacity": 0.0 if (conf == "assumed" or hide) else 0.25},
                 tooltip=folium.Tooltip(tip), popup=pop, zoom_on_click=False).add_to(fg)
 
 
@@ -419,7 +481,22 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
             f"<div style='position:relative;height:4px;width:200px'>{marks}</div>"
             f"<div style='position:relative;height:16px;width:200px;{num}'>{ticks}</div>"
             f"<div style='font-size:10.5px;color:{t['muted']}'>{esc(src)}</div>")
-    if "overlap" in layers:
+    if "overlap" in layers and edges == "soft":
+        from viewer import softzones as SZ
+        xs, cols, alps = SZ.overlap_ramp()
+        stops = ", ".join(f"rgba({int(c[0] * 255)},{int(c[1] * 255)},{int(c[2] * 255)},{max(a, 0.0):.2f}) {100 * x / 5:.0f}%"
+                          for x, c, a in zip(xs, cols, alps))
+        ticks = "".join(f"<span style='position:absolute;left:{100 * k / 5:.0f}%;transform:translateX("
+                        f"{'0' if k == 0 else ('-100%' if k == 5 else '-50%')})'>{k}</span>" for k in range(6))
+        line = (f"<span style='display:inline-block;width:22px;border-top:1.2px solid {t['text']};opacity:0.7;"
+                "vertical-align:middle'></span>")
+        parts.append(f"<span style='{lab}'>Sectors overlapping, of 5 ({esc(season)})</span>"
+                     f"<div style='height:10px;width:200px;background:linear-gradient(to right,{stops});"
+                     f"border:1px solid {t['ctrl']}'></div>"
+                     f"<div style='position:relative;height:16px;width:200px;{num}'>{ticks}</div>"
+                     f"<div style='{row};color:{t['sub']};font-size:11px'>{line}where 1, 2, 3 sectors begin</div>"
+                     f"<div style='font-size:10.5px;color:{t['muted']}'>Hover for the exact count (500 m grid).</div>")
+    elif "overlap" in layers:
         lv = overlap_levels()
         present = sorted(levels or lv)
 
@@ -437,7 +514,9 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
         parts.append(f"<span style='{lab}'>Sectors overlapping, of 5 ({esc(season)})</span>"
                      f"<div style='display:flex;flex-wrap:wrap;gap:2px 0'>{cells}</div>")
     if "zones" in layers or "features" in layers:
-        rows = "".join(f"<div style='{row}'><span style='width:10px;height:10px;border:2px solid {c}'></span>{esc(l)}</div>"
+        sw = ("width:12px;height:12px;background:radial-gradient(circle,{c} 0 35%,transparent 75%)" if edges == "soft"
+              else "width:10px;height:10px;border:2px solid {c}")
+        rows = "".join(f"<div style='{row}'><span style='{sw.format(c=c)}'></span>{esc(l)}</div>"
                        for k, (l, c) in SECTOR.items())
         parts.append(f"<span style='{lab}'>Sectors</span>{rows}"
                      f"<div style='{row};color:{t['muted']}'><span style='width:10px;height:10px;"
@@ -471,7 +550,7 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
     layers. vec_time: the time step for the waves / currents / wind layers (default: the day at 00:00).
     Map notes (nearest available day, layer caveats, and `notes` from the page) go to the bottom of the legend;
     the returned messages are the ones that had no legend to go in, for the page to show in its own place.
-    edges: 'sharp' (500 m cells and polygon outlines) or 'soft' (blurred zones, see viewer.softzones)."""
+    edges: 'sharp' (500 m cells and polygon outlines) or 'soft' (soft zone edges, viewer.softzones)."""
     msgs = []
     m = base_map(view["lat"], view["lon"], view["zoom"], theme)
     stamp = A._zones_stamp()
@@ -509,14 +588,23 @@ def build(view: dict, layers: set, day: str, season: str, sel: dict | None, deta
     if "bathy" in layers or "bathy_colour" in layers:
         add_bathy(m)
     levels = None
+    soft = edges == "soft"
+    if soft and ("overlap" in layers or "zones" in layers):
+        from viewer import softzones as SZ
+        notes = list(notes or []) + [SZ.NOTE]
+    if "zones" in layers and soft:  # under the overlap, as in the sharp map's drawing order
+        add_zones_soft(m, A.sector_zones(stamp), season, stamp, only_sector)
     if "overlap" in layers:
         ogj = A.overlap_geojson(season, stamp)
         levels = sorted({int(f["properties"]["n"]) for f in ogj["features"]})
-        add_overlap(m, ogj, season, hatched=bool(grid))
-    if "zones" in layers:
+        if soft:
+            add_overlap_soft(m, ogj, season, stamp, hatched=bool(grid))
+        else:
+            add_overlap(m, ogj, season, hatched=bool(grid))
+    if "zones" in layers and not soft:
         add_zones(m, A.sector_zones(stamp), season, only_sector)
     if "features" in layers:
-        add_features(m, A.sector_features(stamp), season, only_sector)
+        add_features(m, A.sector_features(stamp), season, only_sector, soft=soft)
     if "natura" in layers:
         add_natura(m, A.natura())
     for lid, kind in VECTOR.items():

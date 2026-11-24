@@ -54,6 +54,8 @@ def _layer_controls(profile: dict):
         if group == "Pressures" and profile.get("sector"):
             ss.setdefault("w_mysector", True)
             st.checkbox(f"Zones and activities: only {P.SECTORS[profile['sector']].lower()}", key="w_mysector")
+        if group == "Pressures":
+            SH.edges_control()
 
 
 # ------------------------------------------------------------------------------------------ Overview
@@ -73,14 +75,15 @@ def overview():
                     SH.season_control()
                 note_slot = st.empty()  # map notes without a legend to go in (rare): a short line here
             only = profile.get("sector") if (profile.get("sector") and ss.get("w_mysector", True)) else None
+            edges = SH.edges()
             m, fd, msgs = M.build(ss.view, layers, day_s, season, None, detail, tiles_mode=ss.get("w_tiles", False),
-                                  only_sector=only, theme=theme_name())
+                                  only_sector=only, theme=theme_name(), edges=edges)
             fg = folium.FeatureGroup(name="Selection")
             M.add_selection(fg, ss.sel)
             # st_folium draws the base map only when it first mounts; later changes to layers, date, season or
             # legend are ignored unless the key changes, so the key carries every input that changes the base map
             mkey = map_key("map", ss.get("map_nonce", 0), theme_name(), sorted(layers), day_s, season,
-                           ss.get("w_tiles", False), only, ss.view)
+                           ss.get("w_tiles", False), only, ss.view, edges)
             out = st_folium(m, height=700, use_container_width=True, key=mkey,
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
             M.notes_slot(note_slot, msgs)

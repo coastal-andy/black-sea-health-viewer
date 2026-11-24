@@ -338,6 +338,11 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{background:{t['panel']};
   border-right:1px solid {t['ctrl']} !important;}}
 .st-key-map_tools_wide [data-testid="stButtonGroup"] button:last-child {{border-right:0 !important;}}
 .st-key-map_tools_wide [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
+.st-key-edges_ctl {{background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:0 0 0 12px;
+  width:auto !important; flex:0 0 auto !important; gap:10px !important;}}
+.st-key-map_tools_wide div:has(> .st-key-edges_ctl) {{flex:0 0 auto !important; width:auto !important; min-width:0 !important;}}
+.st-key-edges_ctl [data-testid="stButtonGroup"] {{background:transparent !important; border:0 !important;}}
+.st-key-edges_ctl [data-testid="stButtonGroup"] button:first-child {{border-left:1px solid {t['ctrl']} !important;}}
 .bsv-stats.bsv-stats3 {{grid-template-columns:repeat(3, minmax(0,1fr)); margin:0; border-top:0;}}
 .bsv-stats3 .bsv-stat:first-child {{padding-left:22px;}}
 .bsv-stats3 .bsv-stat .v {{font-size:28px;}}

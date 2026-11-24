@@ -121,12 +121,16 @@ def page():
                                      required=True, label_visibility="collapsed")
                 st.segmented_control("Season", ["winter", "summer"], key="w_pseason", format_func=str.capitalize,
                                      required=True, label_visibility="collapsed")
+                with st.container(key="edges_ctl", horizontal=True, vertical_alignment="center"):
+                    st.markdown("<span class='bsv-lbl'>Edges</span>", unsafe_allow_html=True)
+                    SH.edges_control(compact=True)
+            edges = SH.edges()
             pts = [(s["lat"], s["lon"]) for s in sites] + [(44.34, 28.68), (43.79, 28.58)]
             view = SC.fit_view(pts, width_px=900, height_px=760)
             notes = (["Tourism zones are switched off outside the bathing season (1 June - 15 September)."]
                      if sector == "tourism" and season == "winter" else [])
             m, _, msgs = M.build(view, {"overlap", "zones", "features"}, day_s, season, None, detail,
-                                 only_sector=sector, theme=theme_name(), notes=notes)
+                                 only_sector=sector, theme=theme_name(), notes=notes, edges=edges)
             t = tokens()
             for i, s in enumerate(sites):
                 folium.CircleMarker([s["lat"], s["lon"]], radius=8, color=t["text"], weight=2, fill=True,
@@ -136,7 +140,7 @@ def page():
                     html=f"<div style='font:600 11px sans-serif;color:{t['text']};transform:translate(-3px,-7px)'>"
                          f"{i + 1}</div>")).add_to(m)
             st_folium(m, height=720, use_container_width=True, returned_objects=[],
-                      key=f"pmap_{sector}_{season}_{theme_name()}")
+                      key=f"pmap_{sector}_{season}_{theme_name()}_{edges}")
             if msgs:  # only when the map has no legend to hold them
                 with st.container(key="map_tools_note"):
                     M.notes_slot(st.empty(), msgs)
@@ -172,8 +176,10 @@ def page():
                 with st.container(key="cdet_press"):
                     st.markdown("<ul class='bsv-chain'>" + "".join(f"<li>{esc(x)}</li>" for x in press) + "</ul>",
                                 unsafe_allow_html=True)
+            how = ("soft edges: zone limits fade out over 1-3 km because they are approximate; inside the zones the "
+                   "colour is the exact count" if edges == "soft" else "counted in each 500 m cell")
             st.markdown("<div class='bsv-sec' style='border-bottom:0'><p class='bsv-note'>Map: number of the 5 sectors "
-                        "whose zones overlap in each 500 m cell (no weights). Dashed outlines are assumed locations, to "
+                        f"whose zones overlap (no weights), {how}. Dashed outlines are assumed locations, to "
                         "confirm with NIMRD.</p></div>", unsafe_allow_html=True)
     if ss.pop("_goto", None) == "overview":
         st.switch_page(SH.PAGE_OBJS["overview"])
