@@ -277,7 +277,7 @@ def slide_prototype(prs):
     path = ["Overview: today at Constanța against a normal late-November day",
             "One indicator opened: value, usual range, rule chain",
             "Sector view: a mussel farm and what to check",
-            "Water quality: 60-day chart and which source we trust",
+            "Water quality: 60-day chart against the usual range",
             "Coast and seabed: waves, currents and wind on one map",
             "Pressures: summer against winter"]
     text(s, 6.95, 2.05, 6.0, 3.5, [[(f"{i + 1}.  ", {"bold": True, "size": 14, "color": BLUE}),
@@ -325,7 +325,7 @@ def slide_validation(prs):
     picture_fit(s, A / "taylor_sst.png", 8.55, 1.35, 4.65, 3.55)
     text(s, 8.6, 4.85, 4.5, 0.4, "Sea temperature: satellite and model sit next to the buoys "
          "(Taylor diagram).", size=11, color=MUTED)
-    text(s, 0.35, 5.25, 6.2, 0.4, "Not trusted, shown greyed out", size=15, bold=True)
+    text(s, 0.35, 5.25, 6.2, 0.4, "Not trusted (from our checks)", size=15, bold=True)
     text(s, 0.35, 5.65, 6.2, 1.6, [
         "Buoy chlorophyll reads 2-3 times too high",
         "Buoy salinity at EUXRoOB01-03: fouled sensor",
@@ -341,7 +341,7 @@ def slide_validation(prs):
     notes(s, "Joseph. We checked every source against buoys and bottle samples before trusting it. Satellite sea "
              "temperature is within about half a degree. Salinity from the model is within about 1 PSU at the "
              "coast. Model nitrate and phosphate do not match the bottles, so we never show them as values. "
-             "Sensors that fail the checks stay visible but greyed out. Hand over to Andrei.")
+             "In the viewer the new coastal buoys are already greyed out; the other flags go in next. Hand over to Andrei.")
 
 
 def slide_impact(prs):
