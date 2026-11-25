@@ -107,6 +107,45 @@ def plotly_layout(fig, height=None):
                      tickfont=dict(color=t["muted"]), title_font=dict(color=t["muted"]))
     if height:
         fig.update_layout(height=height)
+    ro_plotly(fig)
+    return fig
+
+
+def ro_plotly(fig):
+    """Romanian figures: decimal comma, and date ticks written by the viewer (plotly's own month and weekday names
+    are English). No-op in English."""
+    from viewer.i18n import dt, lang
+    if lang() != "ro":
+        return fig
+    import pandas as pd
+    fig.update_layout(separators=",.")
+    spans: dict = {}
+    for tr in fig.data:
+        x = getattr(tr, "x", None)
+        if x is None or not len(x):
+            continue
+        try:
+            xs = pd.to_datetime(pd.Series(list(x)), errors="coerce").dropna()
+        except Exception:
+            continue
+        if len(xs) < 2 or not (isinstance(x[0], (pd.Timestamp, np.datetime64)) or hasattr(x[0], "year")
+                               or (isinstance(x[0], str) and len(x[0]) >= 10 and x[0][4] == "-")):
+            continue
+        ax = "xaxis" + (str(tr.xaxis)[1:] if getattr(tr, "xaxis", None) not in (None, "x") else "")
+        lo, hi = spans.get(ax, (xs.min(), xs.max()))
+        spans[ax] = (min(lo, xs.min()), max(hi, xs.max()))
+    for ax, (lo, hi) in spans.items():
+        days = (hi - lo).days
+        for freq in ("D", "2D", "3D", "7D", "SMS", "MS", "2MS", "QS", "YS"):
+            ticks = pd.date_range(lo.normalize(), hi, freq=freq)
+            if len(ticks) <= 6:
+                break
+        if days > 365 * 3:
+            continue  # yearly axes are plain numbers already
+        axis = fig.layout[ax] if ax in fig.layout else None
+        fmt = (axis.tickformat if axis is not None and axis.tickformat else "%d %b").replace("<br>", " ")
+        fig.update_layout({ax: dict(tickmode="array", tickvals=list(ticks), ticktext=[dt(t, fmt) for t in ticks],
+                                    hoverformat="%d.%m.%Y")})  # numeric date in hover headers (no month names)
     return fig
 
 
@@ -673,7 +712,7 @@ OVERLAP = {k: v[0] for k, v in overlap_levels().items()}
 CSS = css("dark")  # kept for older imports; app.py injects css(theme_name()) instead
 
 
-def table_html(df, height: int | None = None, translate: bool = False) -> str:
+def table_html(df, height: int | None = None, translate: bool = False, keep: tuple = ()) -> str:
     """A DataFrame as a flat themed HTML table (st.dataframe draws on a canvas and ignores the light theme).
     Dates and decimal numbers follow the viewer language; translate=True also translates the column names (viewer
     dictionary) and the text cells (text produced by marinekit or the docs)."""
@@ -681,9 +720,10 @@ def table_html(df, height: int | None = None, translate: bool = False) -> str:
     from viewer.i18n import data, dt, num, t
     head = "".join(f"<th>{esc(t(str(c)) if translate else c)}</th>" for c in df.columns)
     rows = []
+    keep_i = {i for i, c in enumerate(df.columns) if c in keep}  # columns of codes and names, never translated
     for _, r in df.iterrows():
         cells = []
-        for v in r.values:
+        for i, v in enumerate(r.values):
             if v is None or (isinstance(v, float) and pd.isna(v)):
                 v = ""
             elif isinstance(v, pd.Timestamp):
@@ -694,7 +734,7 @@ def table_html(df, height: int | None = None, translate: bool = False) -> str:
                 v = num(f"{v:.4g}")
             elif isinstance(v, (list, tuple)):
                 v = ", ".join(map(str, v))
-            elif isinstance(v, str) and translate:
+            elif isinstance(v, str) and translate and i not in keep_i:
                 v = data(v)
             cells.append(f"<td>{esc(v)}</td>")
         rows.append("<tr>" + "".join(cells) + "</tr>")

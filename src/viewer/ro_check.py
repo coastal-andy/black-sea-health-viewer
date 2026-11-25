@@ -7,7 +7,8 @@
 It walks every rendered element (markdown, captions, labels, options, tables, expanders, tabs, chart traces and
 axis titles, map tooltips and legends), strips HTML, and flags any text with words from an English stop-list.
 Allowed: dataset IDs, product names, units, station codes and place names (ALLOW below). Also counted: blocks
-shown with the "[EN]" marker (marinekit text without a Romanian template) and cedilla diacritics (ş ţ).
+shown with the "[EN]" marker (marinekit text without a Romanian template), cedilla diacritics (ş ţ), ISO dates
+(2026-11-25) and decimal points in values with a unit (12.4 °C), which Romanian writes 25 nov. 2026 and 12,4 °C.
 Exit code 1 when anything is flagged. Set MARINEKIT_OFFLINE=1 to stay on the local cache.
 """
 
@@ -30,7 +31,7 @@ oxygen salinity chlorophyll for to on at by or be was were has have it its than 
 when where which what why how but if only still also about day days year years week weeks value values source
 sources range buoy buoys sample samples measured coast coastal offshore shown used not yes should would could can
 will may might each every all any some after before between under over into out up down our your you we they their
-been being does do did see show click open close page map layer layers zone zones level warning trust trusted
+been being does do did see show click open close page map layer layers zones level warning trust trusted
 untrusted indicative reliable error cycle seasonal season summer winter spring autumn mean average beach bathing
 shipyard shipyards fishing tourism aquaculture nutrients decade decades trend trends change changes rising falling
 higher lower warmer colder clearer murkier normal-range threshold thresholds computing loading downloading still
@@ -41,7 +42,7 @@ blooms clarity nitrate phosphate surface bottom near-bottom dissolved river danu
 
 # words that are also Romanian or proper names: never flagged even if listed above by mistake
 NOT_ENGLISH = {"model", "normal", "data", "are", "sector", "sectoare", "port", "trend", "bias", "in", "a", "pe", "per",
-               "global", "total", "local", "minim", "maxim", "variabil", "standard", "stop", "start", "risc"}
+               "offshore", "global", "total", "local", "minim", "maxim", "variabil", "standard", "stop", "start", "risc"}
 
 # text allowed as is (IDs, product and place names): removed before the word check
 ALLOW = [
@@ -49,12 +50,15 @@ ALLOW = [
     r"EMODnet[\w\s]*?(?=[,.;)]|$)", r"Open-Meteo", r"OpenStreetMap", r"GloFAS", r"NOAA", r"ESA Ocean Colour CCI",
     r"Natura 2000", r"OceanSITES", r"marinekit\.[\w.]+", r"docs/[\w/.\-*]+", r"\b[\w-]+\.(?:csv|md|py|json|geojson)\b",
     r"Esri[\w\s,]*", r"Leaflet", r"Tiles &copy;[^<]*", r"&copy;[^<]*", r"Garcia & Gordon \(1992\)", r"Hobday",
-    r"Newey-West", r"\(HAC\)", r"Sulina \(Danube mouth\)", r"Sfantu Gheorghe \(Danube\)",
+    r"Newey-West", r"\(HAC\)", r"Damen Shipyards", r"Seabed Habitats", r"Human Activities", r"\w+ -> \w+",
+    r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b", r"overlap_summer/winter", r"Drifting Buoy", r"C-RAID buoyID",
+    r"[A-Z][\w']* (?:[A-Z][\w']* )*(?:Beach|Shipyard)\b[\w ]*", r"CC BY[\w\-. ]*", r"TeleGeography[\w ]*",
+    r"Switch to English",  # the language button's tooltip is for English readers
 ]
 _ALLOW = re.compile("|".join(ALLOW))
 _WORD = re.compile(r"[A-Za-zăâîșțĂÂÎȘȚ'][A-Za-zăâîșțĂÂÎȘȚ'\-]*")
 _SKIP_KEYS = {"id", "formId", "key", "type", "componentName", "url", "pageScriptHash", "icon", "color", "format",
-              "theme", "uniqueId", "deltaColor", "id_", "help_", "elementId", "fragmentId", "scriptHash"}
+              "theme", "uniqueId", "urlPath", "page", "pageName", "defaultValue", "default", "deltaColor", "id_", "help_", "elementId", "fragmentId", "scriptHash"}
 
 
 def _strip_html(s: str) -> str:
@@ -81,8 +85,8 @@ def _from_folium(h: str) -> list[str]:
             pass
     for m in re.finditer(r"overlays\s*:\s*\{(.*?)\}", h, re.S):
         out.extend(re.findall(r'"([^"]+)"\s*:', m.group(1)))
-    body = re.sub(r"<script.*?</script>", " ", h, flags=re.S)
-    out.append(body)
+    if h.lstrip().startswith("<"):
+        out.append(re.sub(r"<script.*?</script>", " ", h, flags=re.S))
     return out
 
 
@@ -119,15 +123,23 @@ def _strings(x, key=None, out=None):
     elif isinstance(x, str):
         if key == "spec":
             out.extend(_from_plotly(x))
-        elif key in ("jsonArgs", "argsJson") or (x.lstrip().startswith("{") and "leaflet" in x[:20000].lower()):
+        elif x.lstrip().startswith("{"):
             try:
                 args = json.loads(x)
-                h = args.get("fig") or args.get("html") or json.dumps(args)
             except Exception:
-                h = x
-            out.extend(_from_folium(h))
-        elif x.lstrip().startswith("<style"):
-            pass
+                args = None
+            if isinstance(args, dict):
+                flat = json.dumps(args)
+                if "L.map(" in flat or "leaflet" in flat.lower():
+                    for v in args.values():
+                        if isinstance(v, str):
+                            out.extend(_from_folium(v))
+                else:
+                    _strings(args, key, out)
+            else:
+                out.append(x)
+        elif x.lstrip().startswith("<style") or re.fullmatch(r"[A-Z_]+|[0-9a-f]{20,}", x):
+            pass  # CSS, layout enums (gapSize NONE)
         else:
             out.append(x)
     return out
@@ -287,7 +299,10 @@ def main():
                 bad = english(txt)
                 marked = "[EN]" in txt
                 ced = bool(re.search("[şţŞŢ]", txt))
-                if bad or marked or ced:
+                t2 = _ALLOW.sub(" ", txt)
+                iso = bool(re.search(r"(?<![\w/-])\d{4}-\d{2}-\d{2}(?![\w-])", t2))
+                dot = bool(re.search(r"(?<![\w.])\d+\.\d+ ?(?:°C|m\b|km\b|PSU|mg|mmol|µ|%|1/m|m/s|s\b)", t2))
+                if bad or marked or ced or iso or dot:
                     flagged[txt[:400]].add(f"{page}/{pr}/{pl}/{day[5:]}")
         print(f"{page:9} {pr:24} {pl:9} {day} {json.dumps(extra)[:60]:60} {time.time() - t0:5.1f}s "
               f"exc={len(at.exception)}", flush=True)
@@ -295,9 +310,13 @@ def main():
     for e in excs[:30]:
         print("  EXC", e)
     if a.lang == "ro":
-        print(f"English or marked strings: {len(flagged)}")
-        for txt, where in sorted(flagged.items(), key=lambda kv: -len(kv[1])):
-            print(f"  [{len(where):3}] {sorted(where)[0]:40} | {sorted(set(english(txt)))[:6]} | {txt[:300]}")
+        shapes = defaultdict(list)
+        for txt, where in flagged.items():
+            shapes[re.sub(r"\d+([.,]\d+)?", "#", txt)[:160]].append((txt, where))
+        print(f"English or marked strings: {len(flagged)} ({len(shapes)} distinct shapes)")
+        for shp, items in sorted(shapes.items(), key=lambda kv: -len(kv[1])):
+            txt, where = items[0]
+            print(f"  [{len(items):3}x] {sorted(where)[0]:40} | {sorted(set(english(txt)))[:6]} | {txt[:300]}")
         print(f"[EN] marker blocks (no RO template): {len(i18n_data.MISSES)}")
     if a.out:
         Path(a.out).write_text(json.dumps(dict(flagged={k: sorted(v) for k, v in flagged.items()},

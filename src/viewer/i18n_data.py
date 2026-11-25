@@ -28,6 +28,8 @@ Placeholder kinds (English side; the Romanian side uses the bare {name}):
     s  text kept as is     -> names, dataset IDs, station codes (numbers inside get the decimal comma)
     k  text kept verbatim  -> nothing changed
     m  month name (Jan, Aug, August) -> Romanian month
+    c  count before a noun -> "5", "19", but "20 de", "101", "120 de" (Romanian adds "de" when the last two
+       digits are 00 or 20 to 99): T("{n:c} days", "{n} zile") -> "7 zile", "23 de zile"
 Templates are tried in registration order; put specific ones before general ones.
 """
 
@@ -52,8 +54,9 @@ _KIND_RE = {
     "s": r".+?",
     "k": r".+?",
     "m": r"[A-Z][a-z]{2,8}",
+    "c": r"\d+",
 }
-_PH = re.compile(r"\{(\w+)(?::([ntidlskm]))?\}")
+_PH = re.compile(r"\{(\w+)(?::([ntidlskmc]))?\}")
 _EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
               "November", "December"]
 _MON = {m[:3]: i for i, m in enumerate(_EN_MONTHS)} | {m: i for i, m in enumerate(_EN_MONTHS)} | {"Sept": 8}
@@ -74,6 +77,9 @@ def T(en: str, ro: str):
         parts.append(f"(?P<{name}>{_KIND_RE[kind]})")
         pos = m.end()
     parts.append(re.escape(en[pos:]))
+    tail = en.rstrip()
+    last = _PH.search(tail[-40:]) if tail.endswith("}") else None
+    kinds["__tail__"] = last.group(1) if last else None  # a final kept-text placeholder may hold several sentences
     TEMPLATES.append((re.compile("".join(parts), re.S), ro, kinds))
 
 
@@ -112,6 +118,9 @@ def _fill(kind: str, v: str) -> str | None:
         return ro_date(v)
     if kind == "m":
         return ro_month(v)
+    if kind == "c":
+        k = int(v)
+        return f"{v} de" if (k >= 20 and (k % 100 == 0 or k % 100 >= 20)) else v
     if kind == "s":
         return ro_num(v)
     out = _tr(v)
@@ -129,7 +138,12 @@ def _template(s: str) -> str | None:
         if not m:
             continue
         vals = {}
+        tail = kinds.get("__tail__")
         for name, kind in kinds.items():
+            if name == "__tail__":
+                continue
+            if kind in "sk" and name != tail and _SENT.search(m.group(name)):
+                break  # a kept-text placeholder must not swallow the next sentence
             v = _fill(kind, m.group(name))
             if v is None:
                 break
@@ -222,6 +236,9 @@ def _md_cell(c: str) -> str:
     return f" {out} "
 
 
+_NUM_ITEM = re.compile(r"^(\s*)(\d+)\.\s+(.*)$")
+
+
 def _md_par(p: str) -> str:
     lines = p.split("\n")
     if all(x.lstrip().startswith("|") for x in lines if x.strip()):
@@ -235,6 +252,9 @@ def _md_par(p: str) -> str:
                                                 for x in lines[1:] if x.strip()])
     if all(x.lstrip().startswith(("- ", "* ")) for x in lines if x.strip()):
         return "\n".join("- " + _md_par(x.lstrip()[2:]) for x in lines if x.strip())
+    if all(_NUM_ITEM.match(x) for x in lines if x.strip()):
+        return "\n".join(f"{m.group(1)}{m.group(2)}. {_md_par(m.group(3))}"
+                         for m in (_NUM_ITEM.match(x) for x in lines if x.strip()))
     whole = " ".join(x.strip() for x in lines)
     out = _tr(whole)
     if out is not None:

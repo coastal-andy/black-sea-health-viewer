@@ -8,7 +8,7 @@ import streamlit as st
 from viewer import adapters as A
 from viewer import panels as PN
 from viewer import profiles as P
-from viewer.i18n import data, dt, lang, t
+from viewer.i18n import data, dt, lang, num, t
 from viewer.style import ORIGIN_LABEL, STATUS, STATUS_LABEL, esc, status_square
 
 # tab label -> role key
@@ -133,7 +133,7 @@ def _value(c) -> str:
     v = c.get("value")
     if v is None:
         return "-"
-    return PN._num(v, c.get("unit") or "")
+    return num(PN._num(v, c.get("unit") or ""))
 
 
 def _means(c, lvl) -> str:
@@ -159,9 +159,9 @@ def _source(c, detail) -> str:
         seen.add(name)
         b = name
         if s.get("date"):
-            b += f", {s['date']}"
+            b += f", {PN.day_txt(s['date'])}"
         if s.get("distance_km") not in (None, ""):
-            b += ", " + t("{d} km away", d=s["distance_km"])
+            b += ", " + t("{d} km away", d=num(str(s["distance_km"])))
         out.append(b)
     if detail and c.get("confidence"):
         out.append(t("confidence {c}", c=t(c["confidence"])))

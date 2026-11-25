@@ -9,7 +9,7 @@ import streamlit as st
 
 from viewer import adapters as A
 from viewer import profiles as P
-from viewer.i18n import data, dt, t as tr_
+from viewer.i18n import data, dt, num, t as tr_
 from viewer.style import table_html, ORIGIN, ORIGIN_LABEL, OI, STATUS, esc, origin_tag, pill, plotly_layout, theme_name, tokens
 
 FONT = dict(family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif", size=12, color="#1C2430")
@@ -242,12 +242,12 @@ def _obs_model_hub(r, var, profile, detail):
         return
     c = st.columns(4)
     c[0].metric(tr_("Days compared"), r["n"])
-    c[1].metric(tr_("Bias (model - obs)"), f"{r['bias']:+.2f} {unit}" if r.get("bias") is not None else "-")
-    c[2].metric("RMSE", f"{r['rmse']:.2f} {unit}" if r.get("rmse") is not None else "-")
-    c[3].metric(tr_("Correlation r"), f"{r['r']:.2f}" if r.get("r") is not None else "-")
-    st.markdown(f"{tr_('Observation')}: **{esc(r.get('obs_label'))}**"
+    c[1].metric(tr_("Bias (model - obs)"), num(f"{r['bias']:+.2f} {unit}") if r.get("bias") is not None else "-")
+    c[2].metric("RMSE", num(f"{r['rmse']:.2f} {unit}") if r.get("rmse") is not None else "-")
+    c[3].metric(tr_("Correlation r"), num(f"{r['r']:.2f}") if r.get("r") is not None else "-")
+    st.markdown(f"{tr_('Observation')}: **{esc(data(r.get('obs_label')))}**"
                 + (f" ({tr_('platform {p}', p=esc(r['obs_platform']))})" if r.get("obs_platform") else "")
-                + f"  \n{tr_('Model')}: **{esc(r.get('model_label'))}**", unsafe_allow_html=True)
+                + f"  \n{tr_('Model')}: **{esc(data(r.get('model_label')))}**", unsafe_allow_html=True)
     j = r.get("joined")
     if j is not None and len(j):
         lo, hi = float(np.nanmin(j.values)), float(np.nanmax(j.values))
@@ -266,8 +266,8 @@ def _obs_model_hub(r, var, profile, detail):
         st.plotly_chart(fig, width="stretch", theme=None, config={"displaylogo": False})
     st.caption(tr_(BIAS_NOTE)
                + (f" {data(r['note'])}." if r.get("note") else "")
-               + (tr_(" Period {a} to {b}, sampled at {la} N {lo} E.", a=r.get('start'), b=r.get('end'),
-                      la=f"{r['lat']:.3f}", lo=f"{r['lon']:.3f}") if detail else ""))
+               + (tr_(" Period {a} to {b}, sampled at {la} N {lo} E.", a=day_txt(r.get('start')), b=day_txt(r.get('end')),
+                      la=num(f"{r['lat']:.3f}"), lo=num(f"{r['lon']:.3f}")) if detail else ""))
 
 
 BIAS_NOTE = ("Bias above zero means the model is too high. RMSE is the typical size of the error. "

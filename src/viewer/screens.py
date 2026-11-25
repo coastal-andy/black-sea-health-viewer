@@ -180,7 +180,7 @@ def methods_screen(profile):
                   "(a measured proxy for the surface), or **model** (computed, fills gaps, gives forecasts)."))
     mods = A.status_of_modules()
     st.markdown(f"<div class='bsv-box'><b>{esc(t('Connected modules'))}</b><br>" + "<br>".join(
-        f"{esc(k)}: {esc(t('connected') if v else t('not yet (placeholder in use)'))}" for k, v in mods.items())
+        f"{esc(t(k))}: {esc(t('connected') if v else t('not yet (placeholder in use)'))}" for k, v in mods.items())
         + f"<br>{esc(t('Pressure zones files'))}: {esc(A.zones_version())}</div>", unsafe_allow_html=True)
     meth = A._mod("marinekit.methods")
     if meth is not None:
@@ -196,7 +196,12 @@ def methods_screen(profile):
         cols = ["key", "origin", "product", "dataset_id", "variables", "resolution_deg", "frequency", "reference_years"]
         if not detail:
             cols = ["origin", "product", "variables", "reference_years"]
-        st.markdown(table_html(cat[cols], height=320), unsafe_allow_html=True)
+        cat = cat.assign(origin=cat["origin"].map(lambda x: t(str(x))),
+                         reference_years=cat["reference_years"].map(
+                             lambda x: t("as {k}", k=x) if (x and not str(x)[:1].isdigit()) else x))
+        st.markdown(table_html(cat[cols], height=320, translate=True,
+                               keep=("key", "product", "dataset_id", "variables", "resolution_deg", "frequency",
+                                     "reference_years")), unsafe_allow_html=True)
         st.markdown("**" + t("Other sources") + "**")
         st.markdown("\n".join("- " + t(x) for x in (
             "EMODnet Physics: buoys, coastal stations, tide gauges near Romania (ERDDAP, no login); QC flags 1 and 2 kept.",
@@ -234,7 +239,7 @@ def methods_screen(profile):
                 columns={"time_end": "last data", "trust": "status", "trust_note": "note"})
             show = show.assign(type=show["type"].map(t), status=show["status"].map(lambda x: t(str(x))),
                                note=show["note"].map(t))
-            st.markdown(table_html(show, height=300, translate=True), unsafe_allow_html=True)
+            st.markdown(table_html(show, height=300, translate=True, keep=("id", "name")), unsafe_allow_html=True)
     with tabs["chain"]:
         st.markdown(t("One rule chain for all cards, applied in order. 'Pressure' is used only when no natural driver "
                       "explains the event."))
@@ -281,6 +286,13 @@ def _uncertainty(profile):
             st.markdown(data_md(txt))
 
 
+NEED_COLS = {"rank": "No.", "what": "What to measure", "where": "Where", "why": "Why", "how": "How", "who": "Who",
+             "cost": "Cost", "sectors": "Sectors", "n_reasons": "Reasons (of 5)", "reasons": "Reasons",
+             "concerns_you": "Your sector", "variable": "Variable", "disagree": "Sources disagree",
+             "no_trusted_insitu": "No trusted sensor", "untrusted_sensor": "Sensor not trusted",
+             "time_gap": "Gap in time", "decision_at_stake": "Official threshold"}
+
+
 def _needs(profile):
     """Where new measurements are needed, ranked by a plain count of five yes/no criteria (marinekit.methods)."""
     meth = A._mod("marinekit.methods")
@@ -298,12 +310,13 @@ def _needs(profile):
     if "sectors" in show.columns:
         show = show.assign(sectors=show["sectors"].map(lambda x: ", ".join(t(P.SECTORS.get(k, k)) for k in str(x).split(", "))))
     if "cost" in show.columns:
-        show = show.assign(cost=show["cost"].map(lambda x: t(str(x))))
+        show = show.assign(cost=show["cost"].map(lambda x: t(f"cost:{x}") if lang() == "ro" else str(x)))
     for c in ("disagree", "no_trusted_insitu", "untrusted_sensor", "time_gap", "decision_at_stake", "concerns_you"):
         if c in show.columns:
             show[c] = show[c].astype(bool)
     evidence = show.pop("evidence") if "evidence" in show.columns else None
-    st.markdown(table_html(show, translate=True), unsafe_allow_html=True)
+    show = show.rename(columns=NEED_COLS)
+    st.markdown(table_html(show, translate=True, keep=(NEED_COLS["variable"],)), unsafe_allow_html=True)
     if evidence is not None and P.show_detail(profile):
         with st.expander(t("Evidence for each criterion")):
             st.markdown("\n".join(f"- **{r}**: " + data(e) for r, e in zip(df["rank"], evidence)))

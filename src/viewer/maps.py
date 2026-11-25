@@ -477,7 +477,7 @@ def _ticks(fd):
 
 
 def _fmt(x):
-    return f"{x:.2f}" if abs(x) < 1 else (f"{x:.1f}" if abs(x) < 20 else f"{x:.0f}")
+    return num(f"{x:.2f}" if abs(x) < 1 else (f"{x:.1f}" if abs(x) < 20 else f"{x:.0f}"))
 
 
 def _summary(n_notes: int) -> str:

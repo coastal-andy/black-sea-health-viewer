@@ -1244,8 +1244,7 @@ _CONF_RANK = {"official": 0, "mapped": 1, "assumed": 2}
 
 
 def _clean_name(s: str) -> str:
-    s = re.sub(r"\s*\((EMODnet port location|AIS-derived[^)]*)\)", "", str(s or "")).strip()
-    return s[:48]
+    return re.sub(r"\s*\((EMODnet port location|AIS-derived[^)]*)\)", "", str(s or "")).strip()
 
 
 @st.cache_data(show_spinner=False)

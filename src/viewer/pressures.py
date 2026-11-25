@@ -119,9 +119,9 @@ def page():
     with left:
         with st.container(key="bsv_map_full"):
             with st.container(key="map_tools_wide", horizontal=True):
-                st.segmented_control("Sector", list(SHORT_SECTOR), key="w_sector", format_func=lambda k: t(SHORT_SECTOR[k]),
+                st.segmented_control(t("Sector"), list(SHORT_SECTOR), key="w_sector", format_func=lambda k: t(SHORT_SECTOR[k]),
                                      required=True, label_visibility="collapsed")
-                st.segmented_control("Season", ["winter", "summer"], key="w_pseason",
+                st.segmented_control(t("Season"), ["winter", "summer"], key="w_pseason",
                                      format_func=lambda k: t(k.capitalize()),
                                      required=True, label_visibility="collapsed")
                 with st.container(key="edges_ctl", horizontal=True, vertical_alignment="center"):
@@ -138,7 +138,7 @@ def page():
             for i, s in enumerate(sites):
                 folium.CircleMarker([s["lat"], s["lon"]], radius=8, color=tk["text"], weight=2, fill=True,
                                     fill_color=tk["panel"], fill_opacity=0.95,
-                                    tooltip=t("Site {i}: {name}", i=i + 1, name=esc(s["name"]))).add_to(m)
+                                    tooltip=t("Site {i}: {name}", i=i + 1, name=esc(SH.site_name(s["name"], 80)))).add_to(m)
                 folium.Marker([s["lat"], s["lon"]], icon=folium.DivIcon(
                     html=f"<div style='font:600 11px sans-serif;color:{tk['text']};transform:translate(-3px,-7px)'>"
                          f"{i + 1}</div>")).add_to(m)
@@ -217,15 +217,16 @@ def site_list(sites, sector, season, day, profile):
             tip = f"{t(CARD_SHORT[k])}: {STATUS[stt][1] if not waiting else t('computing')}"
             sq.append(f"<span class='cell' title='{esc(tip)}'>{status_square(stt, 10)}</span>")
         n, _ = A.overlap_at(s["lat"], s["lon"], season)
-        note = t("near {place}", place=s.get("near") or "").strip()
+        note = t("near {place}", place=SH.place_name(s.get("near") or "")).strip()
         if n and n > 1:
             note += " · " + t("{n} sectors overlap", n=n)
         with st.container(key=f"crow_site{i}"):
             st.markdown(f"<div class='bsv-site{' open' if is_open else ''}'>"
                         f"<span class='bsv-chev'>{_CHEV_OPEN if is_open else _CHEV}</span>"
-                        f"<span class='nm'><span class='t'>{i + 1}. {esc(s['name'])}</span><span class='n'>{esc(note)}</span></span>"
+                        f"<span class='nm'><span class='t'>{i + 1}. {esc(SH.site_name(s['name']))}</span><span class='n'>{esc(note)}</span></span>"
                         f"<span class='cols'>{''.join(sq)}</span></div>", unsafe_allow_html=True)
-            st.button(t("Close site {name}" if is_open else "Open site {name}", name=s["name"]), key=f"cbtn_site{i}",
+            st.button(t("Close site {name}" if is_open else "Open site {name}", name=SH.site_name(s["name"])),
+                      key=f"cbtn_site{i}",
                       on_click=_toggle_site,
                       args=(i,))
         if is_open:

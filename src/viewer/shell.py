@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 import streamlit as st
 
@@ -9,7 +11,7 @@ from viewer import adapters as A
 from viewer import onboarding as OB
 from viewer import profiles as P
 from viewer import i18n as I
-from viewer.i18n import dt, t
+from viewer.i18n import data, dt, t
 from viewer.style import LOGO_SVG, SECTOR, THEMES, esc, tokens
 
 # rail key -> label; the order is the rail order
@@ -150,7 +152,7 @@ def rail(pages: dict):
 def place_options() -> dict:
     opts = {}
     for name, (la, lo) in A.stations().items():
-        opts[t("Station: {name}", name=name)] = dict(name=name, lat=la, lon=lo, kind="station", wkt=None)
+        opts[t("Station: {name}", name=t(name))] = dict(name=name, lat=la, lon=lo, kind="station", wkt=None)
     p = A.platforms()
     for _, r in p[p.recent & p.type.isin(["Mooring", "Gliders"])].iterrows():
         tag = {"under_qc": t(" (under QC)"), "context": t(" (shore station)")}.get(r.trust, "")
@@ -168,7 +170,7 @@ def place_options() -> dict:
                                         wkt=g.simplify(0.002).wkt)
     hs = A.hotspots(stamp)
     for _, r in hs.head(12).iterrows():
-        opts[t("Overlap area: {name}", name=r['name'])] = dict(name=str(r["name"]), lat=float(r.lat), lon=float(r.lon),
+        opts[t("Overlap area: {name}", name=place_name(r['name']))] = dict(name=str(r["name"]), lat=float(r.lat), lon=float(r.lon),
                                                   kind="zone", wkt=r.wkt)
     return opts
 
@@ -283,7 +285,7 @@ def selection_header(sel: dict, season: str) -> str:
     inside = A.zones_containing(sel["lat"], sel["lon"], A._zones_stamp())
     n, secs = A.overlap_at(sel["lat"], sel["lon"], season)
     ov = t("{n} of 5 sectors", n=n) if n else t("outside the sector zones")
-    out = [f"<div class='bsv-lbl'>{sel['lat']:.3f} N &middot; {sel['lon']:.3f} E &middot; {esc(ov)} ({esc(t(season))})</div>",
+    out = [f"<div class='bsv-lbl'>{I.num(f'{sel["lat"]:.3f}')} N &middot; {I.num(f'{sel["lon"]:.3f}')} E &middot; {esc(ov)} ({esc(t(season))})</div>",
            f"<div class='bsv-place'>{esc(place_name(sel['name']))}</div>"]
     if secs:
         names = ", ".join(t(x.strip()) for x in secs.split(","))
@@ -294,10 +296,37 @@ def selection_header(sel: dict, season: str) -> str:
     return "".join(out)
 
 
+_HOTSPOT = re.compile(r"(\d) sectors? near (.+) \((\d+) km\)")
+
+
 def place_name(name: str) -> str:
-    """Names the viewer gives to places (start points, 'Clicked point') in the viewer language; real place names
-    such as Constanța or Mangalia stay as they are."""
-    return t(name) if isinstance(name, str) else name
+    """Names the viewer gives to places (start points, stations, 'Clicked point', overlap areas) in the viewer
+    language; real place names such as Constanța or Mangalia stay as they are."""
+    if not isinstance(name, str):
+        return name
+    m = _HOTSPOT.fullmatch(name)
+    if m:
+        return t("{n} sectors near {place} ({d} km)", n=m[1], place=t(m[2]), d=m[3])
+    if name.startswith("Overlap cell near "):
+        return t("Overlap cell near {place}", place=t(name[len("Overlap cell near "):]))
+    out = t(name)
+    if out == name and I.lang() == "ro":  # a feature or site name from the zone files
+        from viewer import i18n_data
+        i18n_data.load()
+        out = i18n_data._tr(name) or name
+    return out
+
+
+def site_name(name: str, n: int = 48) -> str:
+    """A sector site's name (from the activity features) in the viewer language, shortened for the list."""
+    if not isinstance(name, str):
+        return name
+    from viewer import i18n_data
+    i18n_data.load()
+    out = i18n_data._tr(name) if I.lang() == "ro" else name
+    if out is None:  # names the viewer builds, or a proper name kept as it is
+        out = place_name(name)
+    return out if len(out) <= n else out[: n - 1].rstrip() + "…"
 
 
 def page_head(title: str, sub: str = ""):

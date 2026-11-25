@@ -68,6 +68,8 @@ def t(_key: str, /, **kw) -> str:
 
 MONTHS = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie",
           "octombrie", "noiembrie", "decembrie"]
+DAYS = ["luni", "marți", "miercuri", "joi", "vineri", "sâmbătă", "duminică"]
+DAYS_SHORT = ["lun.", "mar.", "mie.", "joi", "vin.", "sâm.", "dum."]
 MONTHS_SHORT = ["ian.", "feb.", "mar.", "apr.", "mai", "iun.", "iul.", "aug.", "sept.", "oct.", "nov.", "dec."]
 
 
@@ -76,7 +78,9 @@ def dt(ts, fmt: str) -> str:
     import pandas as pd
     ts = pd.Timestamp(ts)
     if lang() == "ro":
-        fmt = fmt.replace("%B", MONTHS[ts.month - 1]).replace("%b", MONTHS_SHORT[ts.month - 1])
+        fmt = (fmt.replace("%B", MONTHS[ts.month - 1]).replace("%b", MONTHS_SHORT[ts.month - 1])
+               .replace("%A", DAYS[ts.dayofweek]).replace("%a", DAYS_SHORT[ts.dayofweek])
+               .replace("%d", str(ts.day)))  # 1 oct., not 01 oct.
     return ts.strftime(fmt)
 
 
@@ -103,14 +107,17 @@ def data(s):
     Unknown text is returned unchanged (English) rather than guessed."""
     if lang() != "ro" or not isinstance(s, str) or not s:
         return s
+    from viewer import i18n_data
+    i18n_data.load()
+    out = i18n_data._tr(s)  # the template tables (i18n_ro_cards, i18n_ro_data) first
+    if out is not None:
+        return out
     if s in DATA_RO:
         return DATA_RO[s]
     for pat, rep in DATA_PATTERNS:
         m = pat.fullmatch(s)
         if m:
             return rep(m) if callable(rep) else m.expand(rep)
-    from viewer import i18n_data
-    i18n_data.load()
     return i18n_data.tr(s)
 
 
@@ -694,3 +701,140 @@ RO.update({
     "Kd490": "Kd490",
     " Source: {src}": " Sursă: {src}",
 })
+
+# Data analysis wiring (pull request 3): Water page band, trend and source check, Methods tabs, places
+RO.update({
+    "Oxygen, surface": "Oxigen, la suprafață",
+    "Season": "Sezon",
+    "Usual range: seasonal fit to {w}, plus or minus 1.28 times the weekly spread (about the 10th to 90th percentile). Thresholds OURS.":
+        "Interval obișnuit: ciclul sezonier ajustat pe {w}, plus sau minus de 1,28 ori abaterea săptămânală (aproximativ "
+        "percentilele 10-90). Praguri OURS.",
+    "Usual range: 10th to 90th percentile of the same days of the year, {y}. Thresholds OURS.":
+        "Interval obișnuit: percentilele 10-90 pentru aceleași zile din an, {y}. Praguri OURS.",
+    "Working out the usual range and the long-term trend for this place (the first time takes up to a minute).":
+        "Se calculează intervalul obișnuit și tendința pe termen lung pentru acest loc (prima dată durează până la un minut).",
+    "Working out the long-term trend for this place (the first time takes up to a minute).":
+        "Se calculează tendința pe termen lung pentru acest loc (prima dată durează până la un minut).",
+    "No usual range shown: {why}": "Intervalul obișnuit nu este afișat: {why}",
+    "The source here is not reliable enough to show this.": "Sursa de aici nu este destul de sigură pentru a afișa acest rezultat.",
+    "Not enough complete years of reliable data here yet: a trend needs at least 8.":
+        "Aici nu există încă destui ani compleți de date sigure: o tendință are nevoie de cel puțin 8.",
+    "The seasons explain too little of the ups and downs here, so a usual range would mislead.":
+        "Aici anotimpurile explică prea puțin din variații, așa că un interval obișnuit ar induce în eroare.",
+    "Not enough years of data at this point yet to work out the usual range.":
+        "În acest punct nu există încă destui ani de date pentru a calcula intervalul obișnuit.",
+    "No recent series for this variable at this point.": "Nu există o serie recentă pentru această variabilă în acest punct.",
+    "No checked long-term trend for this variable. The quality-checked trend analysis covers sea temperature, salinity, surface oxygen and chlorophyll-a.":
+        "Nu există o tendință verificată pentru această variabilă. Analiza verificată a tendințelor acoperă temperatura "
+        "mării, salinitatea, oxigenul de la suprafață și clorofila-a.",
+    "No long-term trend shown here.": "Aici nu este afișată nicio tendință pe termen lung.",
+    "Rising by {x} {u} per decade": "Crește cu {x} {u} pe deceniu",
+    "Falling by {x} {u} per decade": "Scade cu {x} {u} pe deceniu",
+    "No clear long-term change": "Nicio schimbare clară pe termen lung",
+    "Climate trend: {n} complete years ({a}-{b}).": "Tendință climatică: {n} ani compleți ({a}-{b}).",
+    "Indicative trend: {n} complete years ({a}-{b}); a climate trend needs 20.":
+        "Tendință orientativă: {n} ani compleți ({a}-{b}); o tendință climatică are nevoie de 20.",
+    "The year-to-year ups and downs are as large as the change.": "Variațiile de la un an la altul sunt la fel de mari ca schimbarea.",
+    "to": "până la",
+    "Dots: annual means of the long record at this point. Line: the checked trend, drawn through their average.":
+        "Puncte: mediile anuale ale seriei lungi din acest punct. Linie: tendința verificată, trasă prin media lor.",
+    "Trend gate (OURS): a trend needs 8 complete years of a reliable source; below 20 years it is indicative, from 20 years a climate trend.":
+        "Filtrul pentru tendințe (OURS): o tendință are nevoie de 8 ani compleți dintr-o sursă sigură; sub 20 de ani este "
+        "orientativă, de la 20 de ani este o tendință climatică.",
+    "Source: {s}; p = {p}.": "Sursă: {s}; p = {p}.",
+    "Precomputed at station {st} ({d} km away).": "Calculată în prealabil la stația {st} (la {d} km).",
+    "Distance or status": "Distanță sau stare",
+    "indicative only": "doar orientativ",
+    "not used": "nefolosit",
+    "Indicative only: used for comparison, never for thresholds or trends.":
+        "Doar orientativ: folosit pentru comparație, niciodată pentru praguri sau tendințe.",
+    "Not usable as absolute values.": "Nu poate fi folosit ca valori absolute.",
+    "Not quality-checked yet (under QC).": "Încă neverificat (în verificare QC).",
+    "Source check: {x}": "Verificarea surselor: {x}",
+    "Trusted source": "Sursă de încredere",
+    "Typical error": "Eroare tipică",
+    "Bias": "Abatere sistematică (bias)",
+    "(by station {a} to {b})": "(pe stații, de la {a} la {b})",
+    "In plain words": "Pe scurt",
+    "Caveats": "Precizări",
+    "Not used": "Nefolosite",
+    "Reliable": "Sigur",
+    "Fairly reliable": "Destul de sigur",
+    "Rough guide only": "Doar orientativ",
+    "Headline pair {pair}, {n} matched days at {st}; validation run of {run}. All numbers indicative.":
+        "Perechea principală {pair}, {n} zile comparate la {st}; validarea din {run}. Toate valorile sunt orientative.",
+    "Uncertainty": "Incertitudine",
+    "Where to measure next": "Unde să măsurăm în continuare",
+    "The uncertainty texts come from marinekit.methods, which is not available.":
+        "Textele despre incertitudine vin din marinekit.methods, care nu este disponibil.",
+    "The measurement needs come from marinekit.methods, which is not available.":
+        "Nevoile de măsurare vin din marinekit.methods, care nu este disponibil.",
+    "No measurement needs available.": "Nu sunt disponibile nevoi de măsurare.",
+    "Ranked by a plain count of five yes/no reasons (sources disagree, no trusted sensor, sensor not trusted, gap in time, an official threshold depends on it). No weights. Criteria and ranking OURS.":
+        "Ordonate după numărul simplu de motive din cinci (sursele nu concordă, niciun senzor de încredere, senzor "
+        "neverificat, lipsă în timp, un prag oficial depinde de această variabilă). Fără ponderi. Criteriile și "
+        "ordonarea sunt OURS.",
+    "Evidence for each criterion": "Dovezi pentru fiecare criteriu",
+    "Sea surface temperature": "Temperatura la suprafața mării",
+    "Nitrate": "Nitrați", "Phosphate": "Fosfați",
+    "Dissolved oxygen (surface)": "Oxigen dizolvat (la suprafață)",
+    "Dissolved oxygen (near the seabed)": "Oxigen dizolvat (lângă fundul mării)",
+    "yes": "da", "no": "nu",
+    "cost": "cost", "rank": "loc", "what": "ce", "where": "unde", "why": "de ce", "how": "cum", "who": "cine",
+    "sectors": "sectoare", "n_reasons": "motive", "reasons": "motive (care)", "concerns_you": "te privește",
+    "variable": "variabilă", "disagree": "sursele nu concordă", "no_trusted_insitu": "fără senzor de încredere",
+    "untrusted_sensor": "senzor neverificat", "time_gap": "lipsă în timp", "decision_at_stake": "prag oficial",
+    # cost words (masculine/neuter, next to "cost")
+    "low": "scăzută", "medium": "medie", "high": "ridicată",
+    "cost:low": "scăzut", "cost:medium": "mediu", "cost:high": "ridicat", "cost:none": "niciunul",
+    # places the viewer names
+    "Constanta": "Constanța", "Midia port": "Portul Midia", "Sfantu Gheorghe (Danube)": "Sfântu Gheorghe (Dunăre)",
+    "Sulina (Danube mouth)": "Sulina (gura Dunării)", "Offshore shelf": "Platforma continentală (larg)",
+    "{n} sectors near {place} ({d} km)": "{n} sectoare lângă {place} ({d} km)",
+    "Overlap cell near {place}": "Celulă de suprapunere lângă {place}",
+    # wave and current hovers
+    "swell": "hulă", "mixed": "mixt", "wind sea": "valuri de vânt", "deg": "grade",
+    "Coming from": "Vine dinspre", "going to": "merge spre", "Flowing to": "Curge spre",
+    "From {a} ({d} deg), going to {b}": "Dinspre {a} ({d} grade), spre {b}",
+    "Flowing to {a} ({d} deg)": "Curge spre {a} ({d} grade)",
+})
+RO.update({
+    "{what} at {la} N, {lo} E": "{what} la {la} N, {lo} E",
+    "Sea state at {la} N, {lo} E": "Starea mării la {la} N, {lo} E", "Sea state": "Starea mării",
+    "Arrows every {n} h point where it goes (up = north)": "Săgeți la fiecare {n} h, spre unde merge (sus = nord)",
+    "Arrow length = peak period: short = wind sea, long = swell":
+        "Lungimea săgeții = perioada de vârf: scurtă = valuri de vânt, lungă = hulă",
+    "Line = strength. Arrows point where it goes (up = north). Wave arrow length = period (long = swell).":
+        "Linia = intensitatea. Săgețile arată încotro merge (sus = nord). Lungimea săgeții la valuri = perioada (lungă = hulă).",
+    "Source: {src}": "Sursă: {src}",
+    "; nearest model cell {d} km away": "; cea mai apropiată celulă de model la {d} km",
+    "Copernicus Marine BLKSEA_ANALYSISFORECAST_WAV_007_003 (hourly, 2.5 km)":
+        "Copernicus Marine BLKSEA_ANALYSISFORECAST_WAV_007_003 (orar, 2,5 km)",
+    "Copernicus Marine BLKSEA_ANALYSISFORECAST_PHY_007_001 (daily mean, surface, 2.5 km)":
+        "Copernicus Marine BLKSEA_ANALYSISFORECAST_PHY_007_001 (medie zilnică, suprafață, 2,5 km)",
+    "ERA5 reanalysis / forecast via Open-Meteo (hourly, about 25 km)":
+        "Reanaliză ERA5 / prognoză prin Open-Meteo (orar, aproximativ 25 km)",
+    "Open-Meteo marine (Copernicus/Meteo-France models)": "Open-Meteo marine (modele Copernicus / Météo-France)",
+    "Current speed": "Viteza curentului", "Wind speed": "Viteza vântului",
+    # Methods tables: column names
+    "Indicator": "Indicator", "Reference / threshold": "Referință / prag", "Evidence": "Dovezi", "Use": "Utilizare",
+    "ID": "ID", "Formula (short)": "Formulă (pe scurt)", "Data key(s)": "Chei de date",
+    "Trigger": "Declanșator", "Recommended action": "Acțiune recomandată", "Who acts": "Cine acționează",
+    "id": "id", "name": "nume", "type": "tip", "lat": "lat", "lon": "lon", "last data": "ultimele date",
+    "status": "stare", "note": "notă", "origin": "origine", "product": "produs", "variables": "variabile",
+    "reference_years": "ani de referință", "key": "cheie", "dataset_id": "id set de date",
+    "resolution_deg": "rezoluție (grade)", "frequency": "frecvență",
+    "zones v2 (overlap_summer/winter)": "zone v2 (overlap_summer/winter)",
+})
+RO.update({
+    "Mooring": "Geamandură ancorată", "Gliders": "Glider", "Drifting Buoys": "Geamanduri în derivă",
+    "Thermistor Chain Data": "Lanț de termistori", "Tide Gauge": "Maregraf",
+})
+RO.update({
+    "No.": "Nr.", "What to measure": "Ce trebuie măsurat", "Where": "Unde", "Why": "De ce", "How": "Cum",
+    "Who": "Cine", "Cost": "Cost", "Sectors": "Sectoare", "Reasons (of 5)": "Motive (din 5)", "Reasons": "Motive",
+    "Your sector": "Sectorul tău", "Variable": "Variabilă", "Sources disagree": "Sursele nu concordă",
+    "No trusted sensor": "Niciun senzor de încredere", "Sensor not trusted": "Senzor neverificat",
+    "Gap in time": "Lipsă în timp", "Official threshold": "Prag oficial",
+})
+RO.update({"as {k}": "ca la {k}"})

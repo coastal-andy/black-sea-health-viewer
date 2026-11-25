@@ -150,8 +150,8 @@ def _pick(k):
 def var_list(sel, cards, current):
     ss = st.session_state
     st.markdown(f"<div class='bsv-sec'><div class='bsv-lbl'>{tr_('Place')}</div><div class='bsv-place' style='font-size:26px'>"
-                f"{esc(SH.place_name(sel['name']))}</div><div class='bsv-lbl' style='margin-top:4px'>{sel['lat']:.3f} N &middot; "
-                f"{sel['lon']:.3f} E</div></div>", unsafe_allow_html=True)
+                f"{esc(SH.place_name(sel['name']))}</div><div class='bsv-lbl' style='margin-top:4px'>{num(f'{sel["lat"]:.3f}')} N &middot; "
+                f"{num(f'{sel["lon"]:.3f}')} E</div></div>", unsafe_allow_html=True)
     with st.container(key="bsv_pad"):
         SH.place_picker("Search another place")
     st.markdown(f"<div class='bsv-lbl' style='padding:18px 20px 10px 20px'>{tr_('Water quality')}</div>",
@@ -196,7 +196,8 @@ def chart_60(s, c, unit, log, origin) -> go.Figure:
         fig.add_trace(go.Scatter(x=s.index, y=c["mean"], line=dict(color=t["muted"], width=1.5, dash="dash"),
                                  name=tr_("usual"), hovertemplate=tr_("usual") + " %{y:.2f}<extra></extra>"))
     fig.add_trace(go.Scatter(x=s.index, y=s.values, line=dict(color=t["accent"], width=2.5), name=tr_("this year"),
-                             hovertemplate="%{x|%d %b}: %{y:.2f} " + unit + "<extra>" + esc(origin) + "</extra>"))
+                             text=[dt(x, "%d %b") for x in s.index],
+                             hovertemplate="%{text}: %{y:.2f} " + unit + "<extra>" + esc(origin) + "</extra>"))
     last = s.dropna()
     if len(last):
         fig.add_trace(go.Scatter(x=[last.index[-1]], y=[last.iloc[-1]], mode="markers", showlegend=False,
@@ -469,7 +470,7 @@ def _variable(name, var, card, drivers, sel, profile, detail):
     yrs_s = f"{yrs[0]}-{yrs[1]}" if isinstance(yrs, (list, tuple)) and len(yrs) == 2 else (str(yrs) if yrs else "")
     origin = tr_(ORIGIN_LABEL.get(main["origin"], main["origin"])) if main else tr_("no data")
     title = tr_(P.VAR_TEXT.get(var, {}).get(P.level(profile)) or v["label"])
-    src = main["label"] if main else tr_("no source at this point")
+    src = data(main["label"]) if main else tr_("no source at this point")
 
     seas, pending = _seasonal(var, sel) if var in A.SEASONAL_VARS else (None, False)
     cyc = (seas or {}).get("cycle") or {}
@@ -496,7 +497,8 @@ def _variable(name, var, card, drivers, sel, profile, detail):
         band_note = tr_("Working out the usual range and the long-term trend for this place (the first time takes "
                         "up to a minute).")
     elif gated:
-        band_note = tr_("No usual range shown: {why}", why=plain_gate(cyc.get("gate_reason"), "cycle", profile))
+        why = plain_gate(cyc.get("gate_reason"), "cycle", profile)
+        band_note = tr_("No usual range shown: {why}", why=why[:1].lower() + why[1:])
     if var == "sst" and s60 is not None and len(s60):
         sd = A.sst_display(sel["lat"], sel["lon"], str(A.today().date()))
         if sd and sd.get("value") is not None:  # the same SST as the temperature card
@@ -514,7 +516,7 @@ def _variable(name, var, card, drivers, sel, profile, detail):
         diff_txt = _fmt(today_v - usual_v, sign=True) if (today_v is not None and usual_v is not None) else "-"
         diff_unit = unit
     st.markdown(f"<div class='bsv-whead'><div><div class='bsv-place'>{esc(title)}</div>"
-                f"<div class='bsv-lbl' style='margin-top:6px'>{esc(origin)} &middot; {esc(data(src))}"
+                f"<div class='bsv-lbl' style='margin-top:6px'>{esc(origin)} &middot; {esc(src)}"
                 + (f" &middot; {tr_('usual')} = {esc(yrs_s)}" if (yrs_s and c60 is not None) else "")
                 + "</div></div></div>", unsafe_allow_html=True)
     with st.container(key="wtabs"):
