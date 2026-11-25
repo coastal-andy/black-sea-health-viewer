@@ -836,3 +836,8 @@ for _lst in (_NIS_N, _GEL):
     for _n in range(1, len(_lst) + 1):
         for _c in combinations(_lst, _n):
             E(", ".join(_c), ", ".join(_c))
+
+
+# added by the viewer pass
+E("2015-present", "2015-prezent")
+E("GloFAS v4 via Open-Meteo Flood API, Danube at Ceatal Izmail", "GloFAS v4 prin Open-Meteo Flood API, Dunărea la Ceatal Izmail")

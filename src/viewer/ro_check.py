@@ -51,7 +51,7 @@ ALLOW = [
     r"Natura 2000", r"OceanSITES", r"marinekit\.[\w.]+", r"docs/[\w/.\-*]+", r"\b[\w-]+\.(?:csv|md|py|json|geojson)\b",
     r"Esri[\w\s,]*", r"Leaflet", r"Tiles &copy;[^<]*", r"&copy;[^<]*", r"Garcia & Gordon \(1992\)", r"Hobday",
     r"Newey-West", r"\(HAC\)", r"Damen Shipyards", r"Seabed Habitats", r"Human Activities", r"\w+ -> \w+",
-    r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b", r"overlap_summer/winter", r"Drifting Buoy", r"C-RAID buoyID",
+    r"overlap_summer/winter", r"\b[a-z0-9]+(?:_[a-z0-9]+)+\b", r"\bSea\d+\b", r"Drifting Buoy", r"C-RAID buoyID",
     r"[A-Z][\w']* (?:[A-Z][\w']* )*(?:Beach|Shipyard)\b[\w ]*", r"CC BY[\w\-. ]*", r"TeleGeography[\w ]*",
     r"Switch to English",  # the language button's tooltip is for English readers
 ]

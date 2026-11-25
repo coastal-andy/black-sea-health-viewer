@@ -8,7 +8,7 @@ import streamlit as st
 from viewer import adapters as A
 from viewer import panels as PN
 from viewer import profiles as P
-from viewer.i18n import data, dt, lang, num, t
+from viewer.i18n import data, data_soft, dt, lang, num, t
 from viewer.style import ORIGIN_LABEL, STATUS, STATUS_LABEL, esc, status_square
 
 # tab label -> role key
@@ -153,7 +153,7 @@ def _source(c, detail) -> str:
     for s in c.get("sources") or []:
         if s.get("dataset") == "zone sampling":
             continue
-        name = (s.get("dataset") if detail else data(s.get("label") or s.get("dataset"))) or ""
+        name = (data_soft(s.get("dataset")) if detail else data(s.get("label") or s.get("dataset"))) or ""
         if not name or name in seen:
             continue
         seen.add(name)

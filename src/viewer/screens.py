@@ -200,7 +200,7 @@ def methods_screen(profile):
                          reference_years=cat["reference_years"].map(
                              lambda x: t("as {k}", k=x) if (x and not str(x)[:1].isdigit()) else x))
         st.markdown(table_html(cat[cols], height=320, translate=True,
-                               keep=("key", "product", "dataset_id", "variables", "resolution_deg", "frequency",
+                               keep=("key", "origin", "product", "dataset_id", "variables", "resolution_deg", "frequency",
                                      "reference_years")), unsafe_allow_html=True)
         st.markdown("**" + t("Other sources") + "**")
         st.markdown("\n".join("- " + t(x) for x in (
@@ -237,9 +237,12 @@ def methods_screen(profile):
             st.markdown("**" + t("In-situ platforms and their status") + "**")
             show = p[["id", "name", "type", "lat", "lon", "time_end", "trust", "trust_note"]].rename(
                 columns={"time_end": "last data", "trust": "status", "trust_note": "note"})
-            show = show.assign(type=show["type"].map(t), status=show["status"].map(lambda x: t(str(x))),
-                               note=show["note"].map(t))
-            st.markdown(table_html(show, height=300, translate=True, keep=("id", "name")), unsafe_allow_html=True)
+            status_txt = {"under_qc": "under QC (not trusted yet)", "context": "context only", "good": "trusted",
+                          "not_assessed": "not assessed"}
+            show = show.assign(type=show["type"].map(t), status=show["status"].map(lambda x: t(status_txt.get(x, str(x)))),
+                               note=show["note"].map(data))
+            st.markdown(table_html(show, height=300, translate=True, keep=("id", "name", "type", "status", "note")),
+                        unsafe_allow_html=True)
     with tabs["chain"]:
         st.markdown(t("One rule chain for all cards, applied in order. 'Pressure' is used only when no natural driver "
                       "explains the event."))
@@ -316,7 +319,8 @@ def _needs(profile):
             show[c] = show[c].astype(bool)
     evidence = show.pop("evidence") if "evidence" in show.columns else None
     show = show.rename(columns=NEED_COLS)
-    st.markdown(table_html(show, translate=True, keep=(NEED_COLS["variable"],)), unsafe_allow_html=True)
+    st.markdown(table_html(show, translate=True, keep=(NEED_COLS["variable"], NEED_COLS["sectors"], NEED_COLS["cost"])),
+                unsafe_allow_html=True)
     if evidence is not None and P.show_detail(profile):
         with st.expander(t("Evidence for each criterion")):
             st.markdown("\n".join(f"- **{r}**: " + data(e) for r, e in zip(df["rank"], evidence)))

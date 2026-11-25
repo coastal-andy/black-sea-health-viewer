@@ -184,8 +184,8 @@ def _tr(s: str) -> str | None:
     hit = _template(core)
     if hit is not None:
         return lead + hit + trail
-    if not re.search(r"[A-Za-z]{2}", core):  # numbers, units, codes only
-        return lead + ro_num(core) + trail
+    if not re.search(r"[A-Za-z]{2}", core):  # numbers, dates, units, codes only
+        return lead + ro_num(ro_text_dates(core)) + trail
     sents = _sentences(core)
     if len(sents) > 1:
         outs = [_tr(x) for x in sents]

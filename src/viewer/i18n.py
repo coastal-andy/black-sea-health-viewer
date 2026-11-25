@@ -121,6 +121,15 @@ def data(s):
     return i18n_data.tr(s)
 
 
+def data_soft(s):
+    """Like data(), but text without a Romanian version (dataset IDs, names) is returned as it is, unmarked."""
+    if lang() != "ro" or not isinstance(s, str) or not s:
+        return s
+    from viewer import i18n_data
+    i18n_data.load()
+    return i18n_data._tr(s) or s
+
+
 def data_md(s):
     """Markdown produced by marinekit (Methods texts), paragraph by paragraph."""
     if lang() != "ro" or not isinstance(s, str) or not s:
@@ -171,7 +180,7 @@ RO.update({
     "Model water temperature (surface)": "Temperatura apei din model (suprafață)",
     "Model oxygen (surface)": "Oxigen dizolvat din model (suprafață)",
     "Model oxygen near the seabed": "Oxigen dizolvat din model, lângă fundul mării",
-    "Temperature": "Temperatură", "Salinity": "Salinitate", "Oxygen, seabed": "Oxigen, la fund",
+    "Temperature": "Temperatură", "Salinity": "Salinitate", "Oxygen, seabed": "Oxigen, fund",
     "Chlorophyll-a": "Clorofilă-a", "Water clarity": "Transparența apei", "Nutrients": "Nutrienți",
     "Acidity (pH)": "Aciditate (pH)", "Waves": "Valuri", "Currents": "Curenți", "Wind": "Vânt", "Depth": "Adâncime",
     "Natura 2000 protected sites": "Situri protejate Natura 2000", "Natura 2000 site": "Sit Natura 2000",
@@ -704,7 +713,7 @@ RO.update({
 
 # Data analysis wiring (pull request 3): Water page band, trend and source check, Methods tabs, places
 RO.update({
-    "Oxygen, surface": "Oxigen, la suprafață",
+    "Oxygen, surface": "Oxigen, suprafață",
     "Season": "Sezon",
     "Usual range: seasonal fit to {w}, plus or minus 1.28 times the weekly spread (about the 10th to 90th percentile). Thresholds OURS.":
         "Interval obișnuit: ciclul sezonier ajustat pe {w}, plus sau minus de 1,28 ori abaterea săptămânală (aproximativ "
@@ -758,9 +767,9 @@ RO.update({
     "In plain words": "Pe scurt",
     "Caveats": "Precizări",
     "Not used": "Nefolosite",
-    "Reliable": "Sigur",
-    "Fairly reliable": "Destul de sigur",
-    "Rough guide only": "Doar orientativ",
+    "Reliable": "Ridicată",
+    "Fairly reliable": "Medie",
+    "Rough guide only": "Doar orientativă",
     "Headline pair {pair}, {n} matched days at {st}; validation run of {run}. All numbers indicative.":
         "Perechea principală {pair}, {n} zile comparate la {st}; validarea din {run}. Toate valorile sunt orientative.",
     "Uncertainty": "Incertitudine",
@@ -838,3 +847,7 @@ RO.update({
     "Gap in time": "Lipsă în timp", "Official threshold": "Prag oficial",
 })
 RO.update({"as {k}": "ca la {k}"})
+RO.update({
+    "dataset": "set de date", "years": "ani", "window (days)": "fereastră (zile)", "number of years": "număr de ani",
+    "scale": "scară", "linear": "liniară", "log10": "log10",
+})

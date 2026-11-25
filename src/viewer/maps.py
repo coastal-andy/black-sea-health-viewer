@@ -99,7 +99,7 @@ def add_field(m, fd: dict, opacity: float = 0.85):
     # own pane below the vector overlay pane (400), so zones and overlap always draw on top of the field
     folium.map.CustomPane("gridfield", z_index=350, pointer_events=False).add_to(m)
     folium.raster_layers.ImageOverlay(image=fd["rgba"], bounds=fd["bounds"], opacity=opacity, mercator_project=True,
-                                      name=f"{tr(fd['title'])} ({fd['time']})", interactive=False,
+                                      name=f"{tr(fd['title'])} ({_day(fd['time'])})", interactive=False,
                                       pane="gridfield").add_to(m)
 
 
@@ -438,10 +438,18 @@ def add_platforms(m, p: pd.DataFrame, detail: bool):
         tip = (f"<b>{esc(r['name'])}</b> ({esc(r.id)})<br>{esc(tr(r.type))} - {esc(tr('last data'))} {last}<br>"
                f"{esc(tr('status'))}: {status}<br>{esc(params)}")
         if detail:
-            tip += f"<br><span style='color:#666'>{esc(tr(r.trust_note))}</span>"
+            tip += f"<br><span style='color:#666'>{esc(data(r.trust_note))}</span>"
         folium.CircleMarker([r.lat, r.lon], radius=6 if r.recent else 4.5, color="#1C2430" if not grey else "#9AA3AD",
                             weight=1.2, fill=True, fill_color=col, fill_opacity=0.95 if not grey else 0.5,
                             tooltip=folium.Tooltip(tip)).add_to(fg)
+
+
+def _day(x) -> str:
+    """A field's day (ISO) in the viewer language: 25 Nov 2026 / 25 nov. 2026."""
+    try:
+        return dt(pd.Timestamp(str(x)), "%d %b %Y")
+    except Exception:
+        return str(x)
 
 
 def _place(name):
@@ -534,7 +542,7 @@ def legend_html(fd: dict | None, layers: set, season: str, detail: bool, levels:
             for x in (fd.get("ticks") or _ticks(fd)) if vmin <= x <= vmax)
         marks = "".join(f"<span style='position:absolute;left:{100 * frac(x):.2f}%;top:0;width:1px;height:4px;"
                         f"background:{t['muted']}'></span>" for x in (fd.get("ticks") or []) if vmin <= x <= vmax)
-        src = (f"{tr(fd['origin'])}, {fd['time']}" + (f", {fd['dataset']}" if detail else "")
+        src = (f"{tr(fd['origin'])}, {_day(fd['time'])}" + (f", {fd['dataset']}" if detail else "")
                + (", " + tr("log scale") if fd["log"] else ""))
         parts.append(
             f"<span style='{lab};margin-top:2px'>{esc(tr(fd['title']))} {esc(fd['unit'])}</span>"

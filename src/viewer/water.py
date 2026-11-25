@@ -75,6 +75,16 @@ def _poll_seasonal(var, sel):
     _poll()
 
 
+CLIM_KEYS = {"dataset": "dataset", "years": "years", "window_days": "window (days)", "n_years": "number of years",
+             "space": "scale"}
+
+
+def _clim_val(v) -> str:
+    if isinstance(v, (list, tuple)) and len(v) == 2:
+        return f"{v[0]}-{v[1]}"
+    return str(v)
+
+
 def _window_txt(cyc) -> str:
     """'weekly means 2016-11-27 to 2026-11-22' -> '2016-2026' (years of the fitted record)."""
     ys = re.findall(r"\d{4}", str(cyc.get("window") or ""))
@@ -261,7 +271,7 @@ def _sources_html(items, unit, var) -> str:
                     trust, "Not quality-checked yet (under QC)."))
             else:
                 reason = data(reason)
-            where = tr_({"indicative": "indicative only"}.get(trust, "not used")) + ". " + reason
+            where = tr_({"indicative": "indicative only"}.get(trust, "not used")) + ": " + reason[:1].lower() + reason[1:]
             style = f" style='color:{t['muted']}'"
         rows.append(f"<tr{style}><td>{esc(data(it['label']))}</td>"
                     f"<td>{esc(tr_(ORIGIN_LABEL.get(it['origin'], it['origin'])))}</td>"
@@ -577,8 +587,9 @@ def _variable(name, var, card, drivers, sel, profile, detail):
     with st.expander(tr_("Sources  ·  {n} compared", n=n_used) + (tr_(", {n} excluded", n=n_out) if n_out else "")):
         st.markdown(_sources_html(items, unit, var) + _validation_html(var, profile), unsafe_allow_html=True)
         if detail and clim is not None:
-            st.caption(tr_("Usual range: ") + ", ".join(f"{tr_(k)} {num(str(val))}" for k, val in clim.attrs.items()
-                                                    if k in ("dataset", "years", "window_days", "n_years", "space")))
+            st.caption(tr_("Usual range: ") + "; ".join(
+                f"{tr_(CLIM_KEYS[k])}: {val if k == 'dataset' else tr_(_clim_val(val))}" for k, val in clim.attrs.items()
+                if k in CLIM_KEYS))
     with st.expander(tr_("Natural or pressure?  ·  rule chain, 4 steps")):
         steps = _chain(card, drivers, s60, c60, var)
         st.markdown("<ol class='bsv-chain'>" + "".join(f"<li>{esc(x)}</li>" for x in steps) + "</ol>",

@@ -4,7 +4,24 @@ For a fresh Claude session taking over as coordinator. Read this, then `CLAUDE.m
 
 Last update: 23 Nov 2026, late evening (Day 1 of the hackathon), second coordinator. Pitch: Day 2 (24 Nov), 11:00, in Constanța.
 
-## Update 24 Nov, 10:15 (third coordinator): read this first
+## Update 25 Nov (after the pitch): data analysis wired, full Romanian
+- `main` (Joseph's pull request 3) is merged into `design`; the viewer is no longer frozen.
+- Wired (all in `src/viewer/`):
+  - Water page: the usual-range band and the Long-term trend tab come from `marinekit.seasonal` (`usual_range`, `seasonal_cycle`, `long_term_trend`) for temperature, salinity, surface oxygen and chlorophyll-a. A result shows only when `show` is true; otherwise the gate reason (plain words for public and student, marinekit's reason for stakeholder and researcher). The fits take 10-50 s on a cold cache, so they run as background jobs (`adapters.seasonal`, `adapters.background`) and the page polls until done. Bottom oxygen and Kd490 keep the day-of-year p10-p90 band and have no trend (not covered by the gate).
+  - Water page Sources: `validation.source_summary` (trusted source, typical error, bias, plain reading, caveats by profile, sources not used with their reason); untrusted and indicative-only sources greyed out with their reason (`datahub.variable_trust`). A "Oxygen, surface" row was added to the list.
+  - SST "Latest" on the Water page uses `indicators.sst_display` (same value as the temperature card). Direction B has no separate summary box any more.
+  - Zone hovers use `buffer_label` (`adapters._sector_zones` now keeps it).
+  - Methods page: `uncertainty_primer` at the top, new tabs Uncertainty (`uncertainty_text` per variable) and Where to measure next (`measurement_needs`).
+- Romanian (`?lang=ro`):
+  - Viewer text: `i18n.py` (`t()`, the `RO` dict, keyed by the English text). Dates through `dt()` (25 nov. 2026, weekday names too), decimal comma through `num()`; Plotly figures get the decimal comma and Romanian date ticks in `style.ro_plotly` (called by `plotly_layout`); `table_html(..., translate=True, keep=(...))` translates column names and text cells.
+  - Text produced by marinekit: `i18n_data.py` matches the English sentence templates and refills a Romanian template with the same values. Tables: `i18n_ro_cards.py` (indicators.py: titles, texts per level and sector, why, driver notes, investigate, thresholds, sources) and `i18n_ro_data.py` (validation, seasonal, methods, datahub notes, zones and sites, SHORTLIST tables). `i18n.data(s)` and `i18n.data_md(md)` are the entry points. Anything without a template shows in English with an "[EN]" marker, never half and half.
+  - To add a template: in the right `i18n_ro_*.py`, `T("Estimated Secchi depth {a:n} m on {d:d}", "Adâncimea Secchi estimată {a} m pe {d}")`. Kinds: `n` number (decimal comma), `i` integer, `c` count before a noun ("23 de zile"), `d` ISO date, `m` month, `t` translated text, `l` translated and lowercased, `s` kept text, `k` verbatim. Whole fixed strings: `E(en, ro)`. Specific templates before general ones. Details in the `i18n_data.py` docstring.
+  - Check: `MARINEKIT_OFFLINE=1 .venv/bin/python src/viewer/ro_check.py` (about 25 min; `--quick` about 3 min; `--lang en` for exceptions only). It runs every page through AppTest in RO for all profiles, the five sector stakeholders, four places and two dates, and lists English words, "[EN]" blocks, ISO dates and decimal points. Do not edit `ro_check.py` while it runs (AppTest re-reads the function source).
+  - When marinekit wording changes, the checker shows the new sentence with "[EN]"; add a template for it.
+  - Last result (25 Nov): full run 461 scenarios, 0 exceptions in EN and RO; RO flagged 0 strings after the final fixes (platform IDs such as Sea087, dataset IDs, place and company names are allowed).
+- Nothing is needed from Joseph for this; no marinekit change was made. Optional later: a `lang` argument in marinekit would make the template tables unnecessary (proposal in the coordinator notes, `ro_data_side_strings.md`).
+
+## Update 24 Nov, 10:15 (third coordinator)
 - **Viewer frozen for the pitch** at c549de2 (local tag `pitch-demo`; soft pressure map is the default); the server on 8502 runs that code. Don't edit `src/viewer/` or restart 8502 until after the pitch.
 - Done since the sections below: direction B rebuild merged into `main` (pull request 1). On `design` since then: aligned rows, resizable and foldable panels, Copernicus tiles clamped to the latest published day, soft-edged pressure map (Edges: Soft / Sharp, default Sharp, `?edges=soft`), and EN / RO (`?lang=ro`).
 - Joseph's data work (validation, spectra, seasonal gate, trust flags, Methods content) is merged into `main` (pull request 3, 17ee449). By Andrei's decision it is used **in the pitch slides only** for now; it is not wired into the viewer.
