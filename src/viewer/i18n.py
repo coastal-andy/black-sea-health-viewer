@@ -16,9 +16,16 @@ from __future__ import annotations
 import re
 
 LANGS = {"en": "EN", "ro": "RO"}
+_OVERRIDE: list = []  # set_lang_override("ro") for scripts and tests outside a Streamlit run
+
+
+def set_lang_override(code: str | None):
+    _OVERRIDE[:] = [code] if code in LANGS else []
 
 
 def lang() -> str:
+    if _OVERRIDE:
+        return _OVERRIDE[0]
     try:
         import streamlit as st
         if not st.runtime.exists():
@@ -102,7 +109,18 @@ def data(s):
         m = pat.fullmatch(s)
         if m:
             return rep(m) if callable(rep) else m.expand(rep)
-    return s
+    from viewer import i18n_data
+    i18n_data.load()
+    return i18n_data.tr(s)
+
+
+def data_md(s):
+    """Markdown produced by marinekit (Methods texts), paragraph by paragraph."""
+    if lang() != "ro" or not isinstance(s, str) or not s:
+        return s
+    from viewer import i18n_data
+    i18n_data.load()
+    return i18n_data.md(s)
 
 
 DATA_RO: dict[str, str] = {}

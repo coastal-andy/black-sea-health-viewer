@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from viewer import adapters as A
-from viewer.i18n import dt
+from viewer.i18n import data, dt, num
 from viewer.i18n import t as tr  # 't' is the theme tokens in this module
 from viewer.style import FONT_NUM, FONT_UI, OVERLAP, SECTOR, OI, esc, overlap_levels, theme_name, tokens
 
@@ -346,11 +346,16 @@ def add_zones_soft(m, gj: dict, season: str, stamp: tuple, only_sector: str | No
 
 
 def _zone_tip(lab, p, buf) -> str:
-    if buf == buf and buf is not None:
-        return (f"<b>{esc(tr(lab))}</b><br>{esc(p.get('activity') or '')}<br>"
-                f"{esc(tr('buffer'))} {buf:.0f} m ({esc(p.get('buffer_basis'))})<br>"
-                f"{esc(tr('confidence'))}: {esc(tr(str(p.get('confidence'))))}")
-    return f"<b>{esc(tr(lab))}</b>"
+    """Zone hover: sector, activity, buffer (marinekit's buffer_label, e.g. '300 m (law)' or 'AIS density cells,
+    no buffer'), confidence."""
+    blab = p.get("buffer_label")
+    if not blab and buf == buf and buf is not None:
+        blab = f"{buf:.0f} m ({p.get('buffer_basis')})" if p.get("buffer_basis") else f"{buf:.0f} m"
+    if not blab:
+        return f"<b>{esc(tr(lab))}</b>"
+    return (f"<b>{esc(tr(lab))}</b><br>{esc(data(p.get('activity') or ''))}<br>"
+            f"{esc(tr('buffer'))}: {esc(num(data(str(blab))))}<br>"
+            f"{esc(tr('confidence'))}: {esc(tr(str(p.get('confidence'))))}")
 
 
 def add_zones(m, gj: dict, season: str, only_sector: str | None = None):
@@ -383,8 +388,9 @@ def add_features(m, gj: dict, season: str, only_sector: str | None = None, soft:
             continue
         lab, col = SECTOR.get(p["sector"], (p["sector"], "#555"))
         conf = str(p.get("confidence") or "")
-        tip = (f"<b>{esc(p.get('name') or p.get('activity'))}</b><br>{esc(tr(lab))}: {esc(p.get('activity'))}<br>"
-               f"{esc(tr('confidence'))}: {esc(tr(conf))}<br><span style='color:#666'>{esc(str(p.get('source'))[:90])}</span>")
+        src = data(str(p.get("source") or ""))
+        tip = (f"<b>{esc(data(p.get('name') or p.get('activity')))}</b><br>{esc(tr(lab))}: {esc(data(p.get('activity')))}<br>"
+               f"{esc(tr('confidence'))}: {esc(tr(conf))}<br><span style='color:#666'>{esc(src[:90])}</span>")
         url = str(p.get("source_url") or "")
         pop = folium.Popup(tip + (f"<br><a href='{esc(url)}' target='_blank' rel='noopener'>{esc(tr('open source'))}</a>"
                                   if url.startswith("http") else ""), max_width=320)
@@ -429,10 +435,10 @@ def add_platforms(m, p: pd.DataFrame, detail: bool):
         status = tr({"under_qc": "under QC (not trusted yet)", "context": "context only",
                      "good": "trusted", "not_assessed": "not assessed"}[trust])
         last = dt(r.time_end, "%d %b %Y") if pd.notna(r.time_end) else tr("unknown")
-        tip = (f"<b>{esc(r['name'])}</b> ({esc(r.id)})<br>{esc(r.type)} - {esc(tr('last data'))} {last}<br>"
+        tip = (f"<b>{esc(r['name'])}</b> ({esc(r.id)})<br>{esc(tr(r.type))} - {esc(tr('last data'))} {last}<br>"
                f"{esc(tr('status'))}: {status}<br>{esc(params)}")
         if detail:
-            tip += f"<br><span style='color:#666'>{esc(r.trust_note)}</span>"
+            tip += f"<br><span style='color:#666'>{esc(tr(r.trust_note))}</span>"
         folium.CircleMarker([r.lat, r.lon], radius=6 if r.recent else 4.5, color="#1C2430" if not grey else "#9AA3AD",
                             weight=1.2, fill=True, fill_color=col, fill_opacity=0.95 if not grey else 0.5,
                             tooltip=folium.Tooltip(tip)).add_to(fg)

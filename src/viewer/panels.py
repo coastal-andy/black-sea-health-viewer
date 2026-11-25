@@ -324,6 +324,16 @@ def _vec_point(kind, lat, lon, start, end):
 
 
 # ------------------------------------------------------------------------------------------ cards
+def day_txt(x) -> str:
+    """A date from marinekit (ISO day, or free text) in the viewer language; '-' when missing."""
+    if x in (None, ""):
+        return "-"
+    try:
+        return dt(pd.Timestamp(str(x)), "%d %b %Y")
+    except Exception:
+        return data(str(x))
+
+
 def _num(x, unit=""):
     if x is None or (isinstance(x, float) and not np.isfinite(x)):
         return "-"

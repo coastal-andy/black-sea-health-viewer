@@ -14,7 +14,7 @@ from viewer import adapters as A
 from viewer import maps as M
 from viewer import panels as PN
 from viewer import profiles as P
-from viewer.i18n import lang, t
+from viewer.i18n import data, data_md, lang, t
 from viewer.style import table_html, OVERLAP, SECTOR, esc, pill
 
 PRESSURES = {
@@ -182,13 +182,15 @@ def methods_screen(profile):
     st.markdown(f"<div class='bsv-box'><b>{esc(t('Connected modules'))}</b><br>" + "<br>".join(
         f"{esc(k)}: {esc(t('connected') if v else t('not yet (placeholder in use)'))}" for k, v in mods.items())
         + f"<br>{esc(t('Pressure zones files'))}: {esc(A.zones_version())}</div>", unsafe_allow_html=True)
-    if lang() == "ro":
-        st.caption(t("The tables below come from the project documentation and are in English."))
+    meth = A._mod("marinekit.methods")
+    if meth is not None:
+        st.markdown(data_md(meth.uncertainty_primer(profile)))
 
-    tabs = st.tabs([t("Sources"), t("Reference periods and thresholds"), t("Quality control"), t("Natural or pressure?"),
-                    t("What to investigate"), t("Limitations")])
+    tabs = st.tabs([t("Sources"), t("Uncertainty"), t("Reference periods and thresholds"), t("Quality control"),
+                    t("Natural or pressure?"), t("What to investigate"), t("Where to measure next"), t("Limitations")])
+    tabs = dict(zip(["sources", "unc", "ref", "qc", "chain", "inv", "needs", "lim"], tabs))
     sl = A.md_tables(A.DOCS / "indicators" / "SHORTLIST.md")
-    with tabs[0]:
+    with tabs["sources"]:
         st.markdown(t("**Copernicus Marine Service** (model, reanalysis, satellite, in-situ; free account)"))
         cat = A.catalog_table()
         cols = ["key", "origin", "product", "dataset_id", "variables", "resolution_deg", "frequency", "reference_years"]
@@ -203,7 +205,7 @@ def methods_screen(profile):
             "NOAA, ESA Ocean Colour CCI, Open-Meteo (waves, wind), GloFAS Danube discharge: no-login backups and drivers.")))
         if detail:
             st.caption(t("Dataset IDs come from marinekit.sources.copernicus.CATALOG. Details: docs/data_sources/*.md."))
-    with tabs[1]:
+    with tabs["ref"]:
         st.markdown(t("Anomalies are always measured against the **same day of the year** (not the yearly mean). "
                       "OFFICIAL = Romanian MSFD 2024 (NIMRD) or an EU directive; OURS = a climatology band or a value we "
                       "propose. Draft thresholds are to be confirmed with NIMRD."))
@@ -212,10 +214,10 @@ def methods_screen(profile):
             tb = tb.map(A.strip_md)
             if not detail:
                 tb = tb[["Indicator", "Reference / threshold", "Evidence", "Confidence"]]
-            st.markdown(table_html(tb, height=420), unsafe_allow_html=True)
+            st.markdown(table_html(tb, height=420, translate=True), unsafe_allow_html=True)
         st.markdown(t("**Reference periods**: satellite SST 1991-2020 (WMO standard); satellite chlorophyll and Kd490 "
                       "1998-2022; model reanalysis 1993-2022; Danube discharge 1997-2025."))
-    with tabs[2]:
+    with tabs["qc"]:
         st.markdown("**" + t("In-situ QC rules") + "**\n" + "\n".join("- " + t(x) for x in (
             "Only OceanSITES QC flags 1 (good) and 2 (probably good) are kept.",
             "Physical bounds per variable (e.g. temperature -2 to 35 °C, salinity 0 to 40) remove sensor spikes.",
@@ -224,25 +226,31 @@ def methods_screen(profile):
         tb = (sl.get("4. Data quality register (what to trust)") or [None])[0]
         if tb is not None:
             st.markdown("**" + t("Data quality register") + "**")
-            st.markdown(table_html(tb.map(A.strip_md)), unsafe_allow_html=True)
+            st.markdown(table_html(tb.map(A.strip_md), translate=True), unsafe_allow_html=True)
         p = A.platforms()
         if len(p):
             st.markdown("**" + t("In-situ platforms and their status") + "**")
             show = p[["id", "name", "type", "lat", "lon", "time_end", "trust", "trust_note"]].rename(
                 columns={"time_end": "last data", "trust": "status", "trust_note": "note"})
-            st.markdown(table_html(show, height=300), unsafe_allow_html=True)
-    with tabs[3]:
+            show = show.assign(type=show["type"].map(t), status=show["status"].map(lambda x: t(str(x))),
+                               note=show["note"].map(t))
+            st.markdown(table_html(show, height=300, translate=True), unsafe_allow_html=True)
+    with tabs["chain"]:
         st.markdown(t("One rule chain for all cards, applied in order. 'Pressure' is used only when no natural driver "
                       "explains the event."))
         path = A.DOCS / "indicators" / "SHORTLIST.md"
         txt = path.read_text() if path.exists() else ""
         sec = txt.split("## 3.")[1].split("## 4.")[0] if "## 3." in txt else ""
-        st.markdown("\n".join(l for l in sec.splitlines()[1:]))
-    with tabs[4]:
+        st.markdown(data_md("\n".join(l for l in sec.splitlines()[1:])))
+    with tabs["inv"]:
         tb = (sl.get('5. "Investigate" recommendations (the decision output)') or [None])[0]
         if tb is not None:
-            st.markdown(table_html(tb.map(A.strip_md)), unsafe_allow_html=True)
-    with tabs[5]:
+            st.markdown(table_html(tb.map(A.strip_md), translate=True), unsafe_allow_html=True)
+    with tabs["needs"]:
+        _needs(profile)
+    with tabs["unc"]:
+        _uncertainty(profile)
+    with tabs["lim"]:
         st.markdown("\n".join("- " + t(x) for x in (
             "The model's chlorophyll, bottom oxygen and nutrients disagree with its own reanalysis: we use satellite and "
             "in-situ data for those, and keep the model for temperature, salinity and currents.",
@@ -252,3 +260,52 @@ def methods_screen(profile):
             "Aquaculture sites, fishing landing points and some coastal works are located from place names: marked 'assumed'.",
             "Basemap tiles and Copernicus map tiles need the internet; data layers and charts work offline from the cache.",
             "Trends use annual means without correcting for autocorrelation, so the uncertainty is a lower bound.")))
+
+
+UNC_VARS = {"sst": "Sea surface temperature", "chl": "Chlorophyll-a", "sal": "Salinity", "o2": "Dissolved oxygen (surface)",
+            "o2_bottom": "Dissolved oxygen (near the seabed)", "no3": "Nitrate", "po4": "Phosphate"}
+
+
+def _uncertainty(profile):
+    """How far each value can be trusted, per variable, worded for the profile (marinekit.methods)."""
+    meth = A._mod("marinekit.methods")
+    if meth is None:
+        st.info(t("The uncertainty texts come from marinekit.methods, which is not available."))
+        return
+    for v, name in UNC_VARS.items():
+        try:
+            txt = meth.uncertainty_text(v, profile)
+        except Exception:
+            continue
+        with st.expander(t(name), expanded=(v == "sst")):
+            st.markdown(data_md(txt))
+
+
+def _needs(profile):
+    """Where new measurements are needed, ranked by a plain count of five yes/no criteria (marinekit.methods)."""
+    meth = A._mod("marinekit.methods")
+    if meth is None:
+        st.info(t("The measurement needs come from marinekit.methods, which is not available."))
+        return
+    key = P.card_profile(profile)
+    df = A.measurement_needs(key)
+    if df is None or df.empty:
+        st.info(t("No measurement needs available."))
+        return
+    st.markdown(t("Ranked by a plain count of five yes/no reasons (sources disagree, no trusted sensor, sensor not "
+                  "trusted, gap in time, an official threshold depends on it). No weights. Criteria and ranking OURS."))
+    show = df.drop(columns=[c for c in ("lat", "lon", "need_id", "label", "hand_set") if c in df.columns])
+    if "sectors" in show.columns:
+        show = show.assign(sectors=show["sectors"].map(lambda x: ", ".join(t(P.SECTORS.get(k, k)) for k in str(x).split(", "))))
+    if "cost" in show.columns:
+        show = show.assign(cost=show["cost"].map(lambda x: t(str(x))))
+    for c in ("disagree", "no_trusted_insitu", "untrusted_sensor", "time_gap", "decision_at_stake", "concerns_you"):
+        if c in show.columns:
+            show[c] = show[c].astype(bool)
+    evidence = show.pop("evidence") if "evidence" in show.columns else None
+    st.markdown(table_html(show, translate=True), unsafe_allow_html=True)
+    if evidence is not None and P.show_detail(profile):
+        with st.expander(t("Evidence for each criterion")):
+            st.markdown("\n".join(f"- **{r}**: " + data(e) for r, e in zip(df["rank"], evidence)))
+    if "label" in df.columns:
+        st.caption(data(str(df["label"].iloc[0])))

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import html
 
+import numpy as np
+
 # ------------------------------------------------------------------------------------------ themes (direction B)
 # Two flat token sets. Dark is the default; light is the same design on light colours.
 THEMES = {
@@ -318,6 +320,8 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{background:{t['panel']};
 .bsv-table td.n {{font-family:{FONT_NUM}; font-size:15px; white-space:nowrap;}}
 .bsv-chain {{margin:4px 0 0 18px; padding:0; font-size:13.5px; line-height:1.5; color:{t['soft']};}}
 .bsv-chain li {{margin:4px 0;}}
+.bsv-list {{margin:2px 0 6px 18px; padding:0; font-size:13px; line-height:1.5; color:{t['soft']};}}
+.bsv-list li {{margin:3px 0;}}
 .st-key-page_body [data-testid="stExpander"] summary {{padding:12px 0 !important;}}
 .st-key-page_body [data-testid="stExpanderDetails"] {{padding:4px 0 14px 0 !important;}}
 .st-key-page_body [data-testid="stExpander"] details {{border-top:0 !important;}}
@@ -669,10 +673,13 @@ OVERLAP = {k: v[0] for k, v in overlap_levels().items()}
 CSS = css("dark")  # kept for older imports; app.py injects css(theme_name()) instead
 
 
-def table_html(df, height: int | None = None) -> str:
-    """A DataFrame as a flat themed HTML table (st.dataframe draws on a canvas and ignores the light theme)."""
+def table_html(df, height: int | None = None, translate: bool = False) -> str:
+    """A DataFrame as a flat themed HTML table (st.dataframe draws on a canvas and ignores the light theme).
+    Dates and decimal numbers follow the viewer language; translate=True also translates the column names (viewer
+    dictionary) and the text cells (text produced by marinekit or the docs)."""
     import pandas as pd
-    head = "".join(f"<th>{esc(c)}</th>" for c in df.columns)
+    from viewer.i18n import data, dt, num, t
+    head = "".join(f"<th>{esc(t(str(c)) if translate else c)}</th>" for c in df.columns)
     rows = []
     for _, r in df.iterrows():
         cells = []
@@ -680,11 +687,15 @@ def table_html(df, height: int | None = None) -> str:
             if v is None or (isinstance(v, float) and pd.isna(v)):
                 v = ""
             elif isinstance(v, pd.Timestamp):
-                v = v.strftime("%d %b %Y")
+                v = dt(v, "%d %b %Y")
+            elif isinstance(v, (bool, np.bool_)):
+                v = t("yes") if v else t("no")
             elif isinstance(v, float):
-                v = f"{v:.4g}"
+                v = num(f"{v:.4g}")
             elif isinstance(v, (list, tuple)):
                 v = ", ".join(map(str, v))
+            elif isinstance(v, str) and translate:
+                v = data(v)
             cells.append(f"<td>{esc(v)}</td>")
         rows.append("<tr>" + "".join(cells) + "</tr>")
     box = f"max-height:{height}px;overflow:auto" if height else "overflow-x:auto"
