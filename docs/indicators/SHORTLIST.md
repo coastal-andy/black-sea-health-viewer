@@ -68,7 +68,10 @@ Live example: every bottom O₂ < 4 mg/L episode in the forecast since Dec 2024 
 
 | Source | Status | Use |
 |---|---|---|
-| Offshore buoys `EUXRoOB01–03`, `EUXRo02/03` | good; formula matches buoy O₂ saturation (r 0.98) | measured reference for O₂, chl, T, S |
+| Offshore buoys `EUXRoOB01–03`, `EUXRo02/03` | good for T and O₂; formula matches buoy O₂ saturation (r 0.98) | measured reference for O₂ and T (chl and S: see the two rows below) |
+| Buoy chlorophyll (fluorescence) at `EUXRoOB01–03`, `EUXRo03` | **indicative**: OB01-03 (2024-2026) read 2-3x satellite and model (median ratio satellite / buoy 0.36-0.51, R² 0.15-0.23 vs satellite); EUXRo03 (2013-2023) R² 0.00 vs satellite. Likely factory calibration, daytime quenching, biofouling | comparison only, never thresholds or trends; `datahub` "auto" uses satellite, then model |
+| Buoy salinity at `EUXRoOB01–03` | **not trusted**: fouling-like drops to 13-15 PSU for weeks to months (e.g. OB02 Oct 2025-Mar 2026), R² 0.00-0.17 vs model, RMSE 1.1-3.5 PSU | show greyed out; `datahub` "auto" uses the model (about 1 PSU vs coastal bottles) |
+| Buoy salinity at `EUXRo03` (2013-2023) | kept as before (good): no step-like drops reported, model 0.43 PSU above the buoy, RMSE 0.98 PSU (but R² 0.05), within the model's own 1 PSU coastal error | usable as a measured check; the record ends in 2023, so recent dates fall back to the model |
 | Coastal buoys `EUXRoCB01/02` (new, Sep 2026+) | **not trusted**: O₂ units unclear, O₂ saturation 3.6 %, salinity 7.5 | show greyed out, "under QC" |
 | Station 15480 (Constanța) | **shore station**: 3.5 °C colder than open water | air and harbour context only, not sea temperature |
 | Copernicus physics (T, S) | good: reanalysis vs NIMRD casts, surface T r 0.99, bias +0.19 °C | maps, stratification, model vs obs |
@@ -77,6 +80,14 @@ Live example: every bottom O₂ < 4 mg/L episode in the forecast since Dec 2024 
 | Copernicus BGC nitrate, phosphate | **not usable** as absolute values | not shown; use observations and climatology |
 | Satellite SST, chl | good; NRT vs REP SST offset +0.53 °C | P1, B1, B2 |
 | Bathing-water history (`emodnet_layers.bathing_water_history`) | fixed and verified: 2022 45/4, 2023 34/15, 2024 41/8 Excellent/Good, matching the EEA factsheet; seasons before 2015 use an older scheme | C6 per year from 2015; earlier years marked "not comparable" |
+
+**Two-level quality rule.** Level 1 (sensor trust, in `marinekit.datahub`): a whole platform carries a trust in
+`PLATFORMS`, and a single platform-variable pair can be overridden in `VARIABLE_TRUST` (trust, reason). `get_series(...,
+source="auto")` never picks a pair whose trust is indicative, untrusted or not_usable_absolute; an explicit
+`source="buoy"` and `compare_sources` still return it, with `attrs["trust"]` set to the flag and the reason in
+`attrs["notes"]`, so the viewer can grey it out. `obs_vs_model` adds `obs_trust`. Level 2 (value screening, e.g. a
+fouling screen on salinity) is not implemented yet; a flag is lifted only after a calibration against bottle samples.
+Evidence: `docs/indicators/validation/interpretation.md` and `metrics.csv`.
 
 ## 5. "Investigate" recommendations (the decision output)
 
@@ -97,3 +108,12 @@ Live example: every bottom O₂ < 4 mg/L episode in the forecast since Dec 2024 
 4. Are the coastal buoys `EUXRoCB0x` quality-controlled, and in what units is O₂?
 5. Is there an official list of licensed aquaculture sites and of dredging and dumping areas?
 6. Pressure weights: do you agree with the literature-derived sector weights (ports 0.36, fishing 0.35, shipyards 0.21, tourism 0.05, aquaculture 0.03; `data/zones/weights.yaml`)? Two values are our assumptions: the aquaculture floor and the fishing winter factor of 0.5.
+
+## 7. Seasonal cycle and trend gate (analysis level)
+
+Added 23 Nov 2026 (issue #2, request 2). Applied by `marinekit.seasonal` before the Water quality panel shows a spectrum-based cycle or a trend. Every result carries `show` and `gate_reason`. All thresholds are **OURS**.
+
+- **Source**: trust from `datahub.get_series` (section 4 and its per-platform flags) must be good or usable.
+- **Seasonal cycle** (usual-range band, amplitude, date of the maximum): shown when the annual cycle is significant (p < 0.05, Newey-West HAC) and trend + cycles explain adjusted R² >= 0.5 of the weekly means.
+- **Trend** (OLS on complete annual means): fewer than 8 complete years: no number ("not enough years yet"); 8-19 years: number labelled "indicative"; 20 years or more: "climate trend". If p >= 0.05, the text says "not significant".
+- Details and the current result per variable: `docs/indicators/seasonal/README.md`, section "Contract for the viewer".

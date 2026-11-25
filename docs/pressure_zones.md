@@ -305,12 +305,17 @@ Taking tourism out in winter removes almost all 4-sector cells. The remaining wi
 | Shipyards | Cables | KAFOS schematic; Diamond Link landing at Constanța unknown | Surveyed routes |
 | Shipyards | Petrom platform-to-shore pipeline | Not mapped (NP24 notes a 1 nm prohibition) | Route coordinates |
 | Tourism | Bathing season dates | 1 June – 15 September, from INSP / Ministry of Health practice | The legal act fixing the season |
+| Fishing | Near-shore small-scale fishing | Under-counted: AIS covers only vessels of 15 m or more, so small boats and pound nets near shore are missing from the fishing grounds | NIMRD / ANPA records of the small coastal fleet and pound-net sites |
+| All | ANAR scanned PDFs (use-overlay and permit maps) | Not read: they are scanned images, no text or coordinates were extracted | Digitised maps or coordinates from ANAR / ABA Dobrogea-Litoral |
 | All | Rule-based buffers | Port area 1 km, shipyard 500 m, landing point 1 km, coastal protection 200 m, anchorage 300 m | NIMRD's view on footprints |
 
 ## Limitations
 
 - **Presence only.** A sector counts once whether it has one beach or ten, and a small marina counts the same as Constanța port. The count is a screening map of co-location, not of impact.
 - **AIS coverage.** The AIS layers come from ~1.2 km cells and include only vessels of 15 m or more. The small coastal fishing fleet is represented only by the landing points until the pound-net sites are added.
+- **Fishing under-counted near shore.** AIS only covers vessels of 15 m or more, so near-shore small-scale fishing (small boats, pound nets) is missing from the fishing grounds. Say so in the pitch.
+- **ANAR scanned PDFs not read.** The ANAR / ABA Dobrogea-Litoral maps that exist only as scanned PDFs were not digitised, so any zone shown only there (for example the beam-trawl area on the use-overlay map) is missing.
+- **Hover label.** `sector_zones.geojson` carries `buffer_label` (for example "300 m (law)"). Shipping lanes, fishing grounds and dredging areas show "AIS ... density cells, no buffer": their 0 m buffer is by design, the zone is the AIS cells themselves. The label is added by `scripts/add_buffer_labels.py`; re-run it after a rebuild.
 - **Static zones.** Only tourism changes with season.
 - **Romanian zones only.** Bulgarian and Ukrainian activities are excluded.
 

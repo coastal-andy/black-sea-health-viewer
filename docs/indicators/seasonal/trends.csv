@@ -1,0 +1,41 @@
+station,variable,source,n_years,years,meaningful,slope_per_decade,ci_lo,ci_hi,p_value,r2,note
+EUXRo03,sst,insitu,4,2015-2022,False,,,,,,only 4 complete year(s) (need 8): trend not meaningful
+EUXRo03,sst,satellite,10,2014-2023,True,0.8234,-0.3212,1.968,0.1357,0.2559,
+EUXRo03,sst,model,10,2014-2023,True,0.772,-0.3626,1.907,0.1553,0.2353,
+EUXRo03,chl,insitu,5,2015-2022,False,,,,,,only 5 complete year(s) (need 8): trend not meaningful
+EUXRo03,chl,satellite,10,2014-2023,True,0.07217,-0.05821,0.2026,0.2376,0.1692,
+EUXRo03,chl,model,10,2014-2023,True,0.2747,-0.1452,0.6947,0.1698,0.2215,
+EUXRo03,sal,insitu,1,2015-2015,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRo03,sal,model,9,2014-2022,True,0.6091,0.1845,1.034,0.01156,0.6218,
+EUXRo03,o2,insitu,1,2020-2020,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRo03,o2,model,10,2014-2023,True,0.0467,-0.1686,0.262,0.6305,0.03031,
+EUXRoOB01,sst,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,sst,satellite,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,sst,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,chl,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,chl,satellite,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,chl,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,sal,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,sal,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,o2,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB01,o2,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,sst,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,sst,satellite,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,sst,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,chl,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,chl,satellite,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,chl,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,sal,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,sal,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,o2,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB02,o2,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,sst,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,sst,satellite,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,sst,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,chl,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,chl,satellite,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,chl,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,sal,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,sal,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,o2,insitu,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful
+EUXRoOB03,o2,model,1,2025-2025,False,,,,,,only 1 complete year(s) (need 8): trend not meaningful

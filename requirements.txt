@@ -21,6 +21,9 @@ streamlit>=1.45
 streamlit-folium>=0.22
 folium>=0.17
 plotly>=5.24
+matplotlib>=3.9  # static validation figures (scripts/validation)
+# tests
+pytest>=8.0  # CLAUDE.md: run tests/ before every push on data
 # vision
 pillow>=10.4
 opencv-python-headless>=4.10
