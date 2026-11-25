@@ -60,10 +60,22 @@ def t(_key: str, /, **kw) -> str:
     out = RO.get(_key, _key) if lang() == "ro" else _key
     if kw:
         try:
-            return out.format(**kw)
+            res = out.format(**kw)
         except (KeyError, IndexError, ValueError):
             return _key.format(**kw)
+        return _ro_counts(res) if lang() == "ro" else res
     return out
+
+
+# Romanian counts from 20 up take "de" before the noun ("60 de zile", "7 zile"); the last two digits decide.
+_RO_COUNT = re.compile(r"(?<![\d,.])(\d+) (zile|ani|semne|sectoare|note|grade|ore|stații|puncte|celule|valori|luni)\b")
+
+
+def _ro_counts(s: str) -> str:
+    def fix(m):
+        n = int(m.group(1)) % 100
+        return f"{m.group(1)} de {m.group(2)}" if (n >= 20 or (n == 0 and int(m.group(1)) > 0)) else m.group(0)
+    return _RO_COUNT.sub(fix, s)
 
 
 MONTHS = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie",
@@ -148,7 +160,7 @@ RO.update({
     # status and origin
     "Normal": "Normal", "Watch": "Atenție", "Alert": "Alertă", "No data": "Fără date",
     "normal": "normal", "watch": "atenție", "alert": "alertă", "no data": "fără date",
-    "measured": "măsurat", "satellite": "satelit", "model": "model", "model (reanalysis)": "model (reanaliză)",
+    "measured": "măsurat", "satellite": "satelit", "model": "model", "model (reanalysis)": "model (reanaliză)", "reanalysis": "reanaliză",
     "derived": "derivat", "reference": "referință", "unknown": "necunoscut",
     # sectors
     "Ports and logistics": "Porturi și logistică", "Shipyards and marine engineering": "Șantiere navale și inginerie marină",
