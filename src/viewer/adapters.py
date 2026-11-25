@@ -318,14 +318,23 @@ def _hub_compare(var, lat, lon, day):
         ds = ds_names(m.get("datasets")) or col
         notes = m.get("notes")
         notes = "; ".join(map(str, notes)) if isinstance(notes, (list, tuple)) else str(notes or "")
+        reason = None
+        if m.get("platform") and hasattr(hub, "variable_trust"):
+            t2, reason = hub.variable_trust(str(m["platform"]), v["canon"])
+            if t2 in getattr(hub, "AUTO_EXCLUDED_TRUST", ()):
+                trust = t2
+            elif trust not in ("untrusted", "indicative", "not_usable_absolute"):
+                reason = None
         if trust == "untrusted":
             notes = ("Not trusted yet (under QC). " + notes).strip()
         elif trust == "indicative":
             notes = ("Indicative only. " + notes).strip()
-        meta = {"dataset": ds, "distance_km": m.get("distance_km"), "platform": m.get("platform"), "trust": trust}
+        meta = {"dataset": ds, "distance_km": m.get("distance_km"), "platform": m.get("platform"), "trust": trust,
+                "trust_reason": reason}
+        # greyed out in the Sources table: untrusted, indicative-only (comparison) and not usable as absolute values
         out.append(dict(label=str(m.get("label") or col), origin=o, dataset=ds, series=s,
-                        unit=m.get("unit") or v["unit"], meta=meta, note=notes, untrusted=trust == "untrusted",
-                        source_id=col))
+                        unit=m.get("unit") or v["unit"], meta=meta, note=notes,
+                        untrusted=trust in ("untrusted", "indicative", "not_usable_absolute"), source_id=col))
     failed = df.attrs.get("failed") or {}
     for k, why in failed.items():
         if "DataUnavailable" in why or "no " in why.lower():
@@ -621,6 +630,42 @@ def tile_url(layer: str, day: str) -> str | None:
     return None
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def tile_day(layer: str, day: str) -> str | None:
+    """The day the Copernicus WMTS can draw for `day`: the day itself if published, else the nearest published day
+    (the latest one for today and forecast days). The tile server answers HTTP 400 with no image for a TIME it does
+    not have, so the map stays empty if the request asks for an unpublished day. None if the service is unreachable."""
+    from marinekit.sources import copernicus as cp
+    L = LAYERS[layer]
+    want = pd.Timestamp(day)
+    for key in [L["key"], L.get("fallback_key")]:
+        if not key:
+            continue
+        try:
+            lay = next((l for l in cp.wmts_layers(key) if l["variable"] == L["var"]), None)
+        except Exception as ex:
+            log.info("wmts layers %s: %s", key, ex)
+            continue
+        if lay is None:
+            continue
+        spans = []
+        for v in lay.get("time_values") or []:
+            parts = str(v).split("/")
+            if len(parts) >= 2:
+                spans.append((pd.Timestamp(parts[0]).tz_localize(None).normalize(),
+                              pd.Timestamp(parts[1]).tz_localize(None).normalize()))
+            else:
+                for x in str(v).split(","):
+                    t = pd.Timestamp(x).tz_localize(None).normalize()
+                    spans.append((t, t))
+        if not spans:
+            d = lay.get("time_default")
+            return str(pd.Timestamp(d).tz_localize(None).date()) if d else day
+        best = min((min(max(want, a), b) for a, b in spans), key=lambda t: abs((t - want).days))
+        return str(best.date())
+    return None
+
+
 def tile_url_styled(layer: str, day: str, vmin: float, vmax: float) -> str | None:
     """Copernicus WMTS tiles drawn with the viewer's ramp and range (STYLE=cmap:<name>,range:a/b in the
     product's own units, e.g. kelvin for satellite SST). None if the layer has no WMTS tiles."""
@@ -766,6 +811,8 @@ def _sector_zones(stamp: tuple) -> dict:
     g = g[~g.geometry.is_empty & g.geometry.notna()].copy()
     g["geometry"] = g.geometry.buffer(0).simplify(0.0005, preserve_topology=True)
     keep = ["sector", "activity", "buffer_m", "buffer_basis", "basis_ref", "season", "confidence", "geometry"]
+    if "buffer_label" in g.columns:  # marinekit.pressure_zones.buffer_label (hover text), added by the data side
+        keep.insert(4, "buffer_label")
     g["buffer_m"] = pd.to_numeric(g["buffer_m"], errors="coerce")
     return json.loads(g[keep].to_json())
 
@@ -1197,8 +1244,7 @@ _CONF_RANK = {"official": 0, "mapped": 1, "assumed": 2}
 
 
 def _clean_name(s: str) -> str:
-    s = re.sub(r"\s*\((EMODnet port location|AIS-derived[^)]*)\)", "", str(s or "")).strip()
-    return s[:48]
+    return re.sub(r"\s*\((EMODnet port location|AIS-derived[^)]*)\)", "", str(s or "")).strip()
 
 
 @st.cache_data(show_spinner=False)
@@ -1273,3 +1319,125 @@ def cards_for_sites(sites: list[dict], day: str, prof: str, wait: float = 8.0) -
         except Exception as ex:
             out.append([_card(cid, why=f"Could not compute: {str(ex)[:100]}") for cid in CARD_ORDER])
     return out
+
+
+# ------------------------------------------------------------------------------------------ data analysis (PR 3)
+# Source validation, the seasonal cycle / trend quality gate, sensor trust flags and the summary SST, from
+# marinekit.validation, marinekit.seasonal, marinekit.datahub and marinekit.indicators. The seasonal fits can take
+# 10-50 s on a cold cache, so they run as background jobs (same pattern as the cards) and the page shows a short
+# "computing" line meanwhile.
+SEASONAL_VARS = {"sst": "sst", "sal": "sal", "o2": "o2", "chl": "chl"}  # viewer variable -> seasonal variable
+VALIDATION_VARS = {"sst": "sst", "sal": "sal", "o2": "o2", "o2_bottom": "o2", "chl": "chl", "nutrients": "no3", "po4": "po4"}
+_BG: dict = {}
+_BG_DONE: dict = {}
+
+
+def background(key: tuple, fn, *args, wait: float = 1.0):
+    """fn(*args) in a background job keyed by `key`: the result once done, else SlowSource after `wait` seconds.
+    Later reruns pick up the finished result; a failed job raises its exception once and is then retried."""
+    if key in _BG_DONE:
+        return _BG_DONE[key]
+    fut = _BG.get(key)
+    if fut is None:
+        fut = _BG[key] = _POOL.submit(fn, *args)
+    try:
+        res = fut.result(timeout=wait)
+    except _FutTimeout:
+        raise SlowSource("still computing")
+    except Exception:
+        _BG.pop(key, None)
+        raise
+    _BG_DONE[key] = res
+    _BG.pop(key, None)
+    if len(_BG_DONE) > 400:
+        _BG_DONE.pop(next(iter(_BG_DONE)))
+    return res
+
+
+def background_pending(key: tuple) -> bool:
+    return key in _BG and key not in _BG_DONE
+
+
+def _seasonal_job(var, lat, lon, day):
+    sm = importlib.import_module("marinekit.seasonal")
+    cyc = sm.seasonal_cycle(var, lat, lon)
+    trend = sm.long_term_trend(var, lat, lon)
+    return dict(cycle=cyc, trend=trend)
+
+
+def seasonal(var: str, lat: float, lon: float, wait: float = 1.0) -> dict | None:
+    """{cycle, trend} from marinekit.seasonal for a viewer variable it covers; None if it does not cover it.
+    Raises SlowSource while the fit is still running."""
+    sv = SEASONAL_VARS.get(var)
+    if sv is None or not has_module("marinekit.seasonal"):
+        return None
+    k = ("seasonal", sv, round(float(lat), 3), round(float(lon), 3), str(today().date()))
+    return background(k, _seasonal_job, sv, k[2], k[3], k[4], wait=wait)
+
+
+def usual_band(var: str, lat: float, lon: float, dates) -> pd.DataFrame | None:
+    """marinekit.seasonal.usual_range on the given dates (columns fit, lo, hi; attrs with show, gate_reason).
+    Call after seasonal() has finished for the same point (the fit is then cached inside marinekit)."""
+    sv = SEASONAL_VARS.get(var)
+    if sv is None:
+        return None
+    sm = importlib.import_module("marinekit.seasonal")
+    try:
+        return sm.usual_range(sv, round(float(lat), 3), round(float(lon), 3), pd.DatetimeIndex(dates))
+    except Exception as ex:
+        log.info("usual_range %s: %s", var, ex)
+        return None
+
+
+@st.cache_data(show_spinner=False)
+def source_summary(var: str) -> dict | None:
+    """marinekit.validation.source_summary for the variable behind a Water page row (None if not validated)."""
+    v = VALIDATION_VARS.get(var)
+    if v is None or not has_module("marinekit.validation"):
+        return None
+    try:
+        return importlib.import_module("marinekit.validation").source_summary(v)
+    except Exception as ex:
+        log.info("source_summary %s: %s", var, ex)
+        return None
+
+
+def variable_trust(platform: str | None, var: str) -> tuple[str, str | None]:
+    """(trust, reason) of one platform for one variable, from marinekit.datahub (per-variable flags first)."""
+    hub = _mod("marinekit.datahub")
+    canon = VARIABLES.get(var, {}).get("canon", var)
+    if platform and hub is not None and hasattr(hub, "variable_trust"):
+        try:
+            return hub.variable_trust(str(platform), canon)
+        except Exception:
+            pass
+    return "good", None
+
+
+def _sst_display(lat, lon, day):
+    return importlib.import_module("marinekit.indicators").sst_display(lat, lon, day)
+
+
+def sst_display(lat: float, lon: float, day: str, wait: float = 2.0) -> dict | None:
+    """The SST the temperature card uses (indicators.sst_display), for any SST shown outside the card."""
+    ind = _mod("marinekit.indicators")
+    if ind is None or not hasattr(ind, "sst_display"):
+        return None
+    k = ("sst_display", round(float(lat), 4), round(float(lon), 4), str(day))
+    try:
+        return background(k, _sst_display, k[1], k[2], k[3], wait=wait)
+    except Exception as ex:
+        log.info("sst_display: %s", ex)
+        return None
+
+
+@st.cache_data(show_spinner=False)
+def measurement_needs(profile_key: str) -> pd.DataFrame | None:
+    m = _mod("marinekit.methods")
+    if m is None:
+        return None
+    try:
+        return m.measurement_needs(profile_key)
+    except Exception as ex:
+        log.info("measurement_needs: %s", ex)
+        return None

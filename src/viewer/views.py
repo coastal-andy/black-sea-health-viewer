@@ -17,6 +17,7 @@ from viewer import pressures as PR
 from viewer import seabed as SB
 from viewer import shell as SH
 from viewer import water as WQ
+from viewer.i18n import dt, t
 from viewer.style import esc, theme_name
 
 MAP_RATIO = [2.3, 1]  # map column : docked panel
@@ -41,19 +42,22 @@ def _layer_controls(profile: dict):
     grid_opts = ["none"] + list(A.LAYERS)
     if ss.get("w_grid") not in grid_opts:
         ss["w_grid"] = "none"
-    st.selectbox("Gridded layer", grid_opts, key="w_grid",
-                 format_func=lambda k: "No gridded layer" if k == "none" else
-                 f"{A.LAYERS[k]['title']} ({A.LAYERS[k]['origin']})")
-    st.toggle("Use Copernicus map tiles (faster, online only)", key="w_tiles")
+    st.selectbox(t("Gridded layer"), grid_opts, key="w_grid",
+                 format_func=lambda k: t("No gridded layer") if k == "none" else
+                 f"{t(A.LAYERS[k]['title'])} ({t(A.LAYERS[k]['origin'])})")
+    st.toggle(t("Use Copernicus map tiles (faster, online only)"), key="w_tiles")
     for group, items in M.CATALOGUE.items():
         if group.startswith("Conditions"):
             continue
-        st.caption(group)
+        st.caption(t(group))
         for lid, lab in items.items():
-            st.checkbox(lab, key=f"w_{lid}")
+            st.checkbox(t(lab), key=f"w_{lid}")
         if group == "Pressures" and profile.get("sector"):
             ss.setdefault("w_mysector", True)
-            st.checkbox(f"Zones and activities: only {P.SECTORS[profile['sector']].lower()}", key="w_mysector")
+            st.checkbox(t("Zones and activities: only {sector}", sector=t(P.SECTORS[profile['sector']]).lower()),
+                        key="w_mysector")
+        if group == "Pressures":
+            SH.edges_control()
 
 
 # ------------------------------------------------------------------------------------------ Overview
@@ -68,24 +72,23 @@ def overview():
         with st.container(key="bsv_map"):
             with st.container(key="map_tools"):
                 SH.place_picker()
-                with st.popover("Map layers and season", width="stretch"):
+                with st.popover(t("Map layers and season"), width="stretch"):
                     _layer_controls(profile)
                     SH.season_control()
+                note_slot = st.empty()  # map notes without a legend to go in (rare): a short line here
             only = profile.get("sector") if (profile.get("sector") and ss.get("w_mysector", True)) else None
+            edges = SH.edges()
             m, fd, msgs = M.build(ss.view, layers, day_s, season, None, detail, tiles_mode=ss.get("w_tiles", False),
-                                  only_sector=only, theme=theme_name())
+                                  only_sector=only, theme=theme_name(), edges=edges)
             fg = folium.FeatureGroup(name="Selection")
             M.add_selection(fg, ss.sel)
             # st_folium draws the base map only when it first mounts; later changes to layers, date, season or
             # legend are ignored unless the key changes, so the key carries every input that changes the base map
             mkey = map_key("map", ss.get("map_nonce", 0), theme_name(), sorted(layers), day_s, season,
-                           ss.get("w_tiles", False), only, ss.view)
+                           ss.get("w_tiles", False), only, ss.view, edges)
             out = st_folium(m, height=700, use_container_width=True, key=mkey,
                             feature_group_to_add=fg, returned_objects=["last_clicked"])
-            if msgs:
-                with st.container(key="map_msgs"):
-                    for msg in msgs:
-                        st.caption(msg)
+            M.notes_slot(note_slot, msgs)
             OV.timeline()
             click = (out or {}).get("last_clicked")
             if click and click != ss.get("last_click"):
@@ -111,9 +114,10 @@ def overview_panel(day_s, season):
     n, secs = A.overlap_at(sel["lat"], sel["lon"], season)
     head = SH.selection_header(sel, season)
     if pending:
-        st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>Computing the health signs for this "
-                    "place.</p><p class='bsv-vsub'>The first time takes up to a minute; after that it is "
-                    "cached. The rows appear by themselves.</p></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='bsv-sec'>{head}<p class='bsv-verdict'>"
+                    f"{esc(t('Computing the health signs for this place.'))}</p><p class='bsv-vsub'>"
+                    f"{esc(t('The first time takes up to a minute; after that it is cached. The rows appear by themselves.'))}"
+                    "</p></div>", unsafe_allow_html=True)
         PN.poll_cards(sel, day_s, profile)
         return
     if profile.get("role") == "public":
@@ -124,9 +128,10 @@ def overview_panel(day_s, season):
                 f"<p class='bsv-vsub'>{esc(v2)}</p>{OV.counts_html(cards)}</div>", unsafe_allow_html=True)
     OV.card_rows(cards, profile)
     with st.container(key="panel_foot", horizontal=True, vertical_alignment="center"):
-        st.page_link(SH.PAGE_OBJS["water"], label="Water quality analysis")
-        st.markdown(f"<span class='bsv-note'>vs. usual for {pd.Timestamp(day_s):%d %B}, "
-                    f"cards from the {esc(A.cards_source())}</span>", unsafe_allow_html=True)
+        st.page_link(SH.PAGE_OBJS["water"], label=t("Water quality analysis"))
+        st.markdown("<span class='bsv-note'>" + esc(t("vs. usual for {day}, cards from the {src}",
+                                                      day=dt(day_s, "%d %B"), src=t(A.cards_source())))
+                    + "</span>", unsafe_allow_html=True)
     if ss.pop("_goto", None):
         st.switch_page(SH.PAGE_OBJS["water"])
 

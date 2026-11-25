@@ -5,14 +5,17 @@ from __future__ import annotations
 import streamlit as st
 
 from viewer import profiles as P
+from viewer.i18n import t
 
 
 def _choice(label: str, options: dict, key: str, help_map: dict | None = None):
     """A column of large buttons; returns the chosen key or None."""
-    st.markdown(f"#### {label}")
+    st.markdown(f"#### {t(label)}")
     picked = None
     for k, text in options.items():
+        text = t(text)
         h = (help_map or {}).get(k)
+        h = t(h) if h else h
         if st.button(text if not h else f"{text}  \n{h}", key=f"{key}_{k}", width="stretch"):
             picked = k
     return picked
@@ -24,10 +27,10 @@ def render():
     step = ss.setdefault("ob_step", 1)
     _, mid, _ = st.columns([1, 1.6, 1])
     with mid:
-        st.markdown("<p class='bsv-title' style='font-size:1.7rem'>Black Sea Health Viewer</p>"
-                    "<p class='bsv-sub'>Romanian coast: sea conditions, long-term change, and the pressures from five "
-                    "blue-economy sectors. Three quick questions set up the view for you.</p>", unsafe_allow_html=True)
-        st.progress(step / 3, text=f"Step {step} of 3")
+        st.markdown(f"<p class='bsv-title' style='font-size:1.7rem'>{t('Black Sea Health Viewer')}</p>"
+                    f"<p class='bsv-sub'>{t('Romanian coast: sea conditions, long-term change, and the pressures from five blue-economy sectors. Three quick questions set up the view for you.')}"
+                    "</p>", unsafe_allow_html=True)
+        st.progress(step / 3, text=t("Step {step} of 3", step=step))
         if step == 1:
             r = _choice("Who are you?", P.ROLES, "role", P.ROLE_HELP)
             if r:
@@ -58,13 +61,13 @@ def render():
                 finish(dict(draft))
                 st.rerun()
         c1, c2 = st.columns(2)
-        if step > 1 and c1.button("Back", key="ob_back"):
+        if step > 1 and c1.button(t("Back"), key="ob_back"):
             ss.ob_step = 1 if (step == 3 and draft["role"] in ("public", "student")) else step - 1
             st.rerun()
-        if c2.button("Skip, use the general view", key="ob_skip"):
+        if c2.button(t("Skip, use the general view"), key="ob_skip"):
             finish(P.default_profile())
             st.rerun()
-        st.caption("You can change this at any time with the profile control at the top of the page.")
+        st.caption(t("You can change this at any time with the profile control at the top of the page."))
 
 
 def finish(profile: dict):

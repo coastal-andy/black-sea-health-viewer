@@ -288,6 +288,39 @@ def _arrow_svg(length: float, angle_to: float = 90.0, h: int = 18, core: str = "
             f'stroke-linejoin="round"/></svg>')
 
 
+def _tr(s: str, **kw) -> str:
+    """Legend text in the viewer's language (viewer.i18n); plain English when used on its own."""
+    try:
+        from viewer.i18n import t
+        return t(s, **kw)
+    except Exception:
+        return s.format(**kw) if kw else s
+
+
+def _num(x: str) -> str:
+    try:
+        from viewer.i18n import num
+        return num(x)
+    except Exception:
+        return x
+
+
+def _compass(x: str) -> str:
+    try:
+        from viewer.i18n import compass as c
+        return c(x)
+    except Exception:
+        return x
+
+
+def _when(ts, fmt: str) -> str:
+    try:
+        from viewer.i18n import dt
+        return dt(ts, fmt)
+    except Exception:
+        return pd.Timestamp(ts).strftime(fmt)
+
+
 def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | None = None) -> str:
     """HTML legend: colorbar with units, arrow meaning and, for waves, period examples (3, 6, 10 s).
 
@@ -310,8 +343,8 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
         f'<span style="position:absolute;left:{i * 25}%;transform:translateX(-{0 if i == 0 else (100 if i == 4 else 50)}%)">'
         f'{fmt(v)}{"+" if i == 4 else ""}</span>' for i, v in enumerate(ticks))
     parts = [
-        f'<div style="font-weight:600;margin-bottom:2px">{sp["label"]}</div>',
-        f'<div style="font-size:11px;color:{c_sub};margin-bottom:3px">{sp["mag_label"]} ({sp["unit"]})'
+        f'<div style="font-weight:600;margin-bottom:2px">{_tr(sp["label"])}</div>',
+        f'<div style="font-size:11px;color:{c_sub};margin-bottom:3px">{_tr(sp["mag_label"])} ({sp["unit"]})'
         f'{" - " + when if when else ""}</div>',
         f'<div style="height:10px;width:190px;border-radius:2px;background:linear-gradient(to right, {stops})"></div>',
         f'<div style="position:relative;height:14px;width:190px;font-size:11px;color:{c_tick}">{tick_html}</div>',
@@ -320,17 +353,18 @@ def legend_html(kind: str, when: str = "", opacity: float = 1.0, theme: dict | N
         ex = "".join(f'<div style="display:flex;align-items:center;gap:6px;height:18px">'
                      f'<span style="width:30px;text-align:right">{p} s</span>{_arrow_svg(float(_wave_len_px(p)), **arw)}</div>'
                      for p in (3, 6, 10))
-        parts.append('<div style="margin-top:4px;font-size:11px">Arrow length = peak period</div>'
+        parts.append(f'<div style="margin-top:4px;font-size:11px">{_tr("Arrow length = peak period")}</div>'
                      f'<div style="font-size:11px">{ex}</div>'
-                     f'<div style="font-size:11px;color:{c_sub}">short = wind sea, long = swell</div>')
+                     f'<div style="font-size:11px;color:{c_sub}">{_tr("short = wind sea, long = swell")}</div>')
     elif kind == "currents":
-        parts.append('<div style="margin-top:4px;font-size:11px">Dot = slower than 0.02 m/s (no clear direction)</div>')
+        parts.append(f'<div style="margin-top:4px;font-size:11px">'
+                     f'{_tr("Dot = slower than 0.02 m/s (no clear direction)")}</div>')
     elif kind == "wind":
-        parts.append('<div style="margin-top:4px;font-size:11px">Disc colour = wind speed at reference points '
-                     '(no gridded wind source)</div>')
+        parts.append(f'<div style="margin-top:4px;font-size:11px">'
+                     f'{_tr("Disc colour = wind speed at reference points (no gridded wind source)")}</div>')
     parts.append(f'<div style="margin-top:4px;font-size:11px;max-width:200px">{_arrow_svg(22, **arw)} '
-                 f'{sp["convention"].split(".")[0]}.</div>')
-    parts.append(f'<div style="font-size:10px;color:{c_note};max-width:200px">Click the sea for values.</div>')
+                 f'{_tr(sp["convention"].split(".")[0] + ".")}</div>')
+    parts.append(f'<div style="font-size:10px;color:{c_note};max-width:200px">{_tr("Click the sea for values.")}</div>')
     if theme:
         return (f'<div style="background:{th.get("overlay", base)};color:{th.get("text", "#1a1a1a")};padding:8px 12px;'
                 f'border-radius:4px;border:1px solid {th.get("ctrl", "#999")};font:12px/1.35 {th.get("font", "system-ui")}">'
@@ -432,17 +466,21 @@ L.VectorArrows = L.Layer.extend({
   },
   _compass: function (deg) {
     var n = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-    return n[Math.floor(((deg % 360) + 360) % 360 / 22.5 + 0.5) % 16];
+    var w = (this._o.words || {}).W || 'W';
+    return n[Math.floor(((deg % 360) + 360) % 360 / 22.5 + 0.5) % 16].replace(/W/g, w);
   },
   _text: function (i) {
     var d = this._d, o = this._o, s = '<b>' + o.label + '</b>' + (d.name ? ' - ' + d.name[i] : '');
-    s += '<br>' + o.magLabel + ': ' + d.mag[i].toFixed(2) + ' ' + o.unit;
-    if (d.per) { var t = d.per[i]; s += '<br>' + o.perLabel + ': ' + t.toFixed(1) + ' s (' +
-      (t >= 8 ? 'swell' : (t >= 5 ? 'mixed' : 'wind sea')) + ')'; }
-    if (d.frm) { s += '<br>Coming from ' + this._compass(d.frm[i]) + ' (' + Math.round(d.frm[i]) +
-      ' deg), going to ' + this._compass(d.dir[i]); }
-    else { s += '<br>Flowing to ' + this._compass(d.dir[i]) + ' (' + Math.round(d.dir[i]) + ' deg)'; }
-    return s + '<br><span style="color:#666">' + d.lat[i].toFixed(3) + ' N, ' + d.lon[i].toFixed(3) + ' E</span>';
+    var w = o.words || {swell: 'swell', mixed: 'mixed', windsea: 'wind sea', coming: 'Coming from',
+                       going: 'going to', flowing: 'Flowing to', deg: 'deg', dec: '.'};
+    var f = function (x, n) { return x.toFixed(n).replace('.', w.dec || '.'); };
+    s += '<br>' + o.magLabel + ': ' + f(d.mag[i], 2) + ' ' + o.unit;
+    if (d.per) { var t = d.per[i]; s += '<br>' + o.perLabel + ': ' + f(t, 1) + ' s (' +
+      (t >= 8 ? w.swell : (t >= 5 ? w.mixed : w.windsea)) + ')'; }
+    if (d.frm) { s += '<br>' + w.coming + ' ' + this._compass(d.frm[i]) + ' (' + Math.round(d.frm[i]) +
+      ' ' + w.deg + '), ' + w.going + ' ' + this._compass(d.dir[i]); }
+    else { s += '<br>' + w.flowing + ' ' + this._compass(d.dir[i]) + ' (' + Math.round(d.dir[i]) + ' ' + w.deg + ')'; }
+    return s + '<br><span style="color:#666">' + f(d.lat[i], 3) + ' N, ' + f(d.lon[i], 3) + ' E</span>';
   },
   _click: function (e) {
     var map = this._map, d = this._d, p0 = e.containerPoint, best = -1, bd = 1e9;
@@ -513,12 +551,17 @@ def field_layer(m, ds: xr.Dataset, kind: str | None = None, time=None, name: str
     if "time" in ds.dims:
         ds = ds.sel(time=_ts(time), method="nearest") if time is not None else ds.isel(time=0)
     when = ds.attrs.get("time", "")
-    when_txt = pd.Timestamp(when).strftime("%d %b %Y %H:%M UTC") if when else ""
+    when_txt = _when(when, "%d %b %Y %H:%M UTC") if when else ""
     if kind == "currents" and when:
-        when_txt = pd.Timestamp(when).strftime("%d %b %Y") + " daily mean"
-    fg = folium.FeatureGroup(name=name or (f"{sp['label']} ({when_txt})" if when_txt else sp["label"]), show=show)
+        when_txt = _when(when, "%d %b %Y") + _tr(" daily mean")
+    label = _tr(sp["label"])
+    fg = folium.FeatureGroup(name=name or (f"{label} ({when_txt})" if when_txt else label), show=show)
     cm = _cmap(sp["cmap"])
-    opts = dict(label=sp["label"], magLabel=sp["mag_label"], unit=sp["unit"], perLabel=sp.get("period_label", ""))
+    opts = dict(label=label, magLabel=_tr(sp["mag_label"]), unit=sp["unit"],
+                perLabel=_tr(sp.get("period_label", "")) if sp.get("period_label") else "",
+                words=dict(swell=_tr("swell"), mixed=_tr("mixed"), windsea=_tr("wind sea"),
+                           coming=_tr("Coming from"), going=_tr("going to"), flowing=_tr("Flowing to"),
+                           deg=_tr("deg"), W=_compass("W"), dec=_num("0.5")[1]))
 
     if "station" in ds.dims:  # wind at points
         mag = ds[sp["mag"]].values
@@ -604,14 +647,15 @@ def _hover(kind: str, df: pd.DataFrame) -> list[str]:
     per = df[sp["period"]].values if sp["period"] and sp["period"] in df else None
     dfrom = df[sp["dir_from"]].values if sp["dir_from"] and sp["dir_from"] in df else None
     for k, (t, mag, dto) in enumerate(zip(df.index, df[sp["mag"]].values, df["dir_to"].values)):
-        s = [t.strftime("%a %d %b %H:%M UTC"), f"{sp['mag_label']}: {_fmt(mag)} {sp['unit']}"]
+        s = [_when(t, "%a %d %b %H:%M UTC"), f"{_tr(sp['mag_label'])}: {_num(_fmt(mag))} {sp['unit']}"]
         if per is not None:
             sea = "swell" if per[k] >= 8 else ("mixed" if per[k] >= 5 else "wind sea")
-            s.append(f"{sp['period_label']}: {_fmt(per[k], 1)} s ({sea})")
+            s.append(f"{_tr(sp['period_label'])}: {_num(_fmt(per[k], 1))} s ({_tr(sea)})")
         if dfrom is not None and np.isfinite(dfrom[k]):
-            s.append(f"From {compass(dfrom[k])} ({dfrom[k]:.0f} deg), going to {compass(dto)}")
+            s.append(_tr("From {a} ({d} deg), going to {b}", a=_compass(compass(dfrom[k])), d=f"{dfrom[k]:.0f}",
+                         b=_compass(compass(dto))))
         elif np.isfinite(dto):
-            s.append(f"Flowing to {compass(dto)} ({dto:.0f} deg)")
+            s.append(_tr("Flowing to {a} ({d} deg)", a=_compass(compass(dto)), d=f"{dto:.0f}"))
         out.append("<br>".join(s))
     return out
 
@@ -631,7 +675,7 @@ def _add_kind_traces(fig, df: pd.DataFrame, kind: str, every_hours, theme: dict,
         x=df.index, y=df[sp["mag"]], mode="lines+markers" if daily else "lines",
         line=dict(color=c, width=2), marker=dict(size=5),
         fill="tozeroy", fillcolor=f"rgba({r},{g},{b},0.14)",
-        name=f"{sp['mag_label']} ({sp['unit']})", text=hover, hoverinfo="text",
+        name=f"{_tr(sp['mag_label'])} ({sp['unit']})", text=hover, hoverinfo="text",
         hoverlabel=dict(bgcolor="#ffffff", font=dict(color="#1a1a1a")), showlegend=show_legend), **rc)
 
     every = every_hours or _auto_every(df)
@@ -685,15 +729,16 @@ def point_chart(df: pd.DataFrame, kind: str, every_hours: int | None = None, the
     sp, th = SPEC[kind], _THEMES[theme]
     fig = go.Figure()
     df, every = _add_kind_traces(fig, df, kind, every_hours, th)
-    where = ""
+    head = _tr(sp["label"])
     if "lat" in df.attrs:
-        where = f" at {df.attrs['lat']:.2f} N, {df.attrs['lon']:.2f} E"
-    sub = f"Arrows every {every} h point where it goes (up = north)"
+        head = _tr("{what} at {la} N, {lo} E", what=head, la=_num(f"{df.attrs['lat']:.2f}"),
+                   lo=_num(f"{df.attrs['lon']:.2f}"))
+    sub = _tr("Arrows every {n} h point where it goes (up = north)", n=every)
     if sp["period"]:
-        sub += ". Arrow length = peak period: short = wind sea, long = swell"
+        sub += ". " + _tr("Arrow length = peak period: short = wind sea, long = swell")
     fig.update_layout(showlegend=False)
-    _layout(fig, th, title or f"{sp['label']}{where}", sub, height)
-    fig.update_yaxes(title_text=f"{sp['mag_label']} ({sp['unit']})", title_font=dict(size=12))
+    _layout(fig, th, title or head, sub, height)
+    fig.update_yaxes(title_text=f"{_tr(sp['mag_label'])} ({sp['unit']})", title_font=dict(size=12))
     fig.add_annotation(text=_source_line(df, kind), xref="paper", yref="paper", x=0, y=-0.2, showarrow=False,
                        xanchor="left", font=dict(size=10, color=th["muted"]))
     fig.update_layout(margin=dict(b=62))
@@ -705,7 +750,7 @@ def _source_line(df, kind) -> str:
     if df.attrs.get("point_source") == "open-meteo" and kind != "wind":
         src = "Open-Meteo marine (Copernicus/Meteo-France models)"
     d = df.attrs.get("distance_km")
-    return f"Source: {src}" + (f"; nearest model cell {d:.1f} km away" if d else "")
+    return _tr("Source: {src}", src=_tr(src)) + (_tr("; nearest model cell {d} km away", d=_num(f"{d:.1f}")) if d else "")
 
 
 def combined_chart(dfs: dict, every_hours: int | None = None, theme: str = "light", title: str | None = None,
@@ -716,14 +761,15 @@ def combined_chart(dfs: dict, every_hours: int | None = None, theme: str = "ligh
     kinds = [k for k in KINDS if k in dfs and dfs[k] is not None and len(dfs[k])]
     th = _THEMES[theme]
     fig = make_subplots(rows=len(kinds), cols=1, shared_xaxes=True, vertical_spacing=0.07,
-                        subplot_titles=[SPEC[k]["label"] for k in kinds])
+                        subplot_titles=[_tr(SPEC[k]["label"]) for k in kinds])
     for i, k in enumerate(kinds, start=1):
         _add_kind_traces(fig, dfs[k], k, every_hours, th, row=i, col=1, show_legend=False)
         fig.update_yaxes(title_text=f"{SPEC[k]['unit']}", row=i, col=1)
     d0 = dfs[kinds[0]]
-    where = f" at {d0.attrs['lat']:.2f} N, {d0.attrs['lon']:.2f} E" if "lat" in d0.attrs else ""
-    _layout(fig, th, title or f"Sea state{where}",
-            "Line = strength. Arrows point where it goes (up = north). Wave arrow length = period (long = swell).",
+    head = (_tr("Sea state at {la} N, {lo} E", la=_num(f"{d0.attrs['lat']:.2f}"), lo=_num(f"{d0.attrs['lon']:.2f}"))
+            if "lat" in d0.attrs else _tr("Sea state"))
+    _layout(fig, th, title or head,
+            _tr("Line = strength. Arrows point where it goes (up = north). Wave arrow length = period (long = swell)."),
             height)
     for a in fig.layout.annotations:
         if a.xref == "paper" and a.text:  # subplot titles only, not the arrows

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import html
 
+import numpy as np
+
 # ------------------------------------------------------------------------------------------ themes (direction B)
 # Two flat token sets. Dark is the default; light is the same design on light colours.
 THEMES = {
@@ -53,7 +55,8 @@ class _ThemedStatus(dict):
     """STATUS[k] -> (colour for the current theme, label). Same shape as the old constant."""
 
     def __getitem__(self, k):
-        return tokens()[k], STATUS_LABEL[k]
+        from viewer.i18n import t
+        return tokens()[k], t(STATUS_LABEL[k])
 
     def get(self, k, default=None):
         return self[k] if k in STATUS_LABEL else default
@@ -104,6 +107,45 @@ def plotly_layout(fig, height=None):
                      tickfont=dict(color=t["muted"]), title_font=dict(color=t["muted"]))
     if height:
         fig.update_layout(height=height)
+    ro_plotly(fig)
+    return fig
+
+
+def ro_plotly(fig):
+    """Romanian figures: decimal comma, and date ticks written by the viewer (plotly's own month and weekday names
+    are English). No-op in English."""
+    from viewer.i18n import dt, lang
+    if lang() != "ro":
+        return fig
+    import pandas as pd
+    fig.update_layout(separators=",.")
+    spans: dict = {}
+    for tr in fig.data:
+        x = getattr(tr, "x", None)
+        if x is None or not len(x):
+            continue
+        try:
+            xs = pd.to_datetime(pd.Series(list(x)), errors="coerce").dropna()
+        except Exception:
+            continue
+        if len(xs) < 2 or not (isinstance(x[0], (pd.Timestamp, np.datetime64)) or hasattr(x[0], "year")
+                               or (isinstance(x[0], str) and len(x[0]) >= 10 and x[0][4] == "-")):
+            continue
+        ax = "xaxis" + (str(tr.xaxis)[1:] if getattr(tr, "xaxis", None) not in (None, "x") else "")
+        lo, hi = spans.get(ax, (xs.min(), xs.max()))
+        spans[ax] = (min(lo, xs.min()), max(hi, xs.max()))
+    for ax, (lo, hi) in spans.items():
+        days = (hi - lo).days
+        for freq in ("D", "2D", "3D", "7D", "SMS", "MS", "2MS", "QS", "YS"):
+            ticks = pd.date_range(lo.normalize(), hi, freq=freq)
+            if len(ticks) <= 6:
+                break
+        if days > 365 * 3:
+            continue  # yearly axes are plain numbers already
+        axis = fig.layout[ax] if ax in fig.layout else None
+        fmt = (axis.tickformat if axis is not None and axis.tickformat else "%d %b").replace("<br>", " ")
+        fig.update_layout({ax: dict(tickmode="array", tickvals=list(ticks), ticktext=[dt(t, fmt) for t in ticks],
+                                    hoverformat="%d.%m.%Y")})  # numeric date in hover headers (no month names)
     return fig
 
 
@@ -136,6 +178,11 @@ header[data-testid="stHeader"] {{display:none !important;}}
 .block-container, [data-testid="stMainBlockContainer"] {{padding:0 !important; max-width:none !important;}}
 [data-testid="stElementContainer"]:has(> div > div > style), [data-testid="stElementContainer"]:has(style) {{display:none !important;}}
 [data-testid="stMainBlockContainer"] [data-testid="stVerticalBlock"]:has(> [data-testid="stHorizontalBlock"] [class*="st-key-bsv_map"]) {{gap:0;}}
+/* Streamlit pulls every markdown block up by 1rem (to cancel the last paragraph's margin). Our own row and section
+   blocks have no paragraph margin, so without this each row reserves 16 px less than it draws and the highlight of
+   one row spills onto the next. */
+[data-testid="stMarkdownContainer"]:has(> .bsv-vrow, > .bsv-row, > .bsv-site, > .bsv-sec, > .bsv-lbl, > .bsv-sites-head,
+  > .bsv-stats, > .bsv-det, > .bsv-det1, > .bsv-chain, > .bsv-mapnote) {{margin-bottom:0 !important;}}
 
 /* left icon rail (72 px) */
 section[data-testid="stSidebar"] {{width:72px !important; min-width:72px !important; max-width:72px !important;
@@ -169,13 +216,17 @@ section[data-testid="stSidebar"] div[style*="cursor: col-resize"], section[data-
 .st-key-theme_switch {{position:fixed; left:0; bottom:12px; width:72px; z-index:1000; display:flex; align-items:center;}}
 .st-key-theme_switch button {{width:56px; min-height:28px; height:28px; margin:0 8px; padding:0; border-radius:4px;
   border:1px solid {t['ctrl']} !important; background:transparent !important;}}
-.st-key-theme_switch button p {{font-size:10.5px !important; letter-spacing:1px; text-transform:uppercase; color:{t['sub']} !important;}}
+.st-key-theme_switch button p {{font-size:10.5px !important; letter-spacing:0.6px; white-space:nowrap; text-transform:uppercase; color:{t['sub']} !important;}}
+.st-key-lang_switch {{position:fixed; left:0; bottom:48px; width:72px; z-index:1000; display:flex; align-items:center;}}
+.st-key-lang_switch button {{width:56px; min-height:28px; height:28px; margin:0 8px; padding:0; border-radius:4px;
+  border:1px solid {t['ctrl']} !important; background:transparent !important;}}
+.st-key-lang_switch button p {{font-size:10.5px !important; letter-spacing:1px; text-transform:uppercase; color:{t['sub']} !important;}}
 .st-key-theme_switch .bsv-lbl {{display:block; text-align:center; width:72px; margin-bottom:4px;}}
 
 /* docked panel on the right */
 [data-testid="stHorizontalBlock"]:has(> div > .st-key-bsv_panel), [data-testid="stHorizontalBlock"]:has([class*="st-key-bsv_map"]) {{flex-wrap:nowrap !important;}}
 div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{min-width:0 !important;}}
-div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{min-width:280px; background:{t['panel']}; border-left:1px solid {t['line']};
+div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{background:{t['panel']}; border-left:1px solid {t['line']};
   height:100vh; overflow-y:auto; position:sticky; top:0;}}
 .st-key-bsv_panel {{padding:0 0 24px 0;}}
 .st-key-bsv_panel > div {{gap:0;}}
@@ -194,8 +245,11 @@ div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}
 [class*="st-key-bsv_map"] [data-testid="stElementContainer"] {{margin:0;}}
 .st-key-map_tools {{position:absolute; left:16px; top:16px; z-index:20; width:min(380px, calc(100% - 96px)); gap:8px;
   background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:10px;}}
-.st-key-map_msgs {{position:absolute; left:16px; bottom:16px; z-index:20; max-width:60%;}}
-.st-key-map_msgs p {{background:{t['overlay']}; padding:4px 8px; border:1px solid {t['ctrl']}; border-radius:4px; font-size:12px; color:{t['sub']} !important;}}
+/* map notes without a legend: short lines inside the map-tools box (most notes sit in the map legend) */
+.bsv-mapnote {{font-size:11.5px; line-height:1.35; color:{t['sub']};}}
+.bsv-mapnote > div + div {{margin-top:3px;}}
+.st-key-map_tools_note {{position:absolute; left:16px; top:66px; z-index:20; max-width:min(420px, calc(100% - 96px));
+  background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:6px 10px;}}
 .st-key-page_body {{padding:24px 28px 40px 28px;}}
 /* Overview panel (B1) */
 .st-key-ptabs {{border-bottom:1px solid {t['line']}; padding:0 8px;}}
@@ -253,7 +307,7 @@ div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{position:relative;}
 .st-key-panel_foot .bsv-note {{font-size:11.5px;}}
 /* Water quality (B2) */
 [data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) {{flex-wrap:nowrap !important;}}
-div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:300px; background:{t['panel']};
+div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{background:{t['panel']};
   border-right:1px solid {t['line']}; height:100vh; overflow-y:auto; position:sticky; top:0;}}
 .st-key-bsv_aside {{gap:0 !important; padding-bottom:24px;}}
 [class*="st-key-vrow_"] {{position:relative; gap:0 !important;}}
@@ -305,6 +359,8 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .bsv-table td.n {{font-family:{FONT_NUM}; font-size:15px; white-space:nowrap;}}
 .bsv-chain {{margin:4px 0 0 18px; padding:0; font-size:13.5px; line-height:1.5; color:{t['soft']};}}
 .bsv-chain li {{margin:4px 0;}}
+.bsv-list {{margin:2px 0 6px 18px; padding:0; font-size:13px; line-height:1.5; color:{t['soft']};}}
+.bsv-list li {{margin:3px 0;}}
 .st-key-page_body [data-testid="stExpander"] summary {{padding:12px 0 !important;}}
 .st-key-page_body [data-testid="stExpanderDetails"] {{padding:4px 0 14px 0 !important;}}
 .st-key-page_body [data-testid="stExpander"] details {{border-top:0 !important;}}
@@ -315,7 +371,6 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .st-key-map_tools [data-testid="stButtonGroup"] button {{flex:1 1 0; height:38px; padding:0 8px !important;}}
 .st-key-map_tools [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
 .st-key-depthpanel {{background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px 6px 16px; gap:0 !important;}}
-.st-key-bsv_map_po .st-key-map_msgs, .st-key-bsv_map_pc .st-key-map_msgs {{bottom:auto; top:120px;}}
 .st-key-dp_head {{height:56px; gap:16px !important; flex-wrap:nowrap !important;}}
 .st-key-dp_head [data-testid="stMarkdownContainer"] {{display:flex; gap:16px; align-items:baseline;}}
 .bsv-dp-t {{font-size:14px; font-weight:500; color:{t['text']}; white-space:nowrap;}}
@@ -331,6 +386,11 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
   border-right:1px solid {t['ctrl']} !important;}}
 .st-key-map_tools_wide [data-testid="stButtonGroup"] button:last-child {{border-right:0 !important;}}
 .st-key-map_tools_wide [data-testid="stButtonGroup"] button[kind*="Active"] {{box-shadow:inset 0 -2px 0 {t['accent']} !important;}}
+.st-key-edges_ctl {{background:{t['overlay']}; border:1px solid {t['ctrl']}; border-radius:4px; padding:0 0 0 12px;
+  width:auto !important; flex:0 0 auto !important; gap:10px !important;}}
+.st-key-map_tools_wide div:has(> .st-key-edges_ctl) {{flex:0 0 auto !important; width:auto !important; min-width:0 !important;}}
+.st-key-edges_ctl [data-testid="stButtonGroup"] {{background:transparent !important; border:0 !important;}}
+.st-key-edges_ctl [data-testid="stButtonGroup"] button:first-child {{border-left:1px solid {t['ctrl']} !important;}}
 .bsv-stats.bsv-stats3 {{grid-template-columns:repeat(3, minmax(0,1fr)); margin:0; border-top:0;}}
 .bsv-stats3 .bsv-stat:first-child {{padding-left:22px;}}
 .bsv-stats3 .bsv-stat .v {{font-size:28px;}}
@@ -349,7 +409,7 @@ div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{min-width:230px; max-width:
 .bsv-det1 {{display:flex; flex-direction:column; gap:6px; font-size:12.5px; line-height:1.45; color:{t['soft']};}}
 .bsv-det1 .bsv-lbl {{font-size:10.5px; margin-right:4px;}}
 /* bottom timeline */
-.st-key-timeline {{height:64px; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
+.st-key-timeline {{height:64px !important; min-height:64px; flex:0 0 64px !important; background:{t['bg']}; border-top:1px solid {t['line']}; padding:0 16px; gap:16px !important;
   flex-wrap:nowrap !important;}}
 .st-key-tl_track {{flex:1 1 auto; min-width:0; gap:0 !important; position:relative;}}
 .st-key-tl_track [data-testid="stSlider"] {{padding:0 6px; margin-top:-6px;}}
@@ -471,12 +531,46 @@ button p {{color:inherit;}}
 .bsv-card .src {{color:{t['muted']}; font-size:11.5px; margin-top:6px; border-top:1px solid {t['line2']}; padding-top:4px;}}
 .bsv-card summary {{cursor:pointer;}}
 .stApp table {{color:{t['text']};}}
+/* resizable panel and list (handles and script in shell.RESIZE_JS). The script sets --bsv-pw / --bsv-aw on <html>
+   while dragging and keeps them for the browser session; the clamp keeps 280 px to half the width. */
+:root {{--bsv-pw0:max(300px, calc((100vw - 72px) * 0.30)); --bsv-aw0:260px;
+  --bsv-pwe:clamp(280px, var(--bsv-pw, var(--bsv-pw0)), calc((100vw - 72px) * 0.5));
+  --bsv-awe:clamp(200px, var(--bsv-aw, var(--bsv-aw0)), calc((100vw - 72px) * 0.4));}}
+#bsv-ph, #bsv-ah, #bsv-pt, #bsv-shield {{display:none;}}
+@media (min-width: 900px) {{
+  div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{flex:0 0 var(--bsv-pwe) !important; width:var(--bsv-pwe) !important;
+    min-width:0 !important; max-width:none !important;}}
+  div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{flex:1 1 0 !important; width:auto !important; min-width:0 !important;}}
+  div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{flex:0 0 var(--bsv-awe) !important; width:var(--bsv-awe) !important;
+    min-width:0 !important; max-width:none !important;}}
+  [data-testid="stHorizontalBlock"]:has(.st-key-bsv_aside) > div[data-testid="stColumn"]:not(:has(.st-key-bsv_aside)) {{
+    flex:1 1 0 !important; width:auto !important; min-width:0 !important;}}
+  html.bsv-pc div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{display:none !important;}}
+  body:has(.st-key-bsv_panel) > #bsv-ph {{display:block; right:calc(var(--bsv-pwe) - 4px);}}
+  body:has(.st-key-bsv_aside) > #bsv-ah {{display:block; left:calc(72px + var(--bsv-awe) - 4px);}}
+  body:has(.st-key-bsv_panel) > #bsv-pt {{display:flex; right:calc(var(--bsv-pwe) - 1px);}}
+  html.bsv-pc body > #bsv-ph {{display:none;}}
+  html.bsv-pc body:has(.st-key-bsv_panel) > #bsv-pt {{right:0;}}
+}}
+#bsv-ph, #bsv-ah {{position:fixed; top:0; bottom:0; width:8px; z-index:999990; cursor:col-resize; touch-action:none;
+  background:transparent;}}
+#bsv-ph::after, #bsv-ah::after {{content:""; position:absolute; left:3px; top:0; bottom:0; width:2px; background:transparent;
+  transition:background 0.12s;}}
+#bsv-ph:hover::after, #bsv-ah:hover::after, #bsv-ph:focus-visible::after, #bsv-ah:focus-visible::after,
+html.bsv-drag #bsv-ph::after, html.bsv-drag #bsv-ah::after {{background:{t['accent']};}}
+#bsv-ph:focus, #bsv-ah:focus {{outline:none;}}
+#bsv-pt {{position:fixed; top:188px; width:18px; height:56px; z-index:999991; padding:0; margin:0;
+  align-items:center; justify-content:center; cursor:pointer; background:{t['panel']}; color:{t['muted']};
+  border:1px solid {t['line']}; border-right:0; border-radius:4px 0 0 4px;}}
+#bsv-pt:hover, #bsv-pt:focus-visible {{color:{t['text']}; border-color:{t['accent']}; outline:none;}}
+#bsv-pt .op {{display:none;}} html.bsv-pc #bsv-pt .op {{display:block;}} html.bsv-pc #bsv-pt .cl {{display:none;}}
+html.bsv-drag #bsv-shield {{display:block; position:fixed; inset:0; z-index:999989; cursor:col-resize;}}
+html.bsv-drag, html.bsv-drag * {{user-select:none !important;}}
+html.bsv-drag iframe {{pointer-events:none !important;}}
+.st-key-bsv_js {{display:none !important;}}
 /* responsive: 900-1199 px a narrower docked panel; below 900 px the map on top, the panel below, full width */
 @media (max-width: 1199px) {{
-  div[data-testid="stColumn"]:has(.st-key-bsv_panel) {{flex:0 0 330px !important; width:330px !important;
-    min-width:330px !important; max-width:330px !important;}}
-  div[data-testid="stColumn"]:has([class*="st-key-bsv_map"]) {{flex:1 1 auto !important; width:auto !important;}}
-  div[data-testid="stColumn"]:has(.st-key-bsv_aside) {{flex:0 0 240px !important; width:240px !important; min-width:240px !important;}}
+  :root {{--bsv-pw0:330px; --bsv-aw0:240px;}}
   .st-key-page_body:has(.bsv-whead) {{padding:20px 24px 40px 24px;}}
   .bsv-stat .v {{font-size:28px;}}
   .bsv-sites-head .cols, .bsv-site .cols {{grid-template-columns:repeat(4, 36px);}}
@@ -551,17 +645,46 @@ ORIGIN = _ThemedOrigin({
     "model": OI["orange"], "reanalysis": OI["vermillion"],
     "climatology": OI["grey"], "derived": OI["purple"],
 })
-ORIGIN_LABEL = {"in-situ": "measured", "measured": "measured", "satellite": "satellite", "model": "model",
-                "reanalysis": "model (reanalysis)", "derived": "derived", "climatology": "reference"}
+class _Translated(dict):
+    """A label dict whose values come back in the viewer language (viewer.i18n.t)."""
+
+    def __getitem__(self, k):
+        from viewer.i18n import t
+        return t(dict.__getitem__(self, k))
+
+    def get(self, k, default=None):
+        return self[k] if k in self else default
+
+
+ORIGIN_LABEL = _Translated({"in-situ": "measured", "measured": "measured", "satellite": "satellite", "model": "model",
+                            "reanalysis": "model (reanalysis)", "derived": "derived", "climatology": "reference"})
 
 # the sector colours already used in data/zones (pressure_zones.py), kept identical
-SECTOR = {
+class _SectorDict(dict):
+    """SECTOR[k] -> (label in the viewer language, colour)."""
+
+    def __getitem__(self, k):
+        from viewer.i18n import t
+        lab, col = dict.__getitem__(self, k)
+        return t(lab), col
+
+    def get(self, k, default=None):
+        return self[k] if k in self else default
+
+    def items(self):
+        return [(k, self[k]) for k in self.keys()]
+
+    def values(self):
+        return [self[k] for k in self.keys()]
+
+
+SECTOR = _SectorDict({
     "ports": ("Ports and logistics", "#0072B2"),
     "shipyards": ("Shipyards and marine engineering", "#D55E00"),
     "tourism": ("Coastal and marine tourism", "#E69F00"),
     "fishing": ("Fishing", "#009E73"),
     "aquaculture": ("Aquaculture", "#CC79A7"),
-}
+})
 
 # overlap count 1..5: read from data/zones/overlap_style.json (shared with the QGIS project), with this fallback
 _OVERLAP_FALLBACK = [(1, "#FDE0B2", 0.45), (2, "#F4A259", 0.70), (3, "#D55E00", 0.85), (4, "#8C2D04", 0.90),
@@ -589,22 +712,30 @@ OVERLAP = {k: v[0] for k, v in overlap_levels().items()}
 CSS = css("dark")  # kept for older imports; app.py injects css(theme_name()) instead
 
 
-def table_html(df, height: int | None = None) -> str:
-    """A DataFrame as a flat themed HTML table (st.dataframe draws on a canvas and ignores the light theme)."""
+def table_html(df, height: int | None = None, translate: bool = False, keep: tuple = ()) -> str:
+    """A DataFrame as a flat themed HTML table (st.dataframe draws on a canvas and ignores the light theme).
+    Dates and decimal numbers follow the viewer language; translate=True also translates the column names (viewer
+    dictionary) and the text cells (text produced by marinekit or the docs)."""
     import pandas as pd
-    head = "".join(f"<th>{esc(c)}</th>" for c in df.columns)
+    from viewer.i18n import data, dt, num, t
+    head = "".join(f"<th>{esc(t(str(c)) if translate else c)}</th>" for c in df.columns)
     rows = []
+    keep_i = {i for i, c in enumerate(df.columns) if c in keep}  # columns of codes and names, never translated
     for _, r in df.iterrows():
         cells = []
-        for v in r.values:
+        for i, v in enumerate(r.values):
             if v is None or (isinstance(v, float) and pd.isna(v)):
                 v = ""
             elif isinstance(v, pd.Timestamp):
-                v = v.strftime("%d %b %Y")
+                v = dt(v, "%d %b %Y")
+            elif isinstance(v, (bool, np.bool_)):
+                v = t("yes") if v else t("no")
             elif isinstance(v, float):
-                v = f"{v:.4g}"
+                v = num(f"{v:.4g}")
             elif isinstance(v, (list, tuple)):
                 v = ", ".join(map(str, v))
+            elif isinstance(v, str) and translate and i not in keep_i:
+                v = data(v)
             cells.append(f"<td>{esc(v)}</td>")
         rows.append("<tr>" + "".join(cells) + "</tr>")
     box = f"max-height:{height}px;overflow:auto" if height else "overflow-x:auto"

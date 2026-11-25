@@ -8,6 +8,7 @@ import streamlit as st
 from viewer import adapters as A
 from viewer import panels as PN
 from viewer import profiles as P
+from viewer.i18n import data, data_soft, dt, lang, num, t
 from viewer.style import ORIGIN_LABEL, STATUS, STATUS_LABEL, esc, status_square
 
 # tab label -> role key
@@ -46,12 +47,14 @@ def profile_tabs():
     role = ss.profile.get("role", "public")
     ss["w_ptab"] = role  # follow the profile (it can also change from the questionnaire or the other pages)
     with st.container(key="ptabs"):
-        st.segmented_control("Viewing as", list(TABS), key="w_ptab", format_func=TABS.get, on_change=_on_tab, required=True,
+        st.segmented_control(t("Viewing as"), list(TABS), key="w_ptab", format_func=lambda k: t(TABS[k]),
+                             on_change=_on_tab, required=True,
                              label_visibility="collapsed", width="stretch")
     if role == "stakeholder":
         ss["w_psector"] = ss.profile.get("sector") or "ports"
         with st.container(key="bsv_pad"):
-            st.selectbox("Sector", list(P.SECTORS), key="w_psector", format_func=P.SECTORS.get, on_change=_on_sector)
+            st.selectbox(t("Sector"), list(P.SECTORS), key="w_psector", format_func=lambda k: t(P.SECTORS[k]),
+                         on_change=_on_sector)
 
 
 # ------------------------------------------------------------------------------------------ verdict and counts
@@ -61,7 +64,7 @@ def _counts(cards) -> dict:
 
 
 def _names(cards, status) -> list[str]:
-    return [c.get("title", "") for c in cards if c.get("status") == status]
+    return [data(c.get("title", "")) for c in cards if c.get("status") == status]
 
 
 def verdict(cards, profile, season, n_sectors: int, secs: str, day: str) -> tuple[str, str]:
@@ -71,36 +74,41 @@ def verdict(cards, profile, season, n_sectors: int, secs: str, day: str) -> tupl
     with_data = len(cards) - n["no_data"]
     when = pd.Timestamp(day)
     part = "early" if when.day <= 10 else ("mid" if when.day <= 20 else "late")
-    season_txt = f"{part} {when:%B}"
+    season_txt = t(f"{part} {{month}}", month=dt(when, "%B"))
     watch, alert = _names(cards, "watch"), _names(cards, "alert")
-    flagged = ", ".join(t.lower() for t in alert + watch)
+    flagged = ", ".join(x.lower() for x in alert + watch)
     if role == "student":
-        head = f"{n['normal']} of {with_data} health signs are normal for {season_txt}."
-        sub = ("Amber means outside the usual seasonal range or close to a limit; red means clearly unusual. "
-               "Each row says how the value is measured.")
+        head = t("{n} of {m} health signs are normal for {when}.", n=n['normal'], m=with_data, when=season_txt)
+        sub = t("Amber means outside the usual seasonal range or close to a limit; red means clearly unusual. "
+                "Each row says how the value is measured.")
     elif role == "stakeholder":
-        sector = P.SECTORS.get(profile.get("sector"), "your sector").lower()
-        head = (f"{n_sectors} of 5 sectors share this water: {secs.replace(',', ', ')}." if n_sectors
-                else "This point is outside the five sectors' pressure zones.")
+        sector = (t(P.SECTORS[profile["sector"]]) if profile.get("sector") in P.SECTORS else t("your sector")).lower()
+        sec_names = (secs.replace(",", ", ") if lang() == "en" else
+                     ", ".join(t(x.strip()) for x in secs.split(",") if x.strip()))
+        head = (t("{n} of 5 sectors share this water: {secs}.", n=n_sectors, secs=sec_names) if n_sectors
+                else t("This point is outside the five sectors' pressure zones."))
         k = n["alert"] + n["watch"]
-        sub = (f"{k} sign{'s' if k != 1 else ''} to check before planning {sector} work: {flagged}." if k
-               else f"Nothing flagged for {sector} work here today.")
+        sub = ((t("{k} sign to check before planning {sector} work: {flagged}.", k=k, sector=sector, flagged=flagged)
+                if k == 1 else
+                t("{k} signs to check before planning {sector} work: {flagged}.", k=k, sector=sector, flagged=flagged))
+               if k else t("Nothing flagged for {sector} work here today.", sector=sector))
     elif role == "researcher":
-        head = (f"{len(cards)} cards: {n['normal']} normal, {n['watch']} watch, {n['alert']} alert"
-                + (f", {n['no_data']} no data." if n["no_data"] else "."))
-        sub = ("Natural-vs-pressure rule chain applied. Coastal buoys EUXRoCB0x and station 15480 excluded (no QC). "
-               "Model nitrate and phosphate not used.")
+        head = (t("{c} cards: {a} normal, {b} watch, {d} alert", c=len(cards), a=n['normal'], b=n['watch'], d=n['alert'])
+                + (t(", {e} no data.", e=n["no_data"]) if n["no_data"] else "."))
+        sub = t("Natural-vs-pressure rule chain applied. Coastal buoys EUXRoCB0x and station 15480 excluded (no QC). "
+                "Model nitrate and phosphate not used.")
     else:
         if n["alert"]:
-            head = f"Something is unusual here today: {', '.join(t.lower() for t in alert)}."
+            head = t("Something is unusual here today: {what}.", what=", ".join(x.lower() for x in alert))
         elif n["watch"]:
             k = n["watch"]
-            head = f"Mostly normal today. {'One thing' if k == 1 else f'{k} things'} to keep an eye on."
+            head = (t("Mostly normal today. One thing to keep an eye on.") if k == 1 else
+                    t("Mostly normal today. {k} things to keep an eye on.", k=k))
         else:
-            head = "Everything we track looks normal for the season."
-        sub = (f"To watch: {flagged}. Not an alarm." if (n["watch"] and not n["alert"])
-               else ("Scientists would check these first." if n["alert"] else
-                     f"Compared with the usual values for {season_txt}."))
+            head = t("Everything we track looks normal for the season.")
+        sub = (t("To watch: {flagged}. Not an alarm.", flagged=flagged) if (n["watch"] and not n["alert"])
+               else (t("Scientists would check these first.") if n["alert"] else
+                     t("Compared with the usual values for {when}.", when=season_txt)))
     return head, sub
 
 
@@ -111,32 +119,32 @@ def counts_html(cards) -> str:
         if k == "no_data" and not n[k]:
             continue
         dim = " bsv-dim" if not n[k] else ""
-        bits.append(f"<span class='bsv-count{dim}'>{status_square(k)}{n[k]} {STATUS_LABEL[k].lower()}</span>")
+        bits.append(f"<span class='bsv-count{dim}'>{status_square(k)}{n[k]} {esc(t(STATUS_LABEL[k]).lower())}</span>")
     return f"<div class='bsv-counts'>{''.join(bits)}</div>"
 
 
 # ------------------------------------------------------------------------------------------ card rows
 def _origin(c) -> str:
     ev = (c.get("evidence") or "").lower()
-    return ORIGIN_LABEL.get("in-situ" if ev == "measured" else ev, ev or "")
+    return t(ORIGIN_LABEL.get("in-situ" if ev == "measured" else ev, ev or ""))
 
 
 def _value(c) -> str:
     v = c.get("value")
     if v is None:
         return "-"
-    return PN._num(v, c.get("unit") or "")
+    return num(PN._num(v, c.get("unit") or ""))
 
 
 def _means(c, lvl) -> str:
-    why = c.get("why") or ""
+    why = data(c.get("why") or "")
     if lvl == "public":
         return why
     ref = c.get("reference")
     extra = ""
     if isinstance(ref, dict) and ref.get("threshold") and lvl != "public":
         tt = ref.get("threshold_type")
-        extra = f" Threshold: {ref['threshold']}" + (f" ({tt})." if tt else ".")
+        extra = " " + t("Threshold: {x}", x=data(ref["threshold"])) + (f" ({tt})." if tt else ".")
     return why + extra
 
 
@@ -145,18 +153,18 @@ def _source(c, detail) -> str:
     for s in c.get("sources") or []:
         if s.get("dataset") == "zone sampling":
             continue
-        name = (s.get("dataset") if detail else (s.get("label") or s.get("dataset"))) or ""
+        name = (data_soft(s.get("dataset")) if detail else data(s.get("label") or s.get("dataset"))) or ""
         if not name or name in seen:
             continue
         seen.add(name)
         b = name
         if s.get("date"):
-            b += f", {s['date']}"
+            b += f", {PN.day_txt(s['date'])}"
         if s.get("distance_km") not in (None, ""):
-            b += f", {s['distance_km']} km away"
+            b += ", " + t("{d} km away", d=num(str(s["distance_km"])))
         out.append(b)
     if detail and c.get("confidence"):
-        out.append(f"confidence {c['confidence']}")
+        out.append(t("confidence {c}", c=t(c["confidence"])))
     return "; ".join(out[: (4 if detail else 2)])
 
 
@@ -180,28 +188,30 @@ def card_rows(cards, profile):
         cid = c.get("id") or c.get("title")
         is_open = ss.get("open_card") == cid
         txt = c.get("text") if isinstance(c.get("text"), dict) else {}
-        line = txt.get(lvl) or c.get("why") or ""
+        line = data(txt.get(lvl) or c.get("why") or "")
         col = STATUS.get(c.get("status") or "no_data", STATUS["no_data"])[0]
         with st.container(key=f"crow_{cid}"):
             st.markdown(
                 f"<div class='bsv-row{' open' if is_open else ''}'>"
                 f"<span class='bsv-sq' style='width:8px;height:8px;background:{col}'></span>"
-                f"<span class='bsv-rt'>{esc(c.get('title'))}</span>"
+                f"<span class='bsv-rt'>{esc(data(c.get('title')))}</span>"
                 f"<span class='bsv-rv'>{esc(_value(c))}</span>"
                 f"<span class='bsv-chev'>{_CHEV_OPEN if is_open else _CHEV}</span>"
                 f"<span></span><span class='bsv-rl'>{esc(line)}</span>"
                 f"<span class='bsv-ro'>{esc(_origin(c))}</span><span></span></div>", unsafe_allow_html=True)
-            st.button(f"{'Close' if is_open else 'Open'} details: {c.get('title')}", key=f"cbtn_{cid}",
+            st.button(t("Close details: {x}" if is_open else "Open details: {x}", x=data(c.get("title"))),
+                      key=f"cbtn_{cid}",
                       on_click=_toggle, args=(cid,))
         if is_open:
             with st.container(key=f"cdet_{cid}"):
                 st.markdown(
                     "<div class='bsv-det'>"
-                    f"<span class='bsv-lbl'>Means</span><span>{esc(_means(c, lvl))}</span>"
-                    f"<span class='bsv-lbl'>Source</span><span>{esc(_source(c, detail) or 'not given')}</span></div>",
+                    f"<span class='bsv-lbl'>{esc(t('Means'))}</span><span>{esc(_means(c, lvl))}</span>"
+                    f"<span class='bsv-lbl'>{esc(t('Source'))}</span><span>{esc(_source(c, detail) or t('not given'))}"
+                    "</span></div>",
                     unsafe_allow_html=True)
                 if cid in CARD_VAR:
-                    st.button("Open the chart in Water quality", key=f"cchart_{cid}", on_click=_to_chart,
+                    st.button(t("Open the chart in Water quality"), key=f"cchart_{cid}", on_click=_to_chart,
                               args=(cid,))
 
 
@@ -222,18 +232,20 @@ def timeline():
     labels = []
     for i, d in enumerate(days):
         if d == today:
-            labels.append(f"<span class='today'><b class='lg'>{d:%d %b} today</b><b class='sh'>Today</b></span>")
+            labels.append(f"<span class='today'><b class='lg'>{esc(t('{d} today', d=dt(d, '%d %b')))}</b>"
+                          f"<b class='sh'>{esc(t('Today'))}</b></span>")
         elif i == 0:
-            labels.append(f"<span><b class='lg'>{d:%d %b}</b><b class='sh'>{d:%d %b}</b></span>")
+            labels.append(f"<span><b class='lg'>{esc(dt(d, '%d %b'))}</b><b class='sh'>{esc(dt(d, '%d %b'))}</b></span>")
         elif i == len(days) - 1:
-            labels.append(f"<span class='fc'><b class='lg'>{d.day} forecast</b><b class='sh'>{d:%d %b}</b></span>")
+            labels.append(f"<span class='fc'><b class='lg'>{esc(t('{d} forecast', d=d.day))}</b>"
+                          f"<b class='sh'>{esc(dt(d, '%d %b'))}</b></span>")
         else:
             labels.append(f"<span class='mid{' fc' if d > today else ''}'>{d.day}</span>")
     fc_left = 100 * (days.index(today)) / (len(days) - 1)
     with st.container(key="timeline", horizontal=True, vertical_alignment="center"):
         with st.container(key="tl_track"):
-            st.select_slider("Date", options=days, key="w_day", label_visibility="collapsed",
-                             format_func=lambda d: f"{d:%d %b %Y}" + (" (today)" if d == today else
-                                                                      (" (forecast)" if d > today else "")))
+            st.select_slider(t("Date"), options=days, key="w_day", label_visibility="collapsed",
+                             format_func=lambda d: dt(d, "%d %b %Y") + (t(" (today)") if d == today else
+                                                                        (t(" (forecast)") if d > today else "")))
             st.markdown(f"<div class='bsv-tl-labels' style='--fc:{fc_left:.1f}%'>{''.join(labels)}</div>",
                         unsafe_allow_html=True)
